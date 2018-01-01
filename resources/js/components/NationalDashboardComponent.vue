@@ -6,9 +6,9 @@
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-3">
+			<div class="col-md-4">
 				<div class="row">
-					<div class="col-md-6">
+					<div class="col-md-12">
 						<div class="card">
 							<div class="card-body">
 								<div class="row align-items-center">
@@ -31,9 +31,6 @@
 
 							</div>
 						</div>
-					</div>
-
-					<div class="col-md-6">
 						<div class="card">
 							<div class="card-body">
 								<div class="row align-items-center">
@@ -74,9 +71,31 @@
 
 					</div>
 				</div>
+
+				<div class="card">
+					<div class="card-body" style="height: 600px;overflow-x: scroll;">
+						<div class="row align-items-center">
+							<div class="col">
+								<table class="table table-bordered">
+									<thead>
+										<th>County</th>
+										<th>Facilities</th>
+									</thead>
+									<tbody>
+										<tr v-for="(value, key) in countyData">
+											<td>{{ value[1] }}</td>
+											<td><a class="btn btn-link" :href="'/dashboard/county/breakdown/' + value[1]">{{ value[2] }}</a></td>
+										</tr>
+									</tbody>
+									
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
-			<div class="col">
-				<div class="row">		
+			<div class="col-md">
+				<!-- <div class="row">		
 					<div class="col-md-6">
 						<div class="card">
 							<div class="card-header">
@@ -106,6 +125,37 @@
 							</div>
 						</div>
 					</div>
+				</div> -->
+				<div class="row">		
+					<div class="col-md-6">
+						<div class="card">
+							<div class="card-header">
+								<h5 class="card-header-title">
+								PNEUMONIA CLASSIFICATION
+								<span class="badge badge-soft-warning mt-n1 float-right" style="flex: 0"><span v-if="variance.classification.pneumonia > 0">+</span>{{ variance.classification.pneumonia }}%</span>
+								</h5>
+							</div>
+							<div class="card-body">
+								<loading :active.sync="classificationLoading" :color="loaderColor" :can-cancel="false" :is-full-page="false"></loading>
+								<highcharts :options="pneumoniaClassificationOptionsNew" style="height: 50vh;"></highcharts>
+							</div>
+						</div>
+						
+					</div>
+					<div class="col-md-6">
+						<div class="card">
+							<div class="card-header">
+								<h5 class="card-header-title">
+								PNEUMONIA TREATMENT
+								<span class="badge badge-soft-warning mt-n1 float-right" style="flex: 0">+0%</span>
+								</h5>
+							</div>
+							<div class="card-body">
+								<loading :active.sync="pneumoniaTreatmentLoading" :color="loaderColor" :can-cancel="false" :is-full-page="false"></loading>
+								<highcharts :options="pneumoniaTreatmentOptionsNew" style="height: 50vh;"></highcharts>
+							</div>
+						</div>
+					</div>
 				</div>
 				<div class="row" style="margin-bottom: 10px;">
 					<div class="col-md-6">
@@ -119,7 +169,7 @@
 							</div>
 							<div class="card-body">
 								<loading :active.sync="classificationLoading" :color="loaderColor" :can-cancel="false" :is-full-page="false"></loading>
-								<highcharts :options="diarrhoeaClassificationOptions" style = "height: 50vh;"></highcharts>	
+								<highcharts :options="diarrhoeaClassificationOptionsNew" style = "height: 50vh;"></highcharts>	
 							</div>
 						</div>
 					</div>
@@ -133,7 +183,7 @@
 							</div>
 							<div class="card-body">
 								<loading :active.sync="diarrhoeaTreatmentLoading" :color="loaderColor" :can-cancel="false" :is-full-page="false"></loading>
-								<highcharts :options="diarrhoeaTreatmentOptions" style = "height: 50vh;"></highcharts>
+								<highcharts :options="diarrhoeaTreatmentOptionsNew" style = "height: 50vh;"></highcharts>
 							</div>
 							
 						</div>
@@ -157,6 +207,9 @@ import json from '../../../public/counties.json'
 	export default {
 		data() {
 			return {
+				data: {
+					all: {}
+				},
 				mapLoading: false,
 				classificationLoading: false,
 				diarrhoeaTreatmentLoading: false,
@@ -211,28 +264,29 @@ import json from '../../../public/counties.json'
 			}
 		},
 		mounted() {
-			this.classificationLoading = true;
+			this.getComputedData();
+			// this.classificationLoading = true;
 			axios.get('/api/data/classification')
 			.then((response) => {
-				this.classificationLoading = false;
+				// this.classificationLoading = false;
 				var data = response.data;
 				this.classificationData.pneumonia_class = (data.pneumonia.total_cases / (data.pneumonia.total_cases + data.pneumonia.no_class)) * 100;
 				this.classificationData.diarrhoea_class = (data.diarrhoea.total_cases / (data.diarrhoea.total_cases + data.diarrhoea.no_class)) * 100;
 			});
 
-			this.pneumoniaTreatmentLoading = true;
+			// this.pneumoniaTreatmentLoading = true;
 			axios.get('/api/data/treatments/pneumonia')
 			.then((response) => {
-				console.log(response)
+				// console.log(response)
 				var data = response.data;
 				this.treatmentData.pneumonia = data;
-				this.pneumoniaTreatmentLoading = false;
+				// this.pneumoniaTreatmentLoading = false;
 			});
 
-			this.diarrhoeaTreatmentLoading = true
+			// this.diarrhoeaTreatmentLoading = true
 			axios.get('/api/data/treatments/diarrhoea')
 			.then((response) => {
-				this.diarrhoeaTreatmentLoading = false
+				// this.diarrhoeaTreatmentLoading = false
 				var data = response.data;
 				this.treatmentData.diarrhoea = data;
 			});
@@ -276,6 +330,20 @@ import json from '../../../public/counties.json'
 				var data = response.data
 				this.countyData = _.map(data, (county) => ([ county.cto_id, _.toUpper(county.county), county.facilities.length ]))
 			});
+		},
+		methods: {
+			getComputedData(){
+				this.classificationLoading = true;
+				this.pneumoniaTreatmentLoading = true;
+				this.diarrhoeaTreatmentLoading = true;
+				axios.get('/api/data/national')
+				.then(response => {
+					this.classificationLoading = false;
+					this.pneumoniaTreatmentLoading = false;
+					this.diarrhoeaTreatmentLoading = false;
+					this.data.all = response.data
+				})
+			}
 		},
 		computed: {
 			mapData: function(){
@@ -356,6 +424,57 @@ import json from '../../../public/counties.json'
 				// console.log(assessmentArray)
 				return assessmentArray;
 			},
+			pneumoniaClassificationOptionsNew: function(){
+				var em = this
+				var categories = _.map(this.data.all.pneumonia, (object, key)=>{
+					return key
+				})
+
+				categories.sort()
+
+				var chartData = [];
+
+				_.each(categories, (category) => {
+					var data = this.data.all.pneumonia[category];
+					var total_cases_after_dif = _.sumBy(data, 'total_cases_after_dif')
+					var total_classified = _.sumBy(data, 'total_classified')
+					chartData.push(_.round((total_classified / total_cases_after_dif) * 100))
+				})
+				return {
+					title: null,
+					chart: {
+						type: 'column'
+					},
+					xAxis: {
+						categories: categories
+					},
+					yAxis: [{
+						gridLineWidth: 0,
+						minorGridLineWidth: 0,
+						labels:
+						{
+							enabled: false
+						},
+						title: {
+							text: null
+						}
+					}],
+					plotOptions: {
+						column: {
+							dataLabels: {
+								enabled: true,
+								format: "{point.y}%"
+							}
+						}
+					},
+					series: [{
+						showInLegend: false,
+						name: 'Classifications',
+						color: em.pneumoniaColor,
+						data: chartData // sample data
+					}]
+				}
+			},
 			pneumoniaClassificationOptions: function(){
 				var em = this;
 				return {
@@ -428,6 +547,141 @@ import json from '../../../public/counties.json'
 											color: em.diarrhoeaColor,
 											data: [em.diarrhoeaClassificationBaseline,_.round(this.classificationData.diarrhoea_class)] // sample data
 										}]}
+			},
+			diarrhoeaClassificationOptionsNew: function(){
+				var em = this;
+				var chartData = [];
+
+				var categories = _.map(this.data.all.diarrhoea, (object, key)=>{
+					return key
+				})
+
+				categories.sort()
+
+				_.each(categories, (category) => {
+					var data = this.data.all.diarrhoea[category];
+					var total_cases_after_dif = _.sumBy(data, 'TOTAL_CASES_AFTER_DIFF')
+					var total_classified = _.sumBy(data, 'classified')
+					chartData.push(_.round((total_classified / total_cases_after_dif) * 100))
+				})
+
+				return {
+					title: null,
+					chart: {
+						type: 'column'
+					},
+					xAxis: {
+						categories: categories
+					},
+					yAxis: [{
+						gridLineWidth: 0,
+						minorGridLineWidth: 0,
+						labels:
+						{
+							enabled: false
+						},
+						title: {
+							text: null
+						}					
+					}],
+					plotOptions: {
+						column: {
+							dataLabels: {
+								enabled: true,
+								format: "{point.y}%"
+							}
+						}
+					},
+					series: [{
+						showInLegend: false,
+						name: 'Classifications',
+						color: em.diarrhoeaColor,
+						data: chartData // sample data
+					}]
+				}
+			},
+			pneumoniaTreatmentOptionsNew: function(){
+				var _this = this;
+
+				var categories = _.map(this.data.all.pneumonia, (object, key)=>{
+					return key
+				})
+
+				categories.sort()
+
+				var pneumoniaTreatmentKeys = _.map(this.pneumoniaTreatmentLabels, (object, key) => {
+					return key
+				})
+
+				var seriesData = [];
+				var preevaluatedData = {};
+
+				_.each(categories, (category) => {
+					var data = this.data.all.pneumonia[category]
+					var specificData = [];
+					_.each(pneumoniaTreatmentKeys, (k) => {
+						specificData[k] = _.sumBy(data, k)
+					})
+
+					preevaluatedData[category] = specificData
+				});
+
+				_.each(this.pneumoniaTreatmentLabels, (label, key) => {
+					var obj = {}
+					obj.name = label
+					obj.color = this.pneumoniaTreatmentColors[key]
+					var objData = [];
+
+					_.forOwn(categories, (category) => {
+						objData.push(preevaluatedData[category][key])
+					})
+
+					obj.data = objData
+					seriesData.push(obj)
+				})
+
+				return {
+					title: null,
+					chart: {
+						type: 'column'
+					},
+					xAxis: {
+						categories: categories,
+					},
+					yAxis: [{
+						gridLineWidth: 0,
+						minorGridLineWidth: 0,
+						labels:
+						{
+							enabled: false
+						},
+						title: {
+							text: null
+						}
+					}],
+					legend: {
+						verticalAlign: 'top',
+					},
+					
+					plotOptions: {
+						column: {
+							stacking: 'percent',
+							dataLabels: {
+								enabled: true,
+								format: "{point.percentage:.0f}%",
+								color: "#000",
+								borderColor: "#000"
+							},
+							events: {
+								legendItemClick: function () {
+									return false; 
+								}
+							}
+						},
+						allowPointSelect: false,
+					},
+					series: seriesData
+				}
 			},
 			pneumoniaTreatmentOptions: function(){
 				var _this = this;
@@ -511,6 +765,46 @@ import json from '../../../public/counties.json'
 						name: 'Treatments',
 						color: _this.diarrhoeaColor,
 						data: [5,_this.treatmentData.diarrhoea.DIARRHOEA_ZINC_ORS] // sample data
+					}]
+				}
+			},
+			diarrhoeaTreatmentOptionsNew: function(){
+				var _this = this;
+				var seriesData = []
+				var categories = _.map(this.data.all.diarrhoea, (object, key)=>{
+					return key
+				})
+
+				categories.sort()
+
+				_.each(categories, category => {
+					var data = this.data.all.diarrhoea[category]
+					seriesData.push(_.sumBy(data, 'ZINC_ORS'))
+				})
+				return {
+					title: null,
+					chart: {
+						type: 'column'
+					},
+					xAxis: {
+						categories: categories
+					},
+					yAxis: [{
+						gridLineWidth: 0,
+						minorGridLineWidth: 0,
+						labels:
+						{
+							enabled: false
+						},
+						title: {
+							text: null
+						}
+					}],
+					series: [{
+						showInLegend: false,
+						name: 'Treatments',
+						color: _this.diarrhoeaColor,
+						data: seriesData // sample data
 					}]
 				}
 			},

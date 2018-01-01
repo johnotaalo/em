@@ -16,6 +16,29 @@ class SupervisionController extends Controller
     function counties(){
     }
 
+    function getNationalData(){
+        $pneumoniaData = \App\PneumoniaCalculatedValue::select('*', \DB::raw('(CASE WHEN treatment_diff > 0 THEN treatment_diff + NOTX ELSE NOTX END) AS NOTX_DIFF'))->with('county', 'facility', 'subcounty')->get();
+        $pneumoniaCleanedData = [];
+
+        foreach ($pneumoniaData as $d) {
+            $pneumoniaCleanedData[$d->assessment][] = $d;
+        }
+
+        $diarrhoeaData = \App\DiarrhoeaCalculatedValue::select('*', \DB::raw('(ZINC + ORS) AS ZINC_ORS'), \DB::raw('(CASE WHEN DIFFERENCE > 0 THEN classified + NO_CLASS_CASES + DIFFERENCE ELSE classified + NO_CLASS_CASES END) AS TOTAL_CASES_AFTER_DIFF'), \DB::raw('IF (DIFFERENCE < 0, NOTX - DIFFERENCE, NOTX) AS NOTX_CALC'))->with('county', 'facility', 'subcounty')->get();
+
+        $diarrhoeaCleanedData = [];
+
+        foreach ($diarrhoeaData as $d) {
+            $ass = $d->assessment;
+            if ($d->assessment == "Baseline (Legacy)") {
+                $ass = "Baseline";
+            }
+            $diarrhoeaCleanedData[$ass][] = $d;
+        }
+
+        return ['pneumonia' => $pneumoniaCleanedData, 'diarrhoea'   =>  $diarrhoeaCleanedData];
+    }
+
     function getCountyBreakdownData(Request $request){
         $data = \App\PneumoniaCalculatedValue::select('*', \DB::raw('(CASE WHEN treatment_diff > 0 THEN treatment_diff + NOTX ELSE NOTX END) AS NOTX_DIFF'))->where('cname', $request->county_id)->with('county', 'facility', 'subcounty')->get();
         $cleanedData = [];
@@ -263,6 +286,10 @@ FROM
             }else{
                 SPUploadTmp::query()->truncate();
             }
+        }
+
+        if ($request->warning != "true") {
+            \App\Jobs\RecalculateValues::dispatch();
         }
 
         return ['status' => 'success'];

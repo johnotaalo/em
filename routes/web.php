@@ -34,4 +34,5 @@ Route::get('overview/county', 'Dashboard\HomeController@countyOverview')->name('
 Route::prefix('user-management')->group(function(){
 	Route::get('/', 'Dashboard\UserManagement@index')->name('user-management');
 	Route::get('/add', 'Dashboard\UserManagement@add')->name('user-management-add');
+	Route::get('/edit/{id}', 'Dashboard\UserManagement@edit')->name('user-management-edit');
 });

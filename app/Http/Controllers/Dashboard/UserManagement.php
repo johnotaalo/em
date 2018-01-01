@@ -14,4 +14,8 @@ class UserManagement extends Controller
     public function add(Request $request){
     	return view('dashboard.users.add');
     }
+
+    public function edit(Request $request){
+    	return view('dashboard.users.edit')->with(['id' => $request->id]);
+    }
 }

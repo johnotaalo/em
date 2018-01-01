@@ -60,7 +60,10 @@
 							</div>
 						</div>
 					</div>
-				</div>
+			</div>
+			<b-card>
+				<highcharts :options="facilityDistributionChart" style="height: 500px;"></highcharts>
+			</b-card>
 		</div>
 	</div>
 </template>
@@ -164,7 +167,8 @@
 		            point: {
 		            	events: {
 		            		click: function(){
-		            			window.location = `/dashboard/county/breakdown/${this.COUNTY_NAM}`
+		            			// window.location = `/dashboard/county/breakdown/${this.COUNTY_NAM}`
+		            			this.get('Baringo').zoomTo();
 		            		}
 		            	}
 		            },
@@ -181,6 +185,69 @@
 		          }
 		        }
 			},
+			facilityDistributionChart: function(){
+				var facilityCount = 0
+				var finalData = _.map(this.facilityBreakdown, (o) => {
+					facilityCount += o.count
+					return {
+						name: o.type,
+						y: o.count
+					}
+				})
+				return {
+					chart: {
+				        type: 'pie',
+				        margin: 0,
+				        style: {
+							fontFamily: 'Nunito'
+						},
+						options3d: {
+							enabled: true,
+							alpha: 45
+						}
+				    },
+					credits: {
+						enabled: false
+					},
+				    title: {
+				    	verticalAlign: 'middle',
+				    	loating: true,
+				        text: "<center><b>"+facilityCount+"</b> Facilities<br/>Assessed</center>",
+				        style: {
+				        	fontSize: "12px"
+				        }
+				    },
+				    xAxis: {
+				        categories: ['Facilities'],
+				        visible: false
+				    },
+				    yAxis: {
+				        min: 0,
+				        gridLineWidth: 0,
+				        minorGridLineWidth: 0,
+				        visible: false,
+				        title: {
+				            text: null
+				        }
+				    },
+				    legend: {
+				        reversed: true
+				    },
+				    plotOptions: {
+				        pie: {
+				        	innerSize: '60%',
+				        	dataLabels: {
+				        		enabled: true,
+				        		format: '<b>{point.name}</b>, {point.y}'
+				        	}
+				        }
+				    },
+				    series: [{
+				    	name: "Facilities",
+				    	data: finalData
+				    }]
+				}
+			}
 		}
 	}
 </script>

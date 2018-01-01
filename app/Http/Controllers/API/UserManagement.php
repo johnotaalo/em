@@ -4,6 +4,10 @@ namespace App\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\User;
+
+use Illuminate\Mail\Message;
+use Illuminate\Support\Facades\Password;
 
 class UserManagement extends Controller
 {
@@ -36,10 +40,89 @@ class UserManagement extends Controller
     public function add(Request $request){
     	$user = new User();
 
-    	return $request->input();
+        $user->last_name = $request->last_name;
+        $user->first_name = $request->first_name;
+        $user->name = "{$request->first_name} {$request->last_name}";
+        $user->email = $request->email;
+        $user->user_type = $request->user_type;
+        $user->status = ($request->status == "true") ? 1 : 0;
+
+        $user->save();
+
+    	return $user;
+    }
+
+    public function editUser(Request $request){
+        $user = User::findOrFail($request->id);
+
+        $user->last_name = $request->last_name;
+        $user->first_name = $request->first_name;
+        $user->name = "{$request->first_name} {$request->last_name}";
+        $user->email = $request->email;
+        $user->user_type = $request->user_type;
+        $user->status = ($request->status == "true") ? 1 : 0;
+
+        $user->save();
+        
+        return $user;
+    }
+
+    public function getUser(Request $request){
+        $user = User::findOrFail($request->id);
+
+        return $user;
+    }
+
+    public function updateUserStatus(Request $request){
+        $id = $request->id;
+
+        $user = User::findOrFail($id);
+        if ($user) {
+            $status = $user->status;
+
+            $user->status = !$status;
+
+            $user->save();
+
+            return $user;
+        }
+    }
+
+    public function resetPassword(Request $request){
+        $id = $request->id;
+
+        $user = User::findOrFail($id);
+
+        if ($user) {
+            $credentials = ['email' =>  $user->email];
+            $response = Password::sendResetLink($credentials, function(Message $message){
+                $message->subject($this->getEmailSubject());
+            });
+
+            switch ($response) {
+                case Password::RESET_LINK_SENT:
+                    return ['message' => trans($response)];
+                    break;
+                case Password::INVALID_USER:
+                    return ['message'   =>  trans($response)];
+            }
+        }
     }
 
     public function validateEmail(Request $request){
-    	return ['exists' => \App\User::where('email', $request->email)->exists()];
+        $id = $request->id;
+        if(!$id){
+    	   return ['exists' => \App\User::where('email', $request->email)->exists()];
+        }
+
+        $email = $request->email;
+        $user = \App\User::where('email', $email)->first();
+        if ($user) {
+            if ($user->id == $id) {
+                return ['exists'    =>  false];
+            }else{
+                return ['exists'    =>  true];
+            }
+        }
     }
 }

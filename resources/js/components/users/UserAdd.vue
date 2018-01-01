@@ -97,14 +97,14 @@
 					user_type: null,
 					status: true
 				}),
-				userTypes: [{
-					value: null, text: "Please select an option"
-				},
-				{
-					value: 'admin', text: 'Administrator'
-				}, {
-					value: 'chai-admin', text: 'CHAI Administrator'
-				}]
+					userTypes: [{
+						value: null, text: "Please select an option"
+					},
+					{
+						value: 'admin', text: 'Administrator'
+					}, {
+						value: 'chai-admin', text: 'CHAI Administrator'
+					}]
 			}
 		},
 		validations: {
@@ -138,7 +138,20 @@
 				if (this.$v.form.$anyError) {
 					return
 				}
-				this.form.post('/api/users/add');
+				this.form.post('/api/users/add')
+				.then((response)=>{
+					this.$swal({
+						title: "Success!", 
+						text: "User added successfully!", 
+						icon: "success"
+					})
+					.then(()=>{
+						window.location = "/user-management"
+					})
+				})
+				.catch((error) => {
+					this.$swal("Oops Something went wrong!", "There was an error while adding user. Counter check your information or contact administrator", "error")
+				});
 			}
 		}
 	}

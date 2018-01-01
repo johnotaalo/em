@@ -55,6 +55,36 @@
 
 							<div class="row">
 								<div class="col-md">
+									<h6 class="text-uppercase text-muted mb-2">
+										Subcounties
+									</h6>
+									<span class="h2 mb-0">
+										{{ options.subcountiesList.length }}
+									</span>
+								</div>
+
+								<div class="col-md">
+									<h6 class="text-uppercase text-muted mb-2">
+										Pneumonia Cases Assessed
+									</h6>
+									<span class="h2 mb-0">
+										{{ pneumoniaTotals.cases_after_dif.toLocaleString('en') }}
+									</span>
+								</div>
+
+								<div class="col-md">
+									<h6 class="text-uppercase text-muted mb-2">
+										Diarrhoea Cases Assessed
+									</h6>
+									<span class="h2 mb-0">
+										{{ diarrhoeaTotals.cases_after_dif.toLocaleString('en') }}
+									</span>
+								</div>
+							</div>
+							<hr/>
+
+							<div class="row">
+								<!-- <div class="col-md">
 									<div class="mb-5">
 										<h4 class="header-pretitle">
 										Sub Counties
@@ -72,9 +102,9 @@
 											<h3>{{ diarrhoeaTotals.cases_after_dif.toLocaleString('en') }}</h3>
 										</div>
 									</div>
-								</div>
+								</div> -->
 								<div class="col-md-5">
-									<highcharts :options="facilityDistributionChart" style="height: 300px;"></highcharts>
+									<highcharts :options="facilityDistributionChart" style="height: 500px;"></highcharts>
 								</div>
 								
 

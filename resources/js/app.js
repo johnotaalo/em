@@ -85,7 +85,9 @@ Vue.component('facility-component', require('./components/FacilityComponent.vue'
 Vue.component('county-breakdown-component', require('./components/CountyBreakdownComponent.vue').default);
 Vue.component('users', require('./components/users/Users.vue').default);
 Vue.component('user-add', require('./components/users/UserAdd.vue').default);
+Vue.component('user-edit', require('./components/users/UserEdit.vue').default);
 Vue.component('country-overview', require('./components/CountryOverview.vue').default)
+Vue.component('no-data-component', require('./components/common/NoDataComponent').default);
 Vue.component('loading', VueLoading)
 /**
  * Next, we will create a fresh Vue application instance and attach it to

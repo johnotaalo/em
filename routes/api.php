@@ -19,8 +19,12 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::prefix('users')->group(function(){
 	Route::get('/', 'API\UserManagement@index');
+	Route::get('/{id}', 'API\UserManagement@getUser');
 	Route::post('/add', 'API\UserManagement@add');
+	Route::put('/edit/{id}', 'API\UserManagement@editUser');
 	Route::post('/validate/email', 'API\UserManagement@validateEmail');
+	Route::post('/update/status', 'API\UserManagement@updateUserStatus');
+	Route::put('/password/reset', 'API\UserManagement@resetPassword');
 });
 
 Route::prefix('data')->group(function(){
@@ -73,4 +77,5 @@ Route::prefix('data')->group(function(){
 	Route::get('diarrhoea/treatment/scloc/{subcounty}', 'API\SupervisionController@getDiarrhoeaLocTreatmentData');
 
 	Route::get('county/breakdown/{county_id}', 'API\SupervisionController@getCountyBreakdownData');
+	Route::get('national', 'API\SupervisionController@getNationalData');
 });
