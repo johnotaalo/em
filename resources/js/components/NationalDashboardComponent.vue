@@ -80,6 +80,9 @@
 	export default {
 		data() {
 			return {
+				diarrhoeaColor: "#03A9F4",
+				pneumoniaColor: "#4CAF50",
+				baselineColor: "#BDBDBD",
 				facilities: 0,
 				counties: 0,
 				classificationData: {
@@ -138,6 +141,7 @@
 		},
 		computed: {
 			pneumoniaClassificationOptions: function(){
+				var em = this;
 				return {
 					title: {
 						text: 'Pneumonia Classification'
@@ -158,13 +162,15 @@
 					},
 					series: [{
 						name: 'Classifications',
-						bar: {color: "green"},
+						color: em.pneumoniaColor,
 						data: [47,_.round(this.classificationData.pneumonia_class)] // sample data
 					}]
 				};
 			},
 			diarrhoeaClassificationOptions: function(){
-					return {title: {
+				var em = this;
+					return {
+						title: {
 											text: 'Diarrhoea Classifications'
 										},
 										chart: {
@@ -183,6 +189,7 @@
 										},
 										series: [{
 											name: 'Classifications',
+											color: em.diarrhoeaColor,
 											data: [32,_.round(this.classificationData.diarrhoea_class)] // sample data
 										}]}
 			},
@@ -234,6 +241,7 @@
 					},
 					series: [{
 						name: 'Classifications',
+						color: _this.diarrhoeaColor,
 						data: [5,_this.treatmentData.diarrhoea.DIARRHOEA_ZINC_ORS] // sample data
 					}]
 				}

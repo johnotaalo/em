@@ -32,6 +32,9 @@
 	export default {
 		data() {
 			return {
+				diarrhoeaColor: "#03A9F4",
+				pneumoniaColor: "#4CAF50",
+				baselineColor: "#BDBDBD",
 				classificationData: {
 					pneumonia_class: [],
 					diarrhoea_class: [],
@@ -101,9 +104,11 @@
 					},
 					series: [{
 						name: "Baseline",
+						color: em.baselineColor,
 						data: em.classificationData.baselineDiarrhoea
 					},{
 						name: 'Supervision 2018',
+						color: em.diarrhoeaColor,
 						data: em.classificationData.diarrhoea_class
 					}]
 				}
@@ -130,10 +135,12 @@
 					},
 					series: [{
 						name: "Baseline",
-						data: em.classificationData.baselinePneumonia
+						data: em.classificationData.baselinePneumonia,
+						color: em.baselineColor
 					},{
 						name: 'Supervision 2018',
-						data: em.classificationData.pneumonia_class
+						data: em.classificationData.pneumonia_class,
+						color: em.pneumoniaColor
 					}]
 				}
 			},
@@ -165,7 +172,8 @@
 					},
 					series: [{
 						name: 'Variance',
-						data: variance
+						data: variance,
+						color: em.baselineColor
 					}]
 				}
 			},
@@ -197,7 +205,8 @@
 					},
 					series: [{
 						name: 'Variance',
-						data: variance
+						data: variance,
+						color: em.baselineColor
 					}]
 				}
 			},
@@ -224,7 +233,8 @@
 					},
 					series: [{
 						name: 'Treatments',
-						data: em.treatmentData
+						data: em.treatmentData,
+						color: em.diarrhoeaColor
 					}]
 				}
 			},

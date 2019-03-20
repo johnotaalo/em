@@ -1794,6 +1794,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
+      diarrhoeaColor: "#03A9F4",
+      pneumoniaColor: "#4CAF50",
+      baselineColor: "#BDBDBD",
       classificationData: {
         pneumonia_class: [],
         diarrhoea_class: [],
@@ -1862,9 +1865,11 @@ __webpack_require__.r(__webpack_exports__);
         },
         series: [{
           name: "Baseline",
+          color: em.baselineColor,
           data: em.classificationData.baselineDiarrhoea
         }, {
           name: 'Supervision 2018',
+          color: em.diarrhoeaColor,
           data: em.classificationData.diarrhoea_class
         }]
       };
@@ -1891,10 +1896,12 @@ __webpack_require__.r(__webpack_exports__);
         },
         series: [{
           name: "Baseline",
-          data: em.classificationData.baselinePneumonia
+          data: em.classificationData.baselinePneumonia,
+          color: em.baselineColor
         }, {
           name: 'Supervision 2018',
-          data: em.classificationData.pneumonia_class
+          data: em.classificationData.pneumonia_class,
+          color: em.pneumoniaColor
         }]
       };
     },
@@ -1927,7 +1934,8 @@ __webpack_require__.r(__webpack_exports__);
         },
         series: [{
           name: 'Variance',
-          data: variance
+          data: variance,
+          color: em.baselineColor
         }]
       };
     },
@@ -1960,7 +1968,8 @@ __webpack_require__.r(__webpack_exports__);
         },
         series: [{
           name: 'Variance',
-          data: variance
+          data: variance,
+          color: em.baselineColor
         }]
       };
     },
@@ -1986,7 +1995,8 @@ __webpack_require__.r(__webpack_exports__);
         },
         series: [{
           name: 'Treatments',
-          data: em.treatmentData
+          data: em.treatmentData,
+          color: em.diarrhoeaColor
         }]
       };
     },
@@ -2229,6 +2239,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
+      diarrhoeaColor: "#03A9F4",
+      pneumoniaColor: "#4CAF50",
+      baselineColor: "#BDBDBD",
       facilities: 0,
       counties: 0,
       classificationData: {
@@ -2280,6 +2293,7 @@ __webpack_require__.r(__webpack_exports__);
   },
   computed: {
     pneumoniaClassificationOptions: function pneumoniaClassificationOptions() {
+      var em = this;
       return {
         title: {
           text: 'Pneumonia Classification'
@@ -2300,15 +2314,14 @@ __webpack_require__.r(__webpack_exports__);
         },
         series: [{
           name: 'Classifications',
-          bar: {
-            color: "green"
-          },
+          color: em.pneumoniaColor,
           data: [47, _.round(this.classificationData.pneumonia_class)] // sample data
 
         }]
       };
     },
     diarrhoeaClassificationOptions: function diarrhoeaClassificationOptions() {
+      var em = this;
       return {
         title: {
           text: 'Diarrhoea Classifications'
@@ -2329,6 +2342,7 @@ __webpack_require__.r(__webpack_exports__);
         },
         series: [{
           name: 'Classifications',
+          color: em.diarrhoeaColor,
           data: [32, _.round(this.classificationData.diarrhoea_class)] // sample data
 
         }]
@@ -2385,6 +2399,7 @@ __webpack_require__.r(__webpack_exports__);
         },
         series: [{
           name: 'Classifications',
+          color: _this.diarrhoeaColor,
           data: [5, _this.treatmentData.diarrhoea.DIARRHOEA_ZINC_ORS] // sample data
 
         }]
