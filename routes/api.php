@@ -25,4 +25,5 @@ Route::prefix('data')->group(function(){
 	Route::get('count/counties', 'API\SupervisionController@getCountiesCount');
 	Route::get('county/diarrhoea/classification', 'API\SupervisionController@getCountyData');
 	Route::get('county/diarrhoea/treatment', 'API\SupervisionController@getCountyDiarrhoeaTreatments');
+	Route::get('county/pneumonia/treatment', 'API\SupervisionController@getCountyPneumoniaTreatments');
 });

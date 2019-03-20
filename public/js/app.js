@@ -1797,11 +1797,14 @@ __webpack_require__.r(__webpack_exports__);
       classificationData: {
         pneumonia_class: [],
         diarrhoea_class: [],
-        baselineDiarrhoea: []
+        baselineDiarrhoea: [],
+        baselinePneumonia: []
       },
       treatmentData: [],
       classificationCategories: [],
       treatmentCategories: [],
+      pneuTreatmentCategories: [],
+      pneuTreatmentData: [],
       diarrhoeaBaselineData: {
         "Lamu": 36,
         "Machakos": 39,
@@ -1814,6 +1817,25 @@ __webpack_require__.r(__webpack_exports__);
         "Mombasa": 30,
         "Kiambu": 17,
         "Taita Taveta": 19
+      },
+      pneumoniaBaselineData: {
+        "Lamu": 41,
+        "Machakos": 50,
+        "Kilifi": 64,
+        "Nakuru": 42,
+        "Tana River": 46,
+        "Kajiado": 56,
+        "Murang'a": 50,
+        "Kwale": 50,
+        "Mombasa": 58,
+        "Kiambu": 30,
+        "Taita Taveta": 26
+      },
+      pneumoniaTreatmentLabels: {
+        AMOXDT: "Amox DT",
+        AMOX_SYRUP: "Amox Syrup",
+        INJECTIBLES: "Injectibles",
+        CTX: "Amox CTX"
       }
     };
   },
@@ -1847,6 +1869,35 @@ __webpack_require__.r(__webpack_exports__);
         }]
       };
     },
+    pneumoniaClassificationOptions: function pneumoniaClassificationOptions() {
+      var em = this;
+      return {
+        title: {
+          text: 'Pneumonia Classifications'
+        },
+        chart: {
+          type: 'column'
+        },
+        xAxis: {
+          categories: em.classificationCategories
+        },
+        plotOptions: {
+          column: {
+            dataLabels: {
+              enabled: true,
+              format: "{point.y}%"
+            }
+          }
+        },
+        series: [{
+          name: "Baseline",
+          data: em.classificationData.baselinePneumonia
+        }, {
+          name: 'Supervision 2018',
+          data: em.classificationData.pneumonia_class
+        }]
+      };
+    },
     diarrhoeaVarianceOptions: function diarrhoeaVarianceOptions() {
       var em = this;
       var variance = [];
@@ -1859,6 +1910,39 @@ __webpack_require__.r(__webpack_exports__);
       return {
         title: {
           text: 'Diarrhoea Classification Variance'
+        },
+        chart: {
+          type: 'column'
+        },
+        xAxis: {
+          categories: em.classificationCategories
+        },
+        plotOptions: {
+          column: {
+            dataLabels: {
+              enabled: true,
+              format: "{point.y}%"
+            }
+          }
+        },
+        series: [{
+          name: 'Variance',
+          data: variance
+        }]
+      };
+    },
+    pneumoniaVarianceOptions: function pneumoniaVarianceOptions() {
+      var em = this;
+      var variance = [];
+
+      _.forOwn(em.classificationData.pneumonia_class, function (v, k) {
+        var diff = v - em.classificationData.baselinePneumonia[k];
+        variance.push(diff);
+      });
+
+      return {
+        title: {
+          text: 'Pneumonia Classification Variance'
         },
         chart: {
           type: 'column'
@@ -1905,10 +1989,57 @@ __webpack_require__.r(__webpack_exports__);
           data: em.treatmentData
         }]
       };
+    },
+    pneumoniaTreatmentOptions: function pneumoniaTreatmentOptions() {
+      var _this = this;
+
+      var seriesData = [];
+      var _preSortedArray = [];
+
+      _.forOwn(_this.pneuTreatmentData, function (v, k) {
+        _.forOwn(_this.pneumoniaTreatmentLabels, function (label, key) {
+          if (typeof _preSortedArray[label] === "undefined") {
+            _preSortedArray[label] = [];
+          }
+
+          _preSortedArray[label].push(v[key]);
+        });
+      });
+
+      _.forOwn(_preSortedArray, function (data, label) {
+        var _obj = {};
+        _obj = {
+          name: label,
+          data: data
+        };
+        seriesData.push(_obj);
+      });
+
+      return {
+        title: {
+          text: 'Pneumonia Treatment'
+        },
+        chart: {
+          type: 'column'
+        },
+        xAxis: {
+          categories: _this.pneuTreatmentCategories
+        },
+        plotOptions: {
+          column: {
+            stacking: 'percent',
+            dataLabels: {
+              enabled: true,
+              format: "{point.percentage:.0f}%"
+            }
+          }
+        },
+        series: seriesData
+      };
     }
   },
   created: function created() {
-    var _this = this;
+    var _this2 = this;
 
     axios.get('/api/data/county/diarrhoea/classification').then(function (response) {
       var data = response.data;
@@ -1917,7 +2048,7 @@ __webpack_require__.r(__webpack_exports__);
       var _pneuBaseline = [];
       var _diarBaseline = [];
       var _categories = [];
-      var em = _this;
+      var em = _this2;
 
       _.forOwn(data, function (v, k) {
         _categories.push(v.county);
@@ -1927,18 +2058,26 @@ __webpack_require__.r(__webpack_exports__);
         _diarClassification.push(_.round(v.SUM_DIA_CLASSIFICATION / (v.SUM_DIA_CLASSIFICATION + v.SUM_DIA_NO_CLASSIFICATION) * 100));
 
         var bsData = 0;
+        var pnBsData = 0;
 
         if (typeof em.diarrhoeaBaselineData[v.county] !== "undefined") {
           bsData = em.diarrhoeaBaselineData[v.county];
         }
 
+        if (typeof em.pneumoniaBaselineData[v.county] !== "undefined") {
+          pnBsData = em.pneumoniaBaselineData[v.county];
+        }
+
         _diarBaseline.push(bsData);
+
+        _pneuBaseline.push(pnBsData);
       });
 
-      _this.classificationCategories = _categories;
-      _this.classificationData.pneumonia_class = _pneuClassification;
-      _this.classificationData.diarrhoea_class = _diarClassification;
-      _this.classificationData.baselineDiarrhoea = _diarBaseline;
+      _this2.classificationCategories = _categories;
+      _this2.classificationData.pneumonia_class = _pneuClassification;
+      _this2.classificationData.diarrhoea_class = _diarClassification;
+      _this2.classificationData.baselineDiarrhoea = _diarBaseline;
+      _this2.classificationData.baselinePneumonia = _pneuBaseline;
     });
     axios.get('/api/data/county/diarrhoea/treatment').then(function (response) {
       var _categories = [];
@@ -1950,8 +2089,19 @@ __webpack_require__.r(__webpack_exports__);
         _actualData.push(v.DIARRHOEA_ZINC_ORS);
       });
 
-      _this.treatmentCategories = _categories;
-      _this.treatmentData = _actualData;
+      _this2.treatmentCategories = _categories;
+      _this2.treatmentData = _actualData;
+    });
+    axios.get('/api/data/county/pneumonia/treatment').then(function (response) {
+      var _categories = [];
+      var _actualData = [];
+
+      _.forOwn(response.data, function (v, k) {
+        _categories.push(v.county);
+      });
+
+      _this2.pneuTreatmentCategories = _categories;
+      _this2.pneuTreatmentData = response.data;
     });
   }
 });
@@ -60559,15 +60709,15 @@ var render = function() {
                     { attrs: { title: "Pneumonia" } },
                     [
                       _c("highcharts", {
-                        attrs: { options: _vm.diarrhoeaClassificationOptions }
+                        attrs: { options: _vm.pneumoniaClassificationOptions }
                       }),
                       _vm._v(" "),
                       _c("highcharts", {
-                        attrs: { options: _vm.diarrhoeaVarianceOptions }
+                        attrs: { options: _vm.pneumoniaVarianceOptions }
                       }),
                       _vm._v(" "),
                       _c("highcharts", {
-                        attrs: { options: _vm.diarrhoeaTreatmentOptions }
+                        attrs: { options: _vm.pneumoniaTreatmentOptions }
                       })
                     ],
                     1
