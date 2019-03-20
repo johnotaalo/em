@@ -1952,47 +1952,10 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 // import {Chart} from 'highcharts-vue'
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      classificationData: {
-        pneumonia_class: 0,
-        diarrhoea_class: 0
-      },
-      diarrhoeaClassificationOptions: {
-        title: {
-          text: 'Diarrhoea Classifications'
-        },
-        chart: {
-          type: 'column'
-        },
-        xAxis: {
-          categories: ['Baseline', 'Supervision 2018']
-        },
-        series: [{
-          name: 'Classifications',
-          data: [1, 2] // sample data
-
-        }]
-      },
-      pneumoniaClassificationOptions: {
-        title: {
-          text: 'Pneumonia Classification'
-        },
-        chart: {
-          type: 'column'
-        },
-        xAxis: {
-          categories: ['Baseline', 'Supervision 2018']
-        },
-        series: [{
-          name: 'Classifications',
-          data: [5, 15] // sample data
-
-        }]
-      },
       diarrhoeaTreatmentOptions: {
         title: {
           text: 'Diarrhoea Treatment'
@@ -2024,15 +1987,62 @@ __webpack_require__.r(__webpack_exports__);
           data: [5, 15] // sample data
 
         }]
+      },
+      classificationData: {
+        pneumonia_class: 0,
+        diarrhoea_class: 0
       }
     };
   },
-  created: function created() {
+  mounted: function mounted() {
+    var _this = this;
+
     axios.get('/api/data/classification').then(function (response) {
       var data = response.data;
-      this.classificationData.pneumonia_class = data.pneumonia.total_cases / (data.pneumonia.total_cases + data.pneumonia.no_class) * 100;
-      this.classificationData.diarrhoea_class = data.diarrhoea.total_cases / (data.diarrhoea.total_cases + data.diarrhoea.no_class) * 100;
+      _this.classificationData.pneumonia_class = data.pneumonia.total_cases / (data.pneumonia.total_cases + data.pneumonia.no_class) * 100;
+      _this.classificationData.diarrhoea_class = data.diarrhoea.total_cases / (data.diarrhoea.total_cases + data.diarrhoea.no_class) * 100;
     });
+  },
+  computed: {
+    pneumoniaClassificationOptions: function pneumoniaClassificationOptions() {
+      return {
+        title: {
+          text: 'Pneumonia Classification'
+        },
+        chart: {
+          type: 'column'
+        },
+        xAxis: {
+          categories: ['Baseline', 'Supervision 2018']
+        },
+        series: [{
+          name: 'Classifications',
+          bar: {
+            color: "green"
+          },
+          data: [47, this.classificationData.pneumonia_class] // sample data
+
+        }]
+      };
+    },
+    diarrhoeaClassificationOptions: function diarrhoeaClassificationOptions() {
+      return {
+        title: {
+          text: 'Diarrhoea Classifications'
+        },
+        chart: {
+          type: 'column'
+        },
+        xAxis: {
+          categories: ['Baseline', 'Supervision 2018']
+        },
+        series: [{
+          name: 'Classifications',
+          data: [32, this.classificationData.diarrhoea_class] // sample data
+
+        }]
+      };
+    }
   }
 });
 
@@ -38205,13 +38215,6 @@ var render = function() {
               "div",
               { staticClass: "card-body" },
               [
-                _c("p", [
-                  _vm._v(
-                    "Total Data: " +
-                      _vm._s(_vm.classificationData.pneumonia_class)
-                  )
-                ]),
-                _vm._v(" "),
                 _c("highcharts", {
                   attrs: { options: _vm.diarrhoeaClassificationOptions }
                 })
@@ -50959,8 +50962,8 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! C:\Users\CHRIS\development\vagrant\code\em_dashboard\resources\js\app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! C:\Users\CHRIS\development\vagrant\code\em_dashboard\resources\sass\app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! /Users/chai/development/code/em/resources/js/app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! /Users/chai/development/code/em/resources/sass/app.scss */"./resources/sass/app.scss");
 
 
 /***/ })

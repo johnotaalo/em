@@ -4,7 +4,6 @@
 		<div class="col-md-6">
 			<div class="card">
 				<div class="card-body">
-					<p>Total Data: {{ classificationData.pneumonia_class }}</p>
 					<highcharts :options="diarrhoeaClassificationOptions"></highcharts>
 				</div>
 			</div>
@@ -46,40 +45,6 @@
 	export default {
 		data() {
 			return {
-				classificationData: {
-					pneumonia_class: 0,
-					diarrhoea_class: 0
-				},
-				diarrhoeaClassificationOptions: {
-					title: {
-						text: 'Diarrhoea Classifications'
-					},
-					chart: {
-						type: 'column'
-					},
-					xAxis: {
-						categories: ['Baseline', 'Supervision 2018']
-					},
-					series: [{
-						name: 'Classifications',
-						data: [1,2] // sample data
-					}]
-				},
-				pneumoniaClassificationOptions: {
-					title: {
-						text: 'Pneumonia Classification'
-					},
-					chart: {
-						type: 'column'
-					},
-					xAxis: {
-						categories: ['Baseline', 'Supervision 2018']
-					},
-					series: [{
-						name: 'Classifications',
-						data: [5,15] // sample data
-					}]
-				},
 				diarrhoeaTreatmentOptions: {
 					title: {
 						text: 'Diarrhoea Treatment'
@@ -109,16 +74,53 @@
 						name: 'Classifications',
 						data: [5,15] // sample data
 					}]
+				},
+				classificationData: {
+					pneumonia_class: 0,
+					diarrhoea_class: 0
 				}
 			}
 		},
-		created() {
+		mounted() {
 			axios.get('/api/data/classification')
-			.then(function(response){
+			.then((response) => {
 				var data = response.data;
 				this.classificationData.pneumonia_class = (data.pneumonia.total_cases / (data.pneumonia.total_cases + data.pneumonia.no_class)) * 100;
 				this.classificationData.diarrhoea_class = (data.diarrhoea.total_cases / (data.diarrhoea.total_cases + data.diarrhoea.no_class)) * 100;
 			});
+		},
+		computed: {
+			pneumoniaClassificationOptions: function(){
+				return {title: {
+										text: 'Pneumonia Classification'
+									},
+									chart: {
+										type: 'column'
+									},
+									xAxis: {
+										categories: ['Baseline', 'Supervision 2018']
+									},
+									series: [{
+										name: 'Classifications',
+										bar: {color: "green"},
+										data: [47,this.classificationData.pneumonia_class] // sample data
+									}]};
+			},
+			diarrhoeaClassificationOptions: function(){
+					return {title: {
+											text: 'Diarrhoea Classifications'
+										},
+										chart: {
+											type: 'column'
+										},
+										xAxis: {
+											categories: ['Baseline', 'Supervision 2018']
+										},
+										series: [{
+											name: 'Classifications',
+											data: [32,this.classificationData.diarrhoea_class] // sample data
+										}]}
+			}
 		}
 	}
 </script>
