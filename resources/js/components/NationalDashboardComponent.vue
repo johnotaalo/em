@@ -60,24 +60,25 @@
 						data: [5,15] // sample data
 					}]
 				},
-				pneumoniaTreatmentOptions: {
-					title: {
-						text: 'Pneumonia Treatment'
-					},
-					chart: {
-						type: 'column'
-					},
-					xAxis: {
-						categories: ['Baseline', 'Supervision 2018']
-					},
-					series: [{
-						name: 'Classifications',
-						data: [5,15] // sample data
-					}]
-				},
 				classificationData: {
 					pneumonia_class: 0,
 					diarrhoea_class: 0
+				},
+				treatmentData: {
+					diarrhoea: null,
+					pneumonia: null
+				},
+				baselineData: {
+					AMOXDT: 4,
+					AMOX_SYRUP: 42,
+					INJECTIBLES: 29,
+					CTX: 24
+				},
+				pneumoniaTreatmentLabels: {
+					AMOXDT: "Amox DT",
+					AMOX_SYRUP: "Amox Syrup",
+					INJECTIBLES: "Injectibles",
+					CTX: "Amox CTX"
 				}
 			}
 		},
@@ -87,6 +88,12 @@
 				var data = response.data;
 				this.classificationData.pneumonia_class = (data.pneumonia.total_cases / (data.pneumonia.total_cases + data.pneumonia.no_class)) * 100;
 				this.classificationData.diarrhoea_class = (data.diarrhoea.total_cases / (data.diarrhoea.total_cases + data.diarrhoea.no_class)) * 100;
+			});
+
+			axios.get('/api/data/treatments/pneumonia')
+			.then((response) => {
+				var data = response.data;
+				this.treatmentData.pneumonia = data;
 			});
 		},
 		computed: {
@@ -120,6 +127,40 @@
 											name: 'Classifications',
 											data: [32,this.classificationData.diarrhoea_class] // sample data
 										}]}
+			},
+				pneumoniaTreatmentOptions: function(){
+					var _this = this;
+					var seriesData = [];
+					_.forOwn(this.treatmentData.pneumonia, function(v, k){
+						var obj = {};
+						obj = {
+							name: _this.pneumoniaTreatmentLabels[k],
+							data: [_this.baselineData[k], v]
+						};
+
+						seriesData.push(obj);
+					});
+				return {
+					title: {
+						text: 'Pneumonia Treatment'
+					},
+					chart: {
+						type: 'column'
+					},
+					xAxis: {
+						categories: ['Baseline', 'Supervision 2018']
+					},
+					plotOptions: {
+						column: {
+							stacking: 'percent',
+							dataLabels: {
+								enabled: true,
+								format: "{point.percentage:.0f}%"
+							}
+						}
+					},
+					series: seriesData
+				}
 			}
 		}
 	}

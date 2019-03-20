@@ -1972,35 +1972,39 @@ __webpack_require__.r(__webpack_exports__);
 
         }]
       },
-      pneumoniaTreatmentOptions: {
-        title: {
-          text: 'Pneumonia Treatment'
-        },
-        chart: {
-          type: 'column'
-        },
-        xAxis: {
-          categories: ['Baseline', 'Supervision 2018']
-        },
-        series: [{
-          name: 'Classifications',
-          data: [5, 15] // sample data
-
-        }]
-      },
       classificationData: {
         pneumonia_class: 0,
         diarrhoea_class: 0
+      },
+      treatmentData: {
+        diarrhoea: null,
+        pneumonia: null
+      },
+      baselineData: {
+        AMOXDT: 4,
+        AMOX_SYRUP: 42,
+        INJECTIBLES: 29,
+        CTX: 24
+      },
+      pneumoniaTreatmentLabels: {
+        AMOXDT: "Amox DT",
+        AMOX_SYRUP: "Amox Syrup",
+        INJECTIBLES: "Injectibles",
+        CTX: "Amox CTX"
       }
     };
   },
   mounted: function mounted() {
-    var _this = this;
+    var _this2 = this;
 
     axios.get('/api/data/classification').then(function (response) {
       var data = response.data;
-      _this.classificationData.pneumonia_class = data.pneumonia.total_cases / (data.pneumonia.total_cases + data.pneumonia.no_class) * 100;
-      _this.classificationData.diarrhoea_class = data.diarrhoea.total_cases / (data.diarrhoea.total_cases + data.diarrhoea.no_class) * 100;
+      _this2.classificationData.pneumonia_class = data.pneumonia.total_cases / (data.pneumonia.total_cases + data.pneumonia.no_class) * 100;
+      _this2.classificationData.diarrhoea_class = data.diarrhoea.total_cases / (data.diarrhoea.total_cases + data.diarrhoea.no_class) * 100;
+    });
+    axios.get('/api/data/treatments/pneumonia').then(function (response) {
+      var data = response.data;
+      _this2.treatmentData.pneumonia = data;
     });
   },
   computed: {
@@ -2041,6 +2045,42 @@ __webpack_require__.r(__webpack_exports__);
           data: [32, this.classificationData.diarrhoea_class] // sample data
 
         }]
+      };
+    },
+    pneumoniaTreatmentOptions: function pneumoniaTreatmentOptions() {
+      var _this = this;
+
+      var seriesData = [];
+
+      _.forOwn(this.treatmentData.pneumonia, function (v, k) {
+        var obj = {};
+        obj = {
+          name: _this.pneumoniaTreatmentLabels[k],
+          data: [_this.baselineData[k], v]
+        };
+        seriesData.push(obj);
+      });
+
+      return {
+        title: {
+          text: 'Pneumonia Treatment'
+        },
+        chart: {
+          type: 'column'
+        },
+        xAxis: {
+          categories: ['Baseline', 'Supervision 2018']
+        },
+        plotOptions: {
+          column: {
+            stacking: 'percent',
+            dataLabels: {
+              enabled: true,
+              format: "{point.percentage:.0f}%"
+            }
+          }
+        },
+        series: seriesData
       };
     }
   }
@@ -50962,8 +51002,8 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! /Users/chai/development/code/em/resources/js/app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! /Users/chai/development/code/em/resources/sass/app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! C:\Users\CHRIS\development\vagrant\code\em_dashboard\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! C:\Users\CHRIS\development\vagrant\code\em_dashboard\resources\sass\app.scss */"./resources/sass/app.scss");
 
 
 /***/ })
