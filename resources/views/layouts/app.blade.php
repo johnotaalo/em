@@ -42,6 +42,9 @@
                        <li class="nav-item">
                            <a class="nav-link" href="{{ route('home') }}">Dashboard</a>
                        </li>
+                       <li class="nav-item">
+                           <a class="nav-link" href="{{ route('county-dashboard') }}">County</a>
+                       </li>
                         @guest
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>

@@ -1,5 +1,40 @@
 <template>
 	<div>
+		<div class="row">
+			<div class="col-md-4">
+				<div class="card">
+					<div class="card-body">
+						<div class="pull-left">
+							<h3>Counties</h3>
+							<span>{{ counties }}</span>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="card">
+					<div class="card-body">
+						<div class="pull-left">
+							<h3>Facilities</h3>
+							<span>{{ facilities }}</span>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="card">
+					<div class="card-body">
+						<div class="pull-left">
+							<center>
+								<h3>Facility Breakdown</h3>
+								<span>{{ facilities }}</span>
+							</center>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<br/>
 	<div class="row" style="margin-bottom: 10px;">
 		<div class="col-md-6">
 			<div class="card">
@@ -45,28 +80,15 @@
 	export default {
 		data() {
 			return {
-				diarrhoeaTreatmentOptions: {
-					title: {
-						text: 'Diarrhoea Treatment'
-					},
-					chart: {
-						type: 'column'
-					},
-					xAxis: {
-						categories: ['Baseline', 'Supervision 2018']
-					},
-					series: [{
-						name: 'Classifications',
-						data: [5,15] // sample data
-					}]
-				},
+				facilities: 0,
+				counties: 0,
 				classificationData: {
 					pneumonia_class: 0,
 					diarrhoea_class: 0
 				},
 				treatmentData: {
-					diarrhoea: null,
-					pneumonia: null
+					diarrhoea: {},
+					pneumonia: {}
 				},
 				baselineData: {
 					AMOXDT: 4,
@@ -95,23 +117,51 @@
 				var data = response.data;
 				this.treatmentData.pneumonia = data;
 			});
+
+			axios.get('/api/data/treatments/diarrhoea')
+			.then((response) => {
+				var data = response.data;
+				this.treatmentData.diarrhoea = data;
+			});
+
+			axios.get('/api/data/count/facilities')
+			.then((response) => {
+				var data = response.data;
+				this.facilities = data;
+			});
+
+			axios.get('/api/data/count/counties')
+			.then((response) => {
+				var data = response.data;
+				this.counties = data;
+			});
 		},
 		computed: {
 			pneumoniaClassificationOptions: function(){
-				return {title: {
-										text: 'Pneumonia Classification'
-									},
-									chart: {
-										type: 'column'
-									},
-									xAxis: {
-										categories: ['Baseline', 'Supervision 2018']
-									},
-									series: [{
-										name: 'Classifications',
-										bar: {color: "green"},
-										data: [47,this.classificationData.pneumonia_class] // sample data
-									}]};
+				return {
+					title: {
+						text: 'Pneumonia Classification'
+					},
+					chart: {
+						type: 'column'
+					},
+					xAxis: {
+						categories: ['Baseline', 'Supervision 2018']
+					},
+					plotOptions: {
+						column: {
+							dataLabels: {
+								enabled: true,
+								format: "{point.y}%"
+							}
+						}
+					},
+					series: [{
+						name: 'Classifications',
+						bar: {color: "green"},
+						data: [47,_.round(this.classificationData.pneumonia_class)] // sample data
+					}]
+				};
 			},
 			diarrhoeaClassificationOptions: function(){
 					return {title: {
@@ -123,9 +173,17 @@
 										xAxis: {
 											categories: ['Baseline', 'Supervision 2018']
 										},
+										plotOptions: {
+											column: {
+												dataLabels: {
+													enabled: true,
+													format: "{point.y}%"
+												}
+											}
+										},
 										series: [{
 											name: 'Classifications',
-											data: [32,this.classificationData.diarrhoea_class] // sample data
+											data: [32,_.round(this.classificationData.diarrhoea_class)] // sample data
 										}]}
 			},
 				pneumoniaTreatmentOptions: function(){
@@ -160,6 +218,24 @@
 						}
 					},
 					series: seriesData
+				}
+			},
+			diarrhoeaTreatmentOptions: function(){
+				var _this = this;
+				return {
+					title: {
+						text: 'Diarrhoea Treatment'
+					},
+					chart: {
+						type: 'column'
+					},
+					xAxis: {
+						categories: ['Baseline', 'Supervision 2018']
+					},
+					series: [{
+						name: 'Classifications',
+						data: [5,_this.treatmentData.diarrhoea.DIARRHOEA_ZINC_ORS] // sample data
+					}]
 				}
 			}
 		}

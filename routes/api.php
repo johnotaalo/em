@@ -20,4 +20,9 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::prefix('data')->group(function(){
 	Route::get('classification', 'API\SupervisionController@getClassificationData');
 	Route::get('treatments/pneumonia', 'API\SupervisionController@getPneumoniaData');
+	Route::get('treatments/diarrhoea', 'API\SupervisionController@getDiarrhoeaTreatments');
+	Route::get('count/facilities', 'API\SupervisionController@getFacilitiesCount');
+	Route::get('count/counties', 'API\SupervisionController@getCountiesCount');
+	Route::get('county/diarrhoea/classification', 'API\SupervisionController@getCountyData');
+	Route::get('county/diarrhoea/treatment', 'API\SupervisionController@getCountyDiarrhoeaTreatments');
 });
