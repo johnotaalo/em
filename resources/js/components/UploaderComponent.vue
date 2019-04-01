@@ -1,40 +1,17 @@
 <template>
-	<div class="row">
-		<div class="col-md-12">
-			<div class="panel">
-				<div class="panel-head">
-					<h3 class="panel-title">
-						<i class="ti-server"></i>&nbsp;&nbsp;The Data Uploader
-					</h3>
+	<div>
+		<div class="row">
+			<div class="col-md">
+				<vue-dropzone id="dropzone" ref = "dropzone" :options="dropzoneOptions"></vue-dropzone>	
+			</div>
+		</div>
+		<div class="row mt-3">
+			<div class="col-md">
+				<div class="float-right">
+					<b-button variant="outline-info" @click="submitUpload">Upload Data</b-button>
+					<b-button variant="outline-success">Download CSV Template</b-button>
 				</div>
-				<div class="panel-body">
-					<div class="row">
-						<div class="col-md-6">
-							<form>
-								<legend>Supervision Details</legend>
-								<div class="form-group">
-									<label class="control-label">Supervision</label>
-									<select class="form-control">
-										<option value="1">Sample Supervision</option>
-									</select>
-								</div>
-
-								<div class="form-group">
-									<label class="control-label">County</label>
-									<select class="form-control">
-										<option value="1">Select a County</option>
-									</select>
-								</div>
-
-								<button class="btn btn-sm btn-block btn-primary">Upload Data</button>
-							</form>
-						</div>
-						<div class="col-md-6">
-							<vue-dropzone id="dropzone" ref = "dropzone" :options="dropzoneOptions"></vue-dropzone>
-						</div>
-					</div>
-					
-				</div>
+				
 			</div>
 		</div>
 	</div>
@@ -52,24 +29,29 @@ export default {
 	data(){
 		return {
 			dropzoneOptions: {
-				url: 'https://httpbin.org/post',
+				url: '/api/data/uploadData',
 				thumbnailWidth: 200,
 				addRemoveLinks: true,
 				autoProcessQueue: false,
-				acceptedFiles: "text/csv,application/vnd.ms-excel",
-				dictDefaultMessage: '<div class="dz-icon"><i class="demo-pli-upload-to-cloud icon-5x"></i></div><div><span class="dz-text">Drop file to upload</span><p class="text-sm text-muted">or click to pick manually</p></div>',
+				acceptedFiles: "text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+				dictDefaultMessage: '<div class="dz-icon"><i class="demo-pli-upload-to-cloud" style="font-size: 5em;"></i></div><div><span class="dz-text">Drop file to upload</span><p class="text-sm text-muted">or click to pick manually</p></div>',
 				maxFiles: 1,
 				init: function(){
 					this.on("maxfilesexceeded", function(file){
 						alert("You cannot upload more than 1 File");
 						this.removeFile(file);
 					})
+				},
+				success: function(){
+					location.reload();
 				}
 			}
 		}
 	},
 	methods: {
-
+		submitUpload: function() {
+			this.$refs.dropzone.processQueue();
+		}
 	}
 }
 </script>

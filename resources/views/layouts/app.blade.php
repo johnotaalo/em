@@ -18,11 +18,15 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{{ asset('dashboard/plugins/themify-icons/themify-icons.min.css') }}">
+    {{-- <link href="{{ asset('dashboard/css/nifty.min.css') }}" rel="stylesheet"> --}}
+    <link href="{{ asset('dashboard/css/demo/nifty-demo-icons.min.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
 </head>
 <body>
     <div id="app">
         <nav class="navbar navbar-expand-md navbar-light navbar-laravel">
-            <div class="container">
+            <div class="container-fluid">
                 <a class="navbar-brand" href="{{ url('/') }}">
                     {{ config('app.name', 'Laravel') }}
                 </a>
@@ -55,6 +59,9 @@
                                 </li> --}}
                             @endif
                         @else
+                            <li class="nav-item">
+                               <a class="nav-link" href="{{ route('upload-page') }}">Upload Data</a>
+                           </li>
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     {{ Auth::user()->name }} <span class="caret"></span>
@@ -79,7 +86,7 @@
         </nav>
 
         <main class="py-4">
-            <div class="container">
+            <div class="container-fluid">
                 @yield('content')
             </div>
             

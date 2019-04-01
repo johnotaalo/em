@@ -8,6 +8,17 @@
 require('./bootstrap');
 
 window.Vue = require('vue');
+import VueHighcharts from 'vue-highcharts';
+import Highcharts from 'highcharts';
+
+// load these modules as your need
+import loadStock from 'highcharts/modules/stock.js';
+import loadMap from 'highcharts/modules/map.js';
+import loadGantt from 'highcharts/modules/gantt.js';
+import loadDrilldown from 'highcharts/modules/drilldown.js';
+// some charts like solid gauge require `highcharts-more.js`, you can find it in official document.
+import loadHighchartsMore from 'highcharts/highcharts-more.js';
+import loadSolidGauge from 'highcharts/modules/solid-gauge.js';
 
 require('highcharts-vue');
 /**
@@ -23,18 +34,36 @@ require('highcharts-vue');
 
 import HighchartsVue from 'highcharts-vue';
 import BootstrapVue from 'bootstrap-vue';
+import {ServerTable, ClientTable, Event} from 'vue-tables-2';
+import VueSwal from 'vue-swal'
 
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 
+import '../../public/fonts/feather/feather.min.css'
+import '../../public/css/theme.min.css'
+
 Vue.use(HighchartsVue);
 Vue.use(BootstrapVue);
+Vue.use(ClientTable, {}, false, 'bootstrap4', 'default');
+Vue.use(ServerTable, {}, false, 'bootstrap4', 'default');
+Vue.use(VueSwal)
+
+loadStock(Highcharts);
+loadMap(Highcharts);
+loadGantt(Highcharts);
+loadDrilldown(Highcharts);
+loadHighchartsMore(Highcharts);
+loadSolidGauge(Highcharts);
+
+Vue.use(VueHighcharts, { Highcharts });
 
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 Vue.component('welcome-component', require('./components/WelcomeComponent.vue').default);
 Vue.component('national-dashboard-component', require('./components/NationalDashboardComponent.vue').default);
 Vue.component('county-dashboard-component', require('./components/CountyDashboardComponent.vue').default);
 Vue.component('uploader-component', require('./components/UploaderComponent.vue').default);
+Vue.component('temporary-data-component', require('./components/TemporaryDataComponent.vue').default);
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to

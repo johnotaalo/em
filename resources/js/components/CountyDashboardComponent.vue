@@ -33,7 +33,7 @@
 		data() {
 			return {
 				diarrhoeaColor: "#03A9F4",
-				pneumoniaColor: "#4CAF50",
+				pneumoniaColor: "#66BB6A",
 				baselineColor: "#BDBDBD",
 				classificationData: {
 					pneumonia_class: [],
