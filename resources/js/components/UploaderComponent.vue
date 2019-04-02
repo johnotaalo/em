@@ -9,7 +9,7 @@
 			<div class="col-md">
 				<div class="float-right">
 					<b-button variant="outline-info" @click="submitUpload">Upload Data</b-button>
-					<b-button variant="outline-success">Download CSV Template</b-button>
+					<b-button variant="outline-success" @click="downloadTemplate">Download CSV Template</b-button>
 				</div>
 				
 			</div>
@@ -51,6 +51,9 @@ export default {
 	methods: {
 		submitUpload: function() {
 			this.$refs.dropzone.processQueue();
+		},
+		downloadTemplate: function(){
+			window.location.href = "/templates/supervision_data_template.csv"
 		}
 	}
 }

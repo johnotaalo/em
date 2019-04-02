@@ -15,11 +15,6 @@
 								<span class="h2 mb-0">
 									{{ counties }}
 								</span>
-
-								<span class="badge badge-soft-warning mt-n1">
-								+0%
-								</span>
-
 							</div>
 							<div class="col-auto">
 
@@ -43,11 +38,6 @@
 								<span class="h2 mb-0">
 									{{ facilities }}
 								</span>
-
-								<span class="badge badge-soft-warning mt-n1">
-								+0%
-								</span>
-
 							</div>
 							<div class="col-auto">
 
@@ -71,11 +61,6 @@
 								<span class="h2 mb-0">
 									{{ facilities }}
 								</span>
-
-								<span class="badge badge-soft-warning mt-n1">
-								+0%
-								</span>
-
 							</div>
 							<div class="col-auto">
 
@@ -87,8 +72,13 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-md-5">
+			<div class="col-md-4">
 				<div class="card">
+					<div class="card-header">
+						<h4 class="card-header-title">
+						COUNTY COVERAGE
+						</h4>
+					</div>
 					<div class="card-body">
 						<highmaps :options="mapData" style="height: 600px;"></highmaps>
 					</div>
@@ -96,10 +86,17 @@
 				</div>
 				
 			</div>
-			<div class="col-md-5">
+			<div class="col-md-6">
 				<div class="row" style="margin-bottom: 10px;">
 					<div class="col-md-6">
 						<div class="card">
+							<div class="card-header">
+								<h5 class="card-header-title">
+								DIARRHOEA CLASSIFICATION
+
+								<span class="badge badge-soft-warning mt-n1 float-right" style="flex: 0"><span v-if="variance.classification.diarrhoea > 0">+</span>{{ variance.classification.diarrhoea }}%</span>
+								</h5>
+							</div>
 							<div class="card-body">
 								<highcharts :options="diarrhoeaClassificationOptions"></highcharts>	
 							</div>
@@ -107,6 +104,12 @@
 					</div>
 					<div class="col-md-6">
 						<div class="card">
+							<div class="card-header">
+								<h5 class="card-header-title">
+								DIARRHOEA TREATMENT
+								<span class="badge badge-soft-warning mt-n1 float-right" style="flex: 0">+0%</span>
+								</h5>
+							</div>
 							<div class="card-body">
 								<highcharts :options="diarrhoeaTreatmentOptions"></highcharts>
 							</div>
@@ -117,6 +120,12 @@
 				<div class="row">		
 					<div class="col-md-6">
 						<div class="card">
+							<div class="card-header">
+								<h5 class="card-header-title">
+								PNEUMONIA CLASSIFICATION
+								<span class="badge badge-soft-warning mt-n1 float-right" style="flex: 0"><span v-if="variance.classification.pneumonia > 0">+</span>{{ variance.classification.pneumonia }}%</span>
+								</h5>
+							</div>
 							<div class="card-body">
 								<highcharts :options="pneumoniaClassificationOptions"></highcharts>
 							</div>
@@ -124,6 +133,12 @@
 					</div>
 					<div class="col-md-6">
 						<div class="card">
+							<div class="card-header">
+								<h5 class="card-header-title">
+								PNEUMONIA TREATMENT
+								<span class="badge badge-soft-warning mt-n1 float-right" style="flex: 0">+0%</span>
+								</h5>
+							</div>
 							<div class="card-body">
 								<highcharts :options="pneumoniaTreatmentOptions"></highcharts>
 							</div>
@@ -147,6 +162,8 @@ import json from '../../../public/counties.json'
 	export default {
 		data() {
 			return {
+				pneumoniaClassificationBaseline: 47,
+				diarrhoeaClassificationBaseline: 32,
 				countyData: [],
 				diarrhoeaColor: "#03A9F4",
 				pneumoniaColor: "#66BB6A",
@@ -220,9 +237,7 @@ import json from '../../../public/counties.json'
 		            map: json
 		          },
 
-		          title: {
-		            text: 'County Coverage'
-		          },
+		          title: null,
 		          mapNavigation: {
 		            enabled: true,
 		            buttonOptions: {
@@ -264,9 +279,7 @@ import json from '../../../public/counties.json'
 			pneumoniaClassificationOptions: function(){
 				var em = this;
 				return {
-					title: {
-						text: 'Pneumonia Classification'
-					},
+					title: null,
 					chart: {
 						type: 'column'
 					},
@@ -296,16 +309,14 @@ import json from '../../../public/counties.json'
 						showInLegend: false,
 						name: 'Classifications',
 						color: em.pneumoniaColor,
-						data: [47,_.round(this.classificationData.pneumonia_class)] // sample data
+						data: [em.pneumoniaClassificationBaseline,_.round(this.classificationData.pneumonia_class)] // sample data
 					}]
 				};
 			},
 			diarrhoeaClassificationOptions: function(){
 				var em = this;
 					return {
-						title: {
-											text: 'Diarrhoea Classification'
-										},
+						title: null,
 										chart: {
 											type: 'column'
 										},
@@ -335,25 +346,23 @@ import json from '../../../public/counties.json'
 											showInLegend: false,
 											name: 'Classifications',
 											color: em.diarrhoeaColor,
-											data: [32,_.round(this.classificationData.diarrhoea_class)] // sample data
+											data: [em.diarrhoeaClassificationBaseline,_.round(this.classificationData.diarrhoea_class)] // sample data
 										}]}
 			},
-				pneumoniaTreatmentOptions: function(){
-					var _this = this;
-					var seriesData = [];
-					_.forOwn(this.treatmentData.pneumonia, function(v, k){
-						var obj = {};
-						obj = {
-							name: _this.pneumoniaTreatmentLabels[k],
-							data: [_this.baselineData[k], v]
-						};
+			pneumoniaTreatmentOptions: function(){
+				var _this = this;
+				var seriesData = [];
+				_.forOwn(this.treatmentData.pneumonia, function(v, k){
+					var obj = {};
+					obj = {
+						name: _this.pneumoniaTreatmentLabels[k],
+						data: [_this.baselineData[k], v]
+					};
 
-						seriesData.push(obj);
-					});
+					seriesData.push(obj);
+				});
 				return {
-					title: {
-						text: 'Pneumonia Treatment'
-					},
+					title: null,
 					chart: {
 						type: 'column'
 					},
@@ -392,9 +401,7 @@ import json from '../../../public/counties.json'
 			diarrhoeaTreatmentOptions: function(){
 				var _this = this;
 				return {
-					title: {
-						text: 'Diarrhoea Treatment'
-					},
+					title: null,
 					chart: {
 						type: 'column'
 					},
@@ -418,6 +425,17 @@ import json from '../../../public/counties.json'
 						color: _this.diarrhoeaColor,
 						data: [5,_this.treatmentData.diarrhoea.DIARRHOEA_ZINC_ORS] // sample data
 					}]
+				}
+			},
+			variance: function(){
+				var diarrhoeaClassificationVariance = this.classificationData.diarrhoea_class - this.diarrhoeaClassificationBaseline;
+				var pneumoniaClassificationVariance = this.classificationData.pneumonia_class - this.pneumoniaClassificationBaseline;
+
+				return {
+					classification: {
+						diarrhoea: _.round(diarrhoeaClassificationVariance),
+						pneumonia: _.round(pneumoniaClassificationVariance)
+					}
 				}
 			}
 		}
