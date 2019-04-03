@@ -8,6 +8,15 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
 class SupervisionDataImport implements ToModel, WithHeadingRow
 {
+    protected $upload_id;
+    protected $assessment_type_id;
+    protected $period;
+
+    public function __construct($upload_id, $assessment_type_id, $period){
+        $this->upload_id = $upload_id;
+        $this->assessment_type_id = $assessment_type_id;
+        $this->period = $period;
+    }
     /**
     * @param array $row
     *
@@ -112,17 +121,18 @@ class SupervisionDataImport implements ToModel, WithHeadingRow
         $theKeys = [];
         // echo "<pre>";print_r($row);die;
         $keyData = [
-            'SubmissionDate' => \Carbon\Carbon::parse($row["submissiondate"])->format('Y-m-d'),
-            'datesup' => \Carbon\Carbon::parse($row["datesup"])->format('Y-m-d'),
-            'supname' => $row["supname"],
-            'cname' => $row["cname"],
-            'county' => $row["county"],
-            'scname' => $row["scname"],
+            'supname' => ($row["supname"]) ? $row["supname"] : "",
+            'cname' => ($row["cname"]) ? $row["cname"] : "",
+            'county' => ($row["county"]) ? $row["county"] : "" ,
+            'scname' => ($row["scname"]) ? $row["scname"]: "",
             'sub_county' => $row["sub_county"],
             'fname' => $row["fname"],
             'facility_name' => $row["facility_name"],
             'incharge' => $row["incharge"],
-            'mobile' => $row["mobile"]
+            'mobile' => $row["mobile"],
+            'upload_id'             =>  $this->upload_id,
+            'period'                =>  $this->period,
+            'assessment_type_id'    =>  $this->assessment_type_id
         ];
         
         foreach ($row as $key => $value) {
@@ -132,6 +142,8 @@ class SupervisionDataImport implements ToModel, WithHeadingRow
         }        
 
         $keyData = $keyData + $theKeys;
+
+        // echo "<pre>";print_r($keyData);die;
 
         return new SupervisionDataUploadTmp($keyData);
     }

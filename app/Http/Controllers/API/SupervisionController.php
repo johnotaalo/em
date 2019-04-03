@@ -9,6 +9,8 @@ use App\SupervisionDataUploadTmp as SPUploadTmp;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\SupervisionDataImport;
 
+use App\SupervisionUpload as Upload;
+
 class SupervisionController extends Controller
 {
     function counties(){
@@ -32,6 +34,17 @@ class SupervisionController extends Controller
     	];
 
     	return $response;
+    }
+
+    function getCounties(){
+        $counties = \App\County::all();
+
+        return $counties;
+    }
+
+
+    function getAssessmentTypes(){
+        return \App\AssessmentType::all();
     }
 
     function getPneumoniaData(){
@@ -88,9 +101,30 @@ class SupervisionController extends Controller
     }
 
     function uploadCSV(Request $request){
-        $path =$request->file->store('data');
+        // echo "<pre>";print_r($request->input());die;
+        
+        $counties = "";
+        $countyList = [];
+        foreach ($request->input('county') as $key => $value) {
+            if (is_integer($key)) {
+                $countyList[] = $value['value'];
+            }else{
+                $counties = $value;
+            }
+        }
 
-        Excel::import(new SupervisionDataImport, $path);
+        $counties = (count($countyList)) ? implode(", ", $countyList) : $counties;
+
+        $path =$request->file->store('data');
+        $upload = Upload::create([ "counties" => $counties, "path" => $path ]);
+
+        $period = $request->input('duration')['month'] . " " . $request->input('duration')['year'];
+
+        Excel::import(new SupervisionDataImport($upload->id, $request->input('assessmentType'), $period), $path);
+    }
+
+    function createCountiesData($data){
+        return $data['value'];
     }
 
     function getTemporaryData(){

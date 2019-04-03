@@ -9,8 +9,6 @@ use Illuminate\Database\Eloquent\Model;
 class SupervisionDataUploadTmp extends Model
 {
     protected $fillable = [
-		'SubmissionDate',
-		'datesup',
 		'supname',
 		'cname',
 		'county',
@@ -109,11 +107,13 @@ class SupervisionDataUploadTmp extends Model
 		'd_noclass_iv',
 		'd_noclass_a',
 		'd_noclass_other',
-		'd_noclass_no'
+		'd_noclass_no',
+		'upload_id',
+		'assessment_type_id',
+		'period'
     ];
 
-    protected $columns = ['id', 'SubmissionDate',
-		'datesup',
+    protected $columns = ['id', 
 		'supname',
 		'cname',
 		'county',
@@ -212,7 +212,12 @@ class SupervisionDataUploadTmp extends Model
 		'd_noclass_iv',
 		'd_noclass_a',
 		'd_noclass_other',
-		'd_noclass_no','created_at', 'updated_at'];
+		'd_noclass_no',,
+		'upload_id',
+		'assessment_type_id',
+		'period',
+		'created_at',
+		'updated_at'];
 
     public function getSubmissionDateAttr($value){
     	return Carbon::parse($value)->format('Y-m-d');

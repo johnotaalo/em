@@ -10,6 +10,8 @@ require('./bootstrap');
 window.Vue = require('vue');
 import VueHighcharts from 'vue-highcharts';
 import Highcharts from 'highcharts';
+import Vue from 'vue'
+import vSelect from 'vue-select'
 
 // load these modules as your need
 import loadStock from 'highcharts/modules/stock.js';
@@ -36,6 +38,7 @@ import HighchartsVue from 'highcharts-vue';
 import BootstrapVue from 'bootstrap-vue';
 import {ServerTable, ClientTable, Event} from 'vue-tables-2';
 import VueSwal from 'vue-swal'
+import appEvent from './core/AppEvent'
 
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
@@ -57,6 +60,7 @@ loadHighchartsMore(Highcharts);
 loadSolidGauge(Highcharts);
 
 Vue.use(VueHighcharts, { Highcharts });
+Vue.component('v-select', vSelect)
 
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 Vue.component('welcome-component', require('./components/WelcomeComponent.vue').default);
