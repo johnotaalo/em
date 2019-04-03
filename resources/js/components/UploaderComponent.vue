@@ -1,5 +1,6 @@
 <template>
 	<div>
+		<loading :active.sync="isLoading" color="#2196F3" :can-cancel="false" :is-full-page="fullPage"></loading>
 		<div class="row">
 			<div class="col-md">
 				<b-card title="Submission Details">
@@ -68,6 +69,7 @@ export default {
 				thumbnailWidth: 200,
 				addRemoveLinks: true,
 				autoProcessQueue: false,
+				timeout: 0,
 				acceptedFiles: "text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 				dictDefaultMessage: '<div class="dz-icon"><i class="demo-pli-upload-to-cloud" style="font-size: 5em;"></i></div><div><span class="dz-text">Drop file to upload</span><p class="text-sm text-muted">or click to pick manually</p></div>',
 				maxFiles: 1,
@@ -78,9 +80,12 @@ export default {
 					})
 				},
 				success: function(){
+					this.isLoading = false
 					location.reload();
 				}
 			},
+			isLoading: false,
+			fullPage: true,
 			counties: [],
 			assessmentTypes: [],
 			uploadType: "multiple",
@@ -121,9 +126,9 @@ export default {
 			});
 		},
 		sendingEvent: function (file, xhr, formData) {
+			this.isLoading = true
 			var data = this.form.data();
 			formData = this.createFormData(data, formData)
-			console.log(formData);
 		},
 
 		createFormData(data, formData = null, previousKey = null){

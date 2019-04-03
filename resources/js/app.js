@@ -12,6 +12,7 @@ import VueHighcharts from 'vue-highcharts';
 import Highcharts from 'highcharts';
 import Vue from 'vue'
 import vSelect from 'vue-select'
+import VueLoading from 'vue-loading-overlay';
 
 // load these modules as your need
 import loadStock from 'highcharts/modules/stock.js';
@@ -45,12 +46,15 @@ import 'bootstrap-vue/dist/bootstrap-vue.css';
 
 import '../../public/fonts/feather/feather.min.css'
 import '../../public/css/theme.min.css'
+import 'vue-loading-overlay/dist/vue-loading.css'
 
 Vue.use(HighchartsVue);
 Vue.use(BootstrapVue);
 Vue.use(ClientTable, {}, false, 'bootstrap4', 'default');
 Vue.use(ServerTable, {}, false, 'bootstrap4', 'default');
 Vue.use(VueSwal)
+Vue.use(VueLoading);
+
 
 loadStock(Highcharts);
 loadMap(Highcharts);
@@ -68,7 +72,7 @@ Vue.component('national-dashboard-component', require('./components/NationalDash
 Vue.component('county-dashboard-component', require('./components/CountyDashboardComponent.vue').default);
 Vue.component('uploader-component', require('./components/UploaderComponent.vue').default);
 Vue.component('temporary-data-component', require('./components/TemporaryDataComponent.vue').default);
-
+Vue.component('loading', VueLoading)
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
