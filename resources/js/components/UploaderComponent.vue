@@ -71,7 +71,7 @@ export default {
 				autoProcessQueue: false,
 				timeout: 0,
 				acceptedFiles: "text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-				dictDefaultMessage: '<div class="dz-icon"><i class="demo-pli-upload-to-cloud" style="font-size: 5em;"></i></div><div><span class="dz-text">Drop file to upload</span><p class="text-sm text-muted">or click to pick manually</p></div>',
+				dictDefaultMessage: '<div class="dz-icon"><i class="demo-pli-upload-to-cloud" style="font-size: 5em;"></i></div><div><span class="dz-text">Drop file to upload</span><p class="text-sm text-muted">or click to pick manually</p><p><strong>Accepted file formats (.csv and .xlsx)</strong></p></div>',
 				maxFiles: 1,
 				init: function(){
 					this.on("maxfilesexceeded", function(file){
@@ -168,7 +168,7 @@ export default {
 	computed: {
 		years: function() {
 			var dt = new Date();
-			var initial = 2017;
+			var initial = 2015;
 			var thisYear = dt.getFullYear();
 
 			var allYears = [];
