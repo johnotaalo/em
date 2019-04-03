@@ -113,7 +113,8 @@ class SupervisionDataUploadTmp extends Model
 		'period'
     ];
 
-    protected $columns = ['id', 
+    protected $columns = [
+    	'id',
 		'supname',
 		'cname',
 		'county',
@@ -212,7 +213,7 @@ class SupervisionDataUploadTmp extends Model
 		'd_noclass_iv',
 		'd_noclass_a',
 		'd_noclass_other',
-		'd_noclass_no',,
+		'd_noclass_no',
 		'upload_id',
 		'assessment_type_id',
 		'period',

@@ -78,7 +78,7 @@ export default {
 					})
 				},
 				success: function(){
-					// location.reload();
+					location.reload();
 				}
 			},
 			counties: [],
