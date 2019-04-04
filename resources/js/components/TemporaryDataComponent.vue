@@ -36,6 +36,7 @@
 	export default{
 		data() {
 			return {
+				uploaded: 0,
 				temporaryData: [],
 				isBusy: false,
 				isLoading: false,
@@ -165,7 +166,7 @@
 					var data = _.find(this.temporaryData, (o) => {
 						return o.county == "Mombasa"
 					});
-					console.log(data);
+					// console.log(data);
 					return data;
 				}
 			}
@@ -204,13 +205,16 @@
 				})
 				.then((proceed) => {
 					if (proceed) {
+						this.isLoading = true;
 						return fetch('/api/data/upload');
 					}
 				})
 				.then(result => {
-					location.reload();
+					this.isLoading = false;
+					// location.reload();
 				})
 				.catch(err => {
+					this.isLoading = false;
 					if (err) {
 						this.$swal("Error!", "There was an error with the request", "error");
 					} else {

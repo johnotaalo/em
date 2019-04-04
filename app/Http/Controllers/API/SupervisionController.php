@@ -134,16 +134,7 @@ class SupervisionController extends Controller
     }
 
     function uploadData(){
-        $tempData = SPUploadTmp::exclude(['id', 'created_at', 'updated_at'])->get()->toArray();
-
-        foreach ($tempData as $key => $value) {
-            $value['facility name'] = $value['facility_name'];
-            $value['sub county'] = $value['sub_county'];
-            $value['supervision_no'] = 1;
-            unset($value['facility_name']);
-            unset($value['sub_county']);
-            $tempData[$key] = $value;
-        }
+        $tempData = SPUploadTmp::exclude(['id', 'created_at', 'updated_at', 'upload_id'])->limit(500)->get()->toArray();
 
         \DB::table('supervision_data')->insert($tempData);
         SPUploadTmp::query()->truncate();

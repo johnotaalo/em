@@ -3,7 +3,7 @@
 		<loading :active.sync="isLoading" color="#2196F3" :can-cancel="false" :is-full-page="fullPage"></loading>
 		<div class="row">
 			<div class="col-md">
-				<b-card title="Submission Details">
+				<b-card title="Data Upload">
 					<div class="form-group">
 						<b-form-group label="Please select assessment type">
 							<b-form-select v-model="form.assessmentType" name="assessmentType" :options="assessmentTypes"></b-form-select>
