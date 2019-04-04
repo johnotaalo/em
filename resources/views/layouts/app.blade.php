@@ -44,10 +44,10 @@
                     <ul class="navbar-nav ml-auto">
                         <!-- Authentication Links -->
                        <li class="nav-item">
-                           <a class="nav-link" href="{{ route('home') }}">Dashboard</a>
+                           <a class="nav-link {{ Active::checkRoute('home') }}" href="{{ route('home') }}">Dashboard</a>
                        </li>
                        <li class="nav-item">
-                           <a class="nav-link" href="{{ route('county-dashboard') }}">County</a>
+                           <a class="nav-link {{ Active::checkRoute('county-dashboard') }}" href="{{ route('county-dashboard') }}">County</a>
                        </li>
                         @guest
                             <li class="nav-item">
@@ -60,11 +60,11 @@
                             @endif
                         @else
                             <li class="nav-item">
-                               <a class="nav-link" href="{{ route('upload-page') }}">Upload Data</a>
+                               <a class="nav-link {{ Active::checkRoute('upload-page') }}" href="{{ route('upload-page') }}">Upload Data</a>
                            </li>
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                    <i>{{ Auth::user()->name }}</i> <span class="caret"></span>
+                                    {{ Auth::user()->name }} <span class="caret"></span>
                                 </a>
 
                                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">

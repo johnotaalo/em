@@ -177,6 +177,8 @@ return [
 
         Maatwebsite\Excel\ExcelServiceProvider::class,
 
+        Pyaesone17\ActiveState\ActiveStateServiceProvider::class,
+
     ],
 
     /*
@@ -228,6 +230,7 @@ return [
 
 
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
+        'Active' => Pyaesone17\ActiveState\ActiveFacade::class,
 
     ],
 
