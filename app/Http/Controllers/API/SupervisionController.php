@@ -134,7 +134,7 @@ class SupervisionController extends Controller
     }
 
     function uploadData(){
-        $tempData = SPUploadTmp::exclude(['id', 'created_at', 'updated_at', 'upload_id'])->limit(500)->get()->toArray();
+        $tempData = SPUploadTmp::exclude(['id', 'created_at', 'updated_at', 'upload_id'])->get()->toArray();
 
         \DB::table('supervision_data')->insert($tempData);
         SPUploadTmp::query()->truncate();
