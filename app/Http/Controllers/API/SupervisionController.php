@@ -74,7 +74,7 @@ class SupervisionController extends Controller
     }
 
     function getFacilitiesCount(){
-    	$data = \DB::table('supervision_data')->count('facility name');
+    	$data = \DB::table('supervision_data')->count('facility_name');
 
     	return $data;
     }
