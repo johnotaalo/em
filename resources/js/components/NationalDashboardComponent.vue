@@ -80,6 +80,7 @@
 						</h4>
 					</div>
 					<div class="card-body">
+						<loading :active.sync="mapLoading" :color="loaderColor" :can-cancel="false" :is-full-page="false"></loading>
 						<highmaps :options="mapData" style="height: 600px;"></highmaps>
 					</div>
 					
@@ -98,6 +99,7 @@
 								</h5>
 							</div>
 							<div class="card-body">
+								<loading :active.sync="classificationLoading" :color="loaderColor" :can-cancel="false" :is-full-page="false"></loading>
 								<highcharts :options="diarrhoeaClassificationOptions"></highcharts>	
 							</div>
 						</div>
@@ -111,6 +113,7 @@
 								</h5>
 							</div>
 							<div class="card-body">
+								<loading :active.sync="diarrhoeaTreatmentLoading" :color="loaderColor" :can-cancel="false" :is-full-page="false"></loading>
 								<highcharts :options="diarrhoeaTreatmentOptions"></highcharts>
 							</div>
 							
@@ -127,6 +130,7 @@
 								</h5>
 							</div>
 							<div class="card-body">
+								<loading :active.sync="classificationLoading" :color="loaderColor" :can-cancel="false" :is-full-page="false"></loading>
 								<highcharts :options="pneumoniaClassificationOptions"></highcharts>
 							</div>
 						</div>
@@ -140,6 +144,7 @@
 								</h5>
 							</div>
 							<div class="card-body">
+								<loading :active.sync="pneumoniaTreatmentLoading" :color="loaderColor" :can-cancel="false" :is-full-page="false"></loading>
 								<highcharts :options="pneumoniaTreatmentOptions"></highcharts>
 							</div>
 						</div>
@@ -162,6 +167,11 @@ import json from '../../../public/counties.json'
 	export default {
 		data() {
 			return {
+				mapLoading: false,
+				classificationLoading: false,
+				diarrhoeaTreatmentLoading: false,
+				pneumoniaTreatmentLoading: false,
+				loaderColor: "#2196F3",
 				pneumoniaClassificationBaseline: 47,
 				diarrhoeaClassificationBaseline: 32,
 				countyData: [],
@@ -193,21 +203,27 @@ import json from '../../../public/counties.json'
 			}
 		},
 		mounted() {
+			this.classificationLoading = true;
 			axios.get('/api/data/classification')
 			.then((response) => {
+				this.classificationLoading = false;
 				var data = response.data;
 				this.classificationData.pneumonia_class = (data.pneumonia.total_cases / (data.pneumonia.total_cases + data.pneumonia.no_class)) * 100;
 				this.classificationData.diarrhoea_class = (data.diarrhoea.total_cases / (data.diarrhoea.total_cases + data.diarrhoea.no_class)) * 100;
 			});
 
+			this.pneumoniaTreatmentLoading = true;
 			axios.get('/api/data/treatments/pneumonia')
 			.then((response) => {
 				var data = response.data;
 				this.treatmentData.pneumonia = data;
+				this.pneumoniaTreatmentLoading = false;
 			});
 
+			this.diarrhoeaTreatmentLoading = true
 			axios.get('/api/data/treatments/diarrhoea')
 			.then((response) => {
+				this.diarrhoeaTreatmentLoading = false
 				var data = response.data;
 				this.treatmentData.diarrhoea = data;
 			});
@@ -224,8 +240,10 @@ import json from '../../../public/counties.json'
 				this.counties = data;
 			});
 
+			this.mapLoading = true;
 			axios.get('/api/data/countyData')
 			.then((response) => {
+				this.mapLoading = false;
 				var data = response.data
 				this.countyData = _.map(data, (county) => ([ _.toUpper(county), 1 ]))
 			});

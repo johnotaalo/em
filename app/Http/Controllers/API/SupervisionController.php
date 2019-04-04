@@ -133,11 +133,30 @@ class SupervisionController extends Controller
         return SPUploadTmp::all();
     }
 
-    function uploadData(){
-        $tempData = SPUploadTmp::exclude(['id', 'created_at', 'updated_at', 'upload_id'])->get()->toArray();
+    function uploadData(Request $request){
+
+        $tempData = SPUploadTmp::exclude(['created_at', 'updated_at', 'upload_id']);
+        if($request->warning == "true"){
+            $tempData = $tempData->limit(500);
+        }
+
+        $tempIDs = $tempData->pluck("id");
+        $tempData = $tempData->get()->toArray();
+        // dd($tempIDs);
+
+        foreach($tempData as $key => $value) {
+            unset($tempData[$key]['id']);
+        }
+
+        // dd($tempData);
 
         \DB::table('supervision_data')->insert($tempData);
-        SPUploadTmp::query()->truncate();
+
+        if($request->warning == "true"){
+            SPUploadTmp::destroy($tempIDs);
+        }else{
+            SPUploadTmp::query()->truncate();
+        }
 
         return ['status' => 'success'];
     }

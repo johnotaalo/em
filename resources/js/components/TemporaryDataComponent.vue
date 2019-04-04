@@ -1,5 +1,8 @@
 <template>
 	<div>
+		<b-alert variant="warning" :show="warningShow" dismissible>
+			<p>Due to the time, we can only be able to upload 500 rows at a time. After you upload, you may be required to upload the next batch</p>
+		</b-alert>
 		<div class="card">
 			<div class="card-body">
 				<div class="row">
@@ -36,6 +39,7 @@
 	export default{
 		data() {
 			return {
+				warningShow: false,
 				uploaded: 0,
 				temporaryData: [],
 				isBusy: false,
@@ -144,6 +148,8 @@
 			.then((res) => {
 				this.isLoading = false;
 				this.temporaryData = res.data
+
+				this.warningShow = this.temporaryData.length > 500
 			});
 		},
 		computed: {
@@ -206,12 +212,12 @@
 				.then((proceed) => {
 					if (proceed) {
 						this.isLoading = true;
-						return fetch('/api/data/upload');
+						return fetch('/api/data/upload/' + this.warningShow);
 					}
 				})
 				.then(result => {
 					this.isLoading = false;
-					// location.reload();
+					location.reload();
 				})
 				.catch(err => {
 					this.isLoading = false;
