@@ -38,16 +38,12 @@
 			</div>
 			<div class="col-md">
 				<p>Place the mouse over the blue area to remove the file.</p>
-				<vue-dropzone id="dropzone" ref = "dropzone" :options="dropzoneOptions" @vdropzone-sending="sendingEvent"></vue-dropzone>	
-			</div>
-		</div>
-		<div class="row mt-3">
-			<div class="col-md">
-				<div class="float-right">
-					<b-button variant="outline-info" @click="submitUpload">Upload Data</b-button>
+				<vue-dropzone id="dropzone" ref = "dropzone" :options="dropzoneOptions" @vdropzone-sending="sendingEvent"></vue-dropzone>
+
+				<div class="mt-3 float-right">
 					<b-button variant="outline-success" @click="downloadTemplate">Download CSV Template</b-button>
+					<b-button variant="outline-info" @click="submitUpload">Upload Data</b-button>
 				</div>
-				
 			</div>
 		</div>
 	</div>

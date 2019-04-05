@@ -418,7 +418,12 @@ import json from '../../../public/counties.json'
 						type: 'column'
 					},
 					xAxis: {
-						categories: ['Baseline', 'Supervision 2018']
+						categories: ['Baseline', 'Supervision 2018'],
+						labels: {
+					style: {
+						color: '#000'
+						}
+					},
 					},
 					yAxis: [{
 						gridLineWidth: 0,
@@ -434,6 +439,7 @@ import json from '../../../public/counties.json'
 					legend: {
 						verticalAlign: 'top',
 					},
+					
 					plotOptions: {
 						column: {
 							stacking: 'percent',
