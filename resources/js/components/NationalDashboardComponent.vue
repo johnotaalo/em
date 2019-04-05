@@ -212,14 +212,22 @@ import json from '../../../public/counties.json'
 				baselineData: {
 					AMOXDT: 4,
 					AMOX_SYRUP: 42,
-					INJECTIBLES: 29,
+					INJECTABLES: 29,
 					CTX: 24
 				},
 				pneumoniaTreatmentLabels: {
 					AMOXDT: "Amox DT",
 					AMOX_SYRUP: "Amox Syrup",
-					INJECTIBLES: "Injectibles",
-					CTX: "CTX"
+					CTX: "CTX",
+					INJECTABLES: "Injectables",
+					
+				},
+				pneumoniaTreatmentColors: {
+					AMOXDT: "#00B0FF",
+					AMOX_SYRUP: "#66BB6A",
+					CTX: "#9E9E9E",
+					INJECTABLES: "#FF9800"
+					
 				}
 			}
 		},
@@ -398,7 +406,8 @@ import json from '../../../public/counties.json'
 					var obj = {};
 					obj = {
 						name: _this.pneumoniaTreatmentLabels[k],
-						data: [_this.baselineData[k], v]
+						data: [_this.baselineData[k], v],
+						color: _this.pneumoniaTreatmentColors[k]
 					};
 
 					seriesData.push(obj);
@@ -422,6 +431,9 @@ import json from '../../../public/counties.json'
 							text: null
 						}
 					}],
+					legend: {
+						verticalAlign: 'top',
+					},
 					plotOptions: {
 						column: {
 							stacking: 'percent',
