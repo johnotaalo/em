@@ -11,7 +11,7 @@
 					</div>
 					<div class="form-group">
 						<b-form-group label="Pick the number of counties that the data belongs to">
-							<b-form-radio v-model="uploadType" name="no-counties" value="single">1 County</b-form-radio>
+							<b-form-radio v-model="uploadType" name="no-counties" value="single">Single County</b-form-radio>
 							<b-form-radio v-model="uploadType" name="no-counties" value="multiple">Multiple Counties</b-form-radio>
 						</b-form-group>
 					</div>
@@ -37,6 +37,7 @@
 				</b-card>
 			</div>
 			<div class="col-md">
+				<p>Place the mouse over the blue area to remove the file.</p>
 				<vue-dropzone id="dropzone" ref = "dropzone" :options="dropzoneOptions" @vdropzone-sending="sendingEvent"></vue-dropzone>	
 			</div>
 		</div>

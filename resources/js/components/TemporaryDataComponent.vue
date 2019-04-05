@@ -1,16 +1,16 @@
 <template>
 	<div>
-		<b-alert variant="warning" :show="warningShow" dismissible>
-			<p>Due to the time, we can only be able to upload 500 rows at a time. After you upload, you may be required to upload the next batch</p>
+		<b-alert variant="warning" :show="warningShow">
+			<span>The system can only upload 500 rows at a time. After this upload, you will be required to upload the next batch.</span>
 		</b-alert>
 		<div class="card">
 			<div class="card-body">
 				<div class="row">
 					<div class="col-md">
 						<b-button>The current file upload has {{ counties.length }} counties (Hover for more details)</b-button>
-						<div v-if="differences.counties.length || differences.uploadCounties.length">
+						<!-- <div v-if="differences.counties.length || differences.uploadCounties.length">
 							<p class="text-danger">Counties not matching with those selected</p>
-						</div>
+						</div> -->
 					</div>
 					<div class="col-md">
 						<div class="float-right">
@@ -25,7 +25,7 @@
 		</div>
 		<div class="card">
 			<div class="card-body">
-				<v-client-table small :data="filteredData" :columns="columns"></v-client-table>
+				<v-client-table small :data="filteredData" :columns="columns" :options="options"></v-client-table>
 			</div>
 		</div>
 
@@ -48,6 +48,11 @@
 				differences: {
 					counties: [],
 					uploadCounties: []
+				},
+				options: {
+					filterable: false,
+					perPageValues: [],
+					perPage: 500
 				},
 				isBusy: false,
 				isLoading: false,
@@ -220,7 +225,7 @@
 			uploadData(){
 				this.$swal({
 					title: "Upload Data",
-					text: "This shall add the uploaded data to the master data. This shall affect all dashboards.",
+					text: "Are you sure you want to upload the data? You may be redirected to the Upload Data page to continue uploading data.",
 					icon: "info",
 					buttons: true,
 					dangerMode: true,
