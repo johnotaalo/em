@@ -39,7 +39,7 @@ class SupervisionController extends Controller
     }
 
     function getCounties(){
-        $counties = \App\County::all();
+        $counties = \App\County::orderBy('county', 'ASC')->get();
 
         return $counties;
     }
