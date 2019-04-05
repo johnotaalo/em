@@ -66,6 +66,9 @@
                        <li class="nav-item">
                            <a class="nav-link {{ Active::checkRoute('county-dashboard') }}" href="{{ route('county-dashboard') }}">County</a>
                        </li>
+                       <li class="nav-item">
+                           <a class="nav-link" href="#">Resource Materials</a>
+                       </li>
                         @guest
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
@@ -78,6 +81,9 @@
                         @else
                             <li class="nav-item">
                                <a class="nav-link {{ Active::checkRoute('upload-page') }}" href="{{ route('upload-page') }}">Upload Data</a>
+                           </li>
+                           <li class="nav-item">
+                               <a class="nav-link" href="#">Directory</a>
                            </li>
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>

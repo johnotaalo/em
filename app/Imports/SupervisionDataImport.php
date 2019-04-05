@@ -32,6 +32,8 @@ class SupervisionDataImport implements ToModel, WithHeadingRow
             'sev_oxygen',
             'sev_ctx',
             'sev_benz',
+            'sev_gent',
+            'sev_benzgent',
             'sev_anti',
             'sev_other',
             'sev_notx',
