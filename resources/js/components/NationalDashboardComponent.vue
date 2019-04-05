@@ -2,7 +2,7 @@
 	<div>
 		
 		<div class="row">
-			<div class="col-md-2">
+			<div class="col-md-1">
 				<div class="card">
 					<div class="card-body">
 						<div class="row align-items-center">
@@ -72,7 +72,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-md-4">
+			<div class="col-md-3">
 				<div class="card">
 					<div class="card-header">
 						<h4 class="card-header-title">
@@ -81,13 +81,13 @@
 					</div>
 					<div class="card-body">
 						<loading :active.sync="mapLoading" :color="loaderColor" :can-cancel="false" :is-full-page="false"></loading>
-						<highmaps :options="mapData" style="height: 600px;"></highmaps>
+						<highmaps :options="mapData" style="height: 400px;"></highmaps>
 					</div>
 					
 				</div>
 				
 			</div>
-			<div class="col-md-6">
+			<div class="col-md-8">
 				<div class="row" style="margin-bottom: 10px;">
 					<div class="col-md-6">
 						<div class="card">

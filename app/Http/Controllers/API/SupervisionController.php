@@ -130,7 +130,11 @@ class SupervisionController extends Controller
     }
 
     function getTemporaryData(){
-        return SPUploadTmp::all();
+        $data = [];
+        $data['temporaryData'] = SPUploadTmp::all();
+        $upload = \App\SupervisionUpload::orderBy('id', 'DESC')->first();
+        $data['upload'] = $upload;
+        return $data;
     }
 
     function uploadData(Request $request){

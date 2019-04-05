@@ -8,7 +8,9 @@
 				<div class="row">
 					<div class="col-md">
 						<b-button>The current file upload has {{ counties.length }} counties (Hover for more details)</b-button>
-						
+						<div v-if="differences.counties.length || differences.uploadCounties.length">
+							<p class="text-danger">Counties not matching with those selected</p>
+						</div>
 					</div>
 					<div class="col-md">
 						<div class="float-right">
@@ -42,6 +44,11 @@
 				warningShow: false,
 				uploaded: 0,
 				temporaryData: [],
+				upload: "",
+				differences: {
+					counties: [],
+					uploadCounties: []
+				},
 				isBusy: false,
 				isLoading: false,
 				columns: [
@@ -147,14 +154,23 @@
 			axios.get('/api/data/temporary')
 			.then((res) => {
 				this.isLoading = false;
-				this.temporaryData = res.data
+				this.temporaryData = res.data.temporaryData
+				this.upload = res.data.upload
 
 				this.warningShow = this.temporaryData.length > 500
 			});
 		},
 		computed: {
 			counties: function(){
-				var counties = this.getUniqueValuesOfKey(this.temporaryData, "county")
+				var counties = _.sortBy(this.getUniqueValuesOfKey(this.temporaryData, "county"))
+				var selectedUploadCounties = _.split(this.upload.counties, ", ")
+				selectedUploadCounties = _.sortBy(selectedUploadCounties)
+
+				var differenceCounties = _.difference(counties, selectedUploadCounties)
+				var differenceUploadCounties = _.difference(selectedUploadCounties, counties)
+
+				this.differences.counties = differenceCounties
+				this.differences.uploadCounties = differenceUploadCounties
 				var sortedCounties = [];
 				_.forOwn(counties, (county, key)=>{
 					sortedCounties.push({ text: county + " ( 2 Previous Supervisions)", value: county })

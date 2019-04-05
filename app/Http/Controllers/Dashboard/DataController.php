@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Dashboard;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\SupervisionDataUploadTmp as SPUploadTmp;
+use App\SupervisionUpload;
 
 class DataController extends Controller
 {
