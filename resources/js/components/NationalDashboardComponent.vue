@@ -1,53 +1,86 @@
 <template>
 	<div>
-		
+		<div class="col">
+			<div class="col-md">
+				<small style="font-size: .7rem">This page shows data for at least 3 facility assessments.</small>
+			</div>
+		</div>
 		<div class="row">
-			<div class="col-md-1">
-				<div class="card">
-					<div class="card-body">
-						<div class="row align-items-center">
-							<div class="col">
-
-								<h6 class="card-title text-uppercase text-muted mb-2">
-									Counties
-								</h6>
-
-								<span class="h2 mb-0">
-									{{ counties }}
-								</span>
+			<!-- <div class="col-md-1">
+				
+			</div> -->
+			<div class="col-md-4">
+				<div class="row">
+					<div class="col">
+						<div class="card">
+							<div class="card-header">
+								<h4 class="card-header-title">
+								COUNTY COVERAGE
+								</h4>
 							</div>
-							<div class="col-auto">
-
-								<span class="h2 fa fa-flag text-muted mb-0"></span>
-
+							<div class="card-body">
+								<loading :active.sync="mapLoading" :color="loaderColor" :can-cancel="false" :is-full-page="false"></loading>
+								<highmaps :options="mapData" style="height: 400px;"></highmaps>
 							</div>
+							
 						</div>
-
 					</div>
 				</div>
 
-				<div class="card">
-					<div class="card-body">
-						<div class="row align-items-center">
-							<div class="col">
+				<div class="row">
+					<div class="col">
+						<div class="card">
+							<div class="card-body">
+								<div class="row align-items-center">
+									<div class="col">
 
-								<h6 class="card-title text-uppercase text-muted mb-2">
-									Facilities
-								</h6>
+										<h6 class="card-title text-uppercase text-muted mb-2">
+											Counties
+										</h6>
 
-								<span class="h2 mb-0">
-									{{ facilities }}
-								</span>
-							</div>
-							<div class="col-auto">
+										<span class="h2 mb-0">
+											{{ counties }}
+										</span>
+									</div>
+									<div class="col-auto">
 
-								<span class="h2 fa fa-hospital text-muted mb-0"></span>
+										<span class="h2 fa fa-flag text-muted mb-0"></span>
+
+									</div>
+								</div>
 
 							</div>
 						</div>
+					</div>
 
+					<div class="col">
+						<div class="card">
+							<div class="card-body">
+								<div class="row align-items-center">
+									<div class="col">
+
+										<h6 class="card-title text-uppercase text-muted mb-2">
+											Facilities
+										</h6>
+
+										<span class="h2 mb-0">
+											{{ facilities }}
+										</span>
+									</div>
+									<div class="col-auto">
+
+										<span class="h2 fa fa-hospital text-muted mb-0"></span>
+
+									</div>
+								</div>
+
+							</div>
+						</div>
 					</div>
 				</div>
+				
+
+				
 						
 				<div class="card">
 					<div class="card-body">
@@ -71,55 +104,9 @@
 						<hr>
 					</div>
 				</div>
-			</div>
-			<div class="col-md-3">
-				<div class="card">
-					<div class="card-header">
-						<h4 class="card-header-title">
-						COUNTY COVERAGE
-						</h4>
-					</div>
-					<div class="card-body">
-						<loading :active.sync="mapLoading" :color="loaderColor" :can-cancel="false" :is-full-page="false"></loading>
-						<highmaps :options="mapData" style="height: 400px;"></highmaps>
-					</div>
-					
-				</div>
 				
 			</div>
 			<div class="col-md-8">
-				<div class="row" style="margin-bottom: 10px;">
-					<div class="col-md-6">
-						<div class="card">
-							<div class="card-header">
-								<h5 class="card-header-title">
-								DIARRHOEA CLASSIFICATION
-
-								<span class="badge badge-soft-warning mt-n1 float-right" style="flex: 0"><span v-if="variance.classification.diarrhoea > 0">+</span>{{ variance.classification.diarrhoea }}%</span>
-								</h5>
-							</div>
-							<div class="card-body">
-								<loading :active.sync="classificationLoading" :color="loaderColor" :can-cancel="false" :is-full-page="false"></loading>
-								<highcharts :options="diarrhoeaClassificationOptions"></highcharts>	
-							</div>
-						</div>
-					</div>
-					<div class="col-md-6">
-						<div class="card">
-							<div class="card-header">
-								<h5 class="card-header-title">
-								DIARRHOEA TREATMENT
-								<span class="badge badge-soft-warning mt-n1 float-right" style="flex: 0">+0%</span>
-								</h5>
-							</div>
-							<div class="card-body">
-								<loading :active.sync="diarrhoeaTreatmentLoading" :color="loaderColor" :can-cancel="false" :is-full-page="false"></loading>
-								<highcharts :options="diarrhoeaTreatmentOptions"></highcharts>
-							</div>
-							
-						</div>
-					</div>
-				</div>
 				<div class="row">		
 					<div class="col-md-6">
 						<div class="card">
@@ -150,6 +137,39 @@
 						</div>
 					</div>
 				</div>
+				<div class="row" style="margin-bottom: 10px;">
+					<div class="col-md-6">
+						<div class="card">
+							<div class="card-header">
+								<h5 class="card-header-title">
+								DIARRHOEA CLASSIFICATION
+
+								<span class="badge badge-soft-warning mt-n1 float-right" style="flex: 0"><span v-if="variance.classification.diarrhoea > 0">+</span>{{ variance.classification.diarrhoea }}%</span>
+								</h5>
+							</div>
+							<div class="card-body">
+								<loading :active.sync="classificationLoading" :color="loaderColor" :can-cancel="false" :is-full-page="false"></loading>
+								<highcharts :options="diarrhoeaClassificationOptions" style = "height: 200px;"></highcharts>	
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="card">
+							<div class="card-header">
+								<h5 class="card-header-title">
+								DIARRHOEA TREATMENT
+								<span class="badge badge-soft-warning mt-n1 float-right" style="flex: 0">+0%</span>
+								</h5>
+							</div>
+							<div class="card-body">
+								<loading :active.sync="diarrhoeaTreatmentLoading" :color="loaderColor" :can-cancel="false" :is-full-page="false"></loading>
+								<highcharts :options="diarrhoeaTreatmentOptions" style = "height: 200px;"></highcharts>
+							</div>
+							
+						</div>
+					</div>
+				</div>
+				
 			</div>
 		</div>
 	
@@ -271,7 +291,10 @@ import json from '../../../public/counties.json'
 		            }]
 		          },
 
+		          legend:{ enabled:false },
+
 		          series: [{
+		          	showInLegend: false,
 		            data: this.countyData,
 		            keys: ["COUNTY_NAM", "value"],
 		            name: 'County data',
