@@ -419,11 +419,6 @@ import json from '../../../public/counties.json'
 					},
 					xAxis: {
 						categories: ['Baseline', 'Supervision 2018'],
-						labels: {
-					style: {
-						color: '#000'
-						}
-					},
 					},
 					yAxis: [{
 						gridLineWidth: 0,
@@ -445,7 +440,9 @@ import json from '../../../public/counties.json'
 							stacking: 'percent',
 							dataLabels: {
 								enabled: true,
-								format: "{point.percentage:.0f}%"
+								format: "{point.percentage:.0f}%",
+								color: "#000",
+								borderColor: "#000"
 							},
 							events: {
 								legendItemClick: function () {
