@@ -17,6 +17,7 @@
 								<h4 class="card-header-title">
 								COUNTY COVERAGE
 								</h4>
+								<small class="text-muted">Click on a county to view analytics</small>
 							</div>
 							<div class="card-body">
 								<loading :active.sync="mapLoading" :color="loaderColor" :can-cancel="false" :is-full-page="false"></loading>
