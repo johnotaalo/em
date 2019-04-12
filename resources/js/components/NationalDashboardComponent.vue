@@ -214,21 +214,27 @@ import json from '../../../public/counties.json'
 					AMOX_SYRUP: 42,
 					INJECTABLES: 29,
 					CTX: 24,
-					OXYGEN: 0
+					OXYGEN: 0,
+					OTHER: 0,
+					NOTX: 0
 				},
 				pneumoniaTreatmentLabels: {
 					AMOXDT: "Amox DT",
 					AMOX_SYRUP: "Amox Syrup",
 					CTX: "CTX",
 					INJECTABLES: "Injectables",
-					OXYGEN: "Oxygen"
+					OXYGEN: "Oxygen",
+					OTHER: "Other Treatment",
+					NOTX: "No Treatment"
 				},
 				pneumoniaTreatmentColors: {
 					AMOXDT: "#00B0FF",
 					AMOX_SYRUP: "#66BB6A",
 					CTX: "#9E9E9E",
 					INJECTABLES: "#FF9800",
-					OXYGEN: "#7C4DFF"
+					OXYGEN: "#7C4DFF",
+					OTHER: "#FFFF00",
+					NOTX: "#EF9A9A"
 				}
 			}
 		},
