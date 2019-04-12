@@ -119,7 +119,39 @@
 							</div>
 							<div class="card-body">
 								<loading :active.sync="classificationLoading" :color="loaderColor" :can-cancel="false" :is-full-page="false"></loading>
-								<highcharts :options="pneumoniaClassificationOptions"></highcharts>
+								<highcharts :options="pneumoniaClassificationOptions" style="height: 300px;"></highcharts>
+							</div>
+						</div>
+						<div class="row" style="margin-bottom: 10px;">
+							<div class="col-md-6">
+								<div class="card">
+									<div class="card-header">
+										<h5 class="card-header-title">
+										DIARRHOEA CLASSIFICATION
+
+										<span class="badge badge-soft-warning mt-n1 float-right" style="flex: 0"><span v-if="variance.classification.diarrhoea > 0">+</span>{{ variance.classification.diarrhoea }}%</span>
+										</h5>
+									</div>
+									<div class="card-body">
+										<loading :active.sync="classificationLoading" :color="loaderColor" :can-cancel="false" :is-full-page="false"></loading>
+										<highcharts :options="diarrhoeaClassificationOptions" style = "height: 200px;"></highcharts>	
+									</div>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="card">
+									<div class="card-header">
+										<h5 class="card-header-title">
+										DIARRHOEA TREATMENT
+										<span class="badge badge-soft-warning mt-n1 float-right" style="flex: 0">+0%</span>
+										</h5>
+									</div>
+									<div class="card-body">
+										<loading :active.sync="diarrhoeaTreatmentLoading" :color="loaderColor" :can-cancel="false" :is-full-page="false"></loading>
+										<highcharts :options="diarrhoeaTreatmentOptions" style = "height: 200px;"></highcharts>
+									</div>
+									
+								</div>
 							</div>
 						</div>
 					</div>
@@ -133,40 +165,8 @@
 							</div>
 							<div class="card-body">
 								<loading :active.sync="pneumoniaTreatmentLoading" :color="loaderColor" :can-cancel="false" :is-full-page="false"></loading>
-								<highcharts :options="pneumoniaTreatmentOptions"></highcharts>
+								<highcharts :options="pneumoniaTreatmentOptions" style="height: 600px;"></highcharts>
 							</div>
-						</div>
-					</div>
-				</div>
-				<div class="row" style="margin-bottom: 10px;">
-					<div class="col-md-6">
-						<div class="card">
-							<div class="card-header">
-								<h5 class="card-header-title">
-								DIARRHOEA CLASSIFICATION
-
-								<span class="badge badge-soft-warning mt-n1 float-right" style="flex: 0"><span v-if="variance.classification.diarrhoea > 0">+</span>{{ variance.classification.diarrhoea }}%</span>
-								</h5>
-							</div>
-							<div class="card-body">
-								<loading :active.sync="classificationLoading" :color="loaderColor" :can-cancel="false" :is-full-page="false"></loading>
-								<highcharts :options="diarrhoeaClassificationOptions" style = "height: 200px;"></highcharts>	
-							</div>
-						</div>
-					</div>
-					<div class="col-md-6">
-						<div class="card">
-							<div class="card-header">
-								<h5 class="card-header-title">
-								DIARRHOEA TREATMENT
-								<span class="badge badge-soft-warning mt-n1 float-right" style="flex: 0">+0%</span>
-								</h5>
-							</div>
-							<div class="card-body">
-								<loading :active.sync="diarrhoeaTreatmentLoading" :color="loaderColor" :can-cancel="false" :is-full-page="false"></loading>
-								<highcharts :options="diarrhoeaTreatmentOptions" style = "height: 200px;"></highcharts>
-							</div>
-							
 						</div>
 					</div>
 				</div>
@@ -209,32 +209,32 @@ import json from '../../../public/counties.json'
 					diarrhoea: {},
 					pneumonia: {}
 				},
-				baselineData: {
+				baselineData: {NOTX: 0,
 					AMOXDT: 4,
 					AMOX_SYRUP: 42,
 					INJECTABLES: 29,
 					CTX: 24,
 					OXYGEN: 0,
 					OTHER: 0,
-					NOTX: 0
+					
 				},
-				pneumoniaTreatmentLabels: {
+				pneumoniaTreatmentLabels: {NOTX: "No Treatment",
 					AMOXDT: "Amox DT",
 					AMOX_SYRUP: "Amox Syrup",
 					CTX: "CTX",
 					INJECTABLES: "Injectables",
 					OXYGEN: "Oxygen",
 					OTHER: "Other Treatment",
-					NOTX: "No Treatment"
+					
 				},
-				pneumoniaTreatmentColors: {
+				pneumoniaTreatmentColors: {NOTX: "#EF9A9A",
 					AMOXDT: "#00B0FF",
 					AMOX_SYRUP: "#66BB6A",
 					CTX: "#9E9E9E",
 					INJECTABLES: "#FF9800",
 					OXYGEN: "#7C4DFF",
 					OTHER: "#FFFF00",
-					NOTX: "#EF9A9A"
+					
 				}
 			}
 		},
