@@ -231,6 +231,17 @@
 							}
 						}
 					},
+					yAxis: {
+						plotLines: [{
+							color: "red",
+							value: _.mean(em.treatmentData),
+							width: 1,
+							zIndex: 2,
+							dataLabels: {
+								enabled: true
+							}
+						}]
+					},
 					series: [{
 						name: 'Treatments',
 						data: em.treatmentData,

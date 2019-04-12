@@ -27,4 +27,8 @@ class DataController extends Controller
     function countyPage(){
     	return view('dashboard.data.uploadpage');
     }
+
+    function facilitiesPage(){
+      return view('dashboard.data.facilities');
+    }
 }

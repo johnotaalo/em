@@ -50,7 +50,7 @@ class SupervisionController extends Controller
     }
 
     function getPneumoniaData(){
-    	$data = \DB::table('supervision_data')->select(\DB::raw("SUM(IFNULL(sev_amoxdt, 0) + IFNULL(pn_amox, 0) + IFNULL(noc_amox, 0) + IFNULL(noclass_amox, 0)) AS `AMOXDT`, SUM(IFNULL(sev_amoxsy, 0) + IFNULL(pn_amoxsy, 0) + IFNULL(noc_amoxsy, 0) + IFNULL(noclass_amoxsy, 0)) AS `AMOX_SYRUP`, SUM(IFNULL(sev_ctx, 0) + IFNULL(pn_ctx, 0) + IFNULL(noc_ctx, 0) + IFNULL(noclass_ctx, 0)) AS `CTX`, SUM(IFNULL(sev_other, 0) + IFNULL(pn_other, 0) + IFNULL(noc_other, 0) + IFNULL(noclass_other, 0) + IFNULL(sev_oxygen, 0) + IFNULL(pn_oxygen, 0) + IFNULL(noc_oxygen, 0) + IFNULL(noclass_oxygen, 0) + IFNULL(sev_gent, 0) + IFNULL(pn_gent, 0) + IFNULL(noc_gent, 0) + IFNULL(noclass_gent, 0) + IFNULL(sev_benz, 0) + IFNULL(pn_benz, 0) + IFNULL(noc_benz, 0) + IFNULL(noclass_benz, 0)) AS `INJECTABLES`"))->first();
+    	$data = \DB::table('supervision_data')->select(\DB::raw("SUM(IFNULL(sev_amoxdt, 0) + IFNULL(pn_amox, 0) + IFNULL(noc_amox, 0) + IFNULL(noclass_amox, 0)) AS `AMOXDT`, SUM(IFNULL(sev_amoxsy, 0) + IFNULL(pn_amoxsy, 0) + IFNULL(noc_amoxsy, 0) + IFNULL(noclass_amoxsy, 0)) AS `AMOX_SYRUP`, SUM(IFNULL(sev_ctx, 0) + IFNULL(pn_ctx, 0) + IFNULL(noc_ctx, 0) + IFNULL(noclass_ctx, 0)) AS `CTX`, SUM(IFNULL(sev_oxygen, 0) + IFNULL(pn_oxygen, 0) + IFNULL(noc_oxygen, 0) + IFNULL(noclass_oxygen, 0)) AS `OXYGEN` , SUM(IFNULL(sev_other, 0) + IFNULL(pn_other, 0) + IFNULL(noc_other, 0) + IFNULL(noclass_other, 0) + IFNULL(sev_gent, 0) + IFNULL(pn_gent, 0) + IFNULL(noc_gent, 0) + IFNULL(noclass_gent, 0) + IFNULL(sev_benz, 0) + IFNULL(pn_benz, 0) + IFNULL(noc_benz, 0) + IFNULL(noclass_benz, 0)) AS `INJECTABLES`"))->first();
 
     	$reponse = [];
 
@@ -167,6 +167,12 @@ class SupervisionController extends Controller
 
     function getCountyCoverage(){
         $counties = \DB::table('supervision_data')->distinct('county')->pluck('county');
+
+        return $counties;
+    }
+
+    function getCountiesFacilitySupervision(){
+        $counties = \App\County::where('cto_id', '!=', NULL)->with('supervisions', 'facilities')->get();
 
         return $counties;
     }

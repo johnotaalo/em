@@ -213,21 +213,22 @@ import json from '../../../public/counties.json'
 					AMOXDT: 4,
 					AMOX_SYRUP: 42,
 					INJECTABLES: 29,
-					CTX: 24
+					CTX: 24,
+					OXYGEN: 0
 				},
 				pneumoniaTreatmentLabels: {
 					AMOXDT: "Amox DT",
 					AMOX_SYRUP: "Amox Syrup",
 					CTX: "CTX",
 					INJECTABLES: "Injectables",
-					
+					OXYGEN: "Oxygen"
 				},
 				pneumoniaTreatmentColors: {
 					AMOXDT: "#00B0FF",
 					AMOX_SYRUP: "#66BB6A",
 					CTX: "#9E9E9E",
-					INJECTABLES: "#FF9800"
-					
+					INJECTABLES: "#FF9800",
+					OXYGEN: "#7C4DFF"
 				}
 			}
 		},
@@ -287,9 +288,7 @@ import json from '../../../public/counties.json'
 		          title: null,
 		          mapNavigation: {
 		            enabled: true,
-		            buttonOptions: {
-		                verticalAlign: 'bottom'
-		            }
+		            enableDoubleClickZoomTo: true
 		          },
 
 		          colorAxis: {
@@ -301,6 +300,18 @@ import json from '../../../public/counties.json'
 		          },
 
 		          legend:{ enabled:false },
+
+		          plotOptions: {
+		          	series: {
+		          		points: {
+		          			events: {
+		          				click: function(){
+		          					console.log(this);
+		          				}
+		          			}
+		          		}
+		          	}
+		          },
 
 		          series: [{
 		          	showInLegend: false,
@@ -321,7 +332,7 @@ import json from '../../../public/counties.json'
 
 		          tooltip: {
 		            formatter: function(){
-		              return "<b>"+this.point.COUNTY_NAM+"</b>"
+		              return this.point.COUNTY_NAM
 		            }
 		          }
 		        }

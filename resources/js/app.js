@@ -72,6 +72,8 @@ Vue.component('national-dashboard-component', require('./components/NationalDash
 Vue.component('county-dashboard-component', require('./components/CountyDashboardComponent.vue').default);
 Vue.component('uploader-component', require('./components/UploaderComponent.vue').default);
 Vue.component('temporary-data-component', require('./components/TemporaryDataComponent.vue').default);
+Vue.component('directory-component', require('./components/DirectoryComponent.vue').default);
+Vue.component('facility-component', require('./components/FacilityComponent.vue').default);
 Vue.component('loading', VueLoading)
 /**
  * Next, we will create a fresh Vue application instance and attach it to

@@ -21,3 +21,5 @@ Route::get('dashboard/county', 'Dashboard\CountyController@index')->name('county
 Route::get('data/upload', 'Dashboard\DataController@uploadPage')->name('upload-page');
 Route::get('data/upload/cancel', 'Dashboard\DataController@cancelUpload')->name('upload-page');
 Route::get('data/counties', 'Dashboard\DataController@countyPage')->name('county-page');
+
+Route::get('data/facilities', 'Dashboard\DataController@facilitiesPage')->name('facilities');
