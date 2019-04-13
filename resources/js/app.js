@@ -13,6 +13,7 @@ import Highcharts from 'highcharts';
 import Vue from 'vue'
 import vSelect from 'vue-select'
 import VueLoading from 'vue-loading-overlay';
+import VuePluralize from 'vue-pluralize'
 
 // load these modules as your need
 import loadStock from 'highcharts/modules/stock.js';
@@ -53,7 +54,8 @@ Vue.use(BootstrapVue);
 Vue.use(ClientTable, {}, false, 'bootstrap4', 'default');
 Vue.use(ServerTable, {}, false, 'bootstrap4', 'default');
 Vue.use(VueSwal)
-Vue.use(VueLoading);
+Vue.use(VueLoading)
+Vue.use(VuePluralize)
 
 
 loadStock(Highcharts);

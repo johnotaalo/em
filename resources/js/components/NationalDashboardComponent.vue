@@ -107,7 +107,7 @@
 							<div class="col">
 								<b-list-group>
 									<b-list-group-item v-for="(breakdown, key) in facilityBreakdown" class="d-flex justify-content-between align-items-center" :key="key">
-										{{ breakdown.type }}
+										{{ breakdown.type | pluralize(breakdown.count) }}
 										<b-badge variant="primary" pill>{{ breakdown.count }}</b-badge>
 									</b-list-group-item>
 								</b-list-group>
