@@ -102,7 +102,18 @@
 
 							</div>
 						</div>
-						<hr>
+
+						<div class="row">
+							<div class="col">
+								<b-list-group>
+									<b-list-group-item v-for="(breakdown, key) in facilityBreakdown" class="d-flex justify-content-between align-items-center" :key="key">
+										{{ breakdown.type }}
+										<b-badge variant="primary" pill>{{ breakdown.count }}</b-badge>
+									</b-list-group-item>
+								</b-list-group>
+							</div>
+							
+						</div>
 					</div>
 				</div>
 				
@@ -201,6 +212,7 @@ import json from '../../../public/counties.json'
 				baselineColor: "#BDBDBD",
 				facilities: 0,
 				counties: 0,
+				facilityBreakdown: {},
 				classificationData: {
 					pneumonia_class: 0,
 					diarrhoea_class: 0
@@ -276,6 +288,19 @@ import json from '../../../public/counties.json'
 				this.counties = data;
 			});
 
+			axios.get('/api/data/facilities/breakdown')
+			.then(res => {
+				var breakdown = []
+				_.forOwn(res.data, (value, key) => {
+					breakdown.push({
+						type: _.startCase(_.toLower(key)),
+						count: value.length
+					});
+				})
+
+				this.facilityBreakdown = breakdown
+			})
+
 			this.mapLoading = true;
 			axios.get('/api/data/countyData')
 			.then((response) => {
@@ -293,8 +318,8 @@ import json from '../../../public/counties.json'
 
 		          title: null,
 		          mapNavigation: {
-		            enabled: true,
-		            enableDoubleClickZoomTo: true
+		            enabled: false,
+		            enableDoubleClickZoomTo: false
 		          },
 
 		          colorAxis: {

@@ -33,13 +33,24 @@
 							<b-link @click="row.toggleDetails">{{ row.item.facilities.length }}</b-link>
 						</template>
 
-						<template slot="row-details" slot-scope="row">
+						<template slot="row-details" slot-scope="data">
 							<b-card>
+
+								<div v-for="(facilities, subcounty) in countyListing[data.item.county]">
+									{{ subcounty }} <b-link v-b-toggle="'collapse-facilities-'+subcounty">{{ facilities.length }} Facilities</b-link>
+									<b-collapse :id = "'collapse-facilities-'+subcounty">
+										<ol>
+											<li v-for="facility in facilities">{{ facility.FACILITY_NAME }}</li>
+										</ol>
+									</b-collapse>
+								</div>
 								
-								<ol>
-									<li v-for="facility in row.item.facilities"> {{ facility.FACILITY_NAME }}[{{ facility.SUB_COUNTY }}] </li>
-								</ol>
+								
 							</b-card>
+						</template>
+
+						<template slot-scope="data" slot="sub_counties">
+							{{ $_.keys(countyListing[data.item.county]).length }}
 						</template>
 
 						<template slot-scope="data" slot="baseline">
@@ -76,13 +87,15 @@
 	</div>
 </template>
 
-<script type="text/javascript">
+<script>
+	import _ from 'lodash';
+	Object.defineProperty(Vue.prototype, '$_', { value: _ });
 	export default {
 		data() {
 			return {
-				fields: [ {key: "county", sortable: true}, "facilities", "baseline", "facility_supervisions",  "Mid-Term","End-Line"],
+				fields: [ {key: "county", sortable: true}, "facilities", "sub_counties", "baseline", "facility_supervisions",  "Mid-Term","End-Line"],
 				items: [],
-				isBusy: true,
+				isBusy: true
 			}
 		},
 		mounted() {
@@ -95,6 +108,20 @@
 				.then(res => {
 					this.isBusy = false
 					this.items = res.data
+					// var counties = [];
+					// _.forOwn(this.items, (item) => {
+					// 	counties[item.county] = []
+					// 	console.log(item.county)
+					// 	_.forOwn(item.facilities, (facility) => {
+					// 		if (typeof counties[item.county][facility.SUB_COUNTY] == "undefined") {
+					// 			counties[item.county][facility.SUB_COUNTY] = [];
+					// 		}
+
+					// 		counties[item.county][facility.SUB_COUNTY].push(facility);
+					// 		console.log(counties)
+					// 	})
+					// })
+					// this.countyListing = counties
 				})
 				.catch(() => {
 					this.isBusy = false
@@ -137,9 +164,9 @@
 				return info
 			},
 			countyListing: function(){
-				var counties = [];
+				var counties = {};
 				_.forOwn(this.items, (item) => {
-					counties[item.county] = []
+					counties[item.county] = {}
 					_.forOwn(item.facilities, (facility) => {
 						if (typeof counties[item.county][facility.SUB_COUNTY] == "undefined") {
 							counties[item.county][facility.SUB_COUNTY] = [];
@@ -148,7 +175,7 @@
 						counties[item.county][facility.SUB_COUNTY].push(facility);
 					})
 				})
-				console.log(counties)
+				// console.log(counties)
 				return counties
 			}
 		}

@@ -14,4 +14,8 @@ class Supervision extends Model
     	$agency = \App\AssessmentType::find($this->assessment_type_id);
         return $agency;
     }
+
+    public function facility(){
+    	return $this->belongsTo('\App\Facility', 'fname', 'SURVEY_CTO_ID');
+    }
 }

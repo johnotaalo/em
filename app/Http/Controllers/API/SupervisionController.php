@@ -74,9 +74,25 @@ class SupervisionController extends Controller
     }
 
     function getFacilitiesCount(){
-    	$data = \DB::table('supervision_data')->count('facility_name');
+    	$data = \DB::table('supervision_data')->distinct('fname')->count('fname');
 
     	return $data;
+    }
+
+    function getFacilitiesBreakdown(){
+        $data = \App\Supervision::distinct('fname')->with('facility')->get();
+
+        $response = [];
+
+        foreach ($data as $d) {
+            if(isset($d->facility->FACILITY_TYPE)){
+                $response[$d->facility->FACILITY_TYPE][] = $d->facility->FACILITY_NAME;
+            }else{
+                $response['UNKNOWN'][] = $d->facility_name;
+            }
+        }
+
+        return $response;
     }
 
     function getCountiesCount(){

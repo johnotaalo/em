@@ -27,6 +27,7 @@ Route::prefix('data')->group(function(){
 	Route::get('county/diarrhoea/treatment', 'API\SupervisionController@getCountyDiarrhoeaTreatments');
 	Route::get('county/pneumonia/treatment', 'API\SupervisionController@getCountyPneumoniaTreatments');
 	Route::get('countyData', 'API\SupervisionController@getCountyCoverage');
+	Route::get('facilities/breakdown', 'API\SupervisionController@getFacilitiesBreakdown');
 
 	Route::post('uploadData', 'API\SupervisionController@uploadCSV');
 	Route::get('temporary', 'API\SupervisionController@getTemporaryData');
