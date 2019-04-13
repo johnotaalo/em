@@ -187,6 +187,12 @@ class SupervisionController extends Controller
         return $counties;
     }
 
+    function getCountyFacilities(){
+        $counties = \App\County::where('cto_id', '!=', NULL)->with('facilities')->get();
+
+        return $counties;
+    }
+
     function getCountiesFacilitySupervision(){
         $counties = \App\County::where('cto_id', '!=', NULL)->with('supervisions', 'facilities')->get();
 

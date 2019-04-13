@@ -213,6 +213,7 @@ import json from '../../../public/counties.json'
 				facilities: 0,
 				counties: 0,
 				facilityBreakdown: {},
+				countyFacilities: {},
 				classificationData: {
 					pneumonia_class: 0,
 					diarrhoea_class: 0
@@ -302,11 +303,12 @@ import json from '../../../public/counties.json'
 			})
 
 			this.mapLoading = true;
-			axios.get('/api/data/countyData')
+			axios.get('/api/data/county/facilities')
 			.then((response) => {
+				// console.log(response.data)
 				this.mapLoading = false;
 				var data = response.data
-				this.countyData = _.map(data, (county) => ([ _.toUpper(county), 1 ]))
+				this.countyData = _.map(data, (county) => ([ _.toUpper(county.county), county.facilities.length ]))
 			});
 		},
 		computed: {
@@ -325,7 +327,7 @@ import json from '../../../public/counties.json'
 		          colorAxis: {
 		            dataClasses: [{
 		              from: 1,
-		              to: 2,
+		              to: 1000000,
 		              color: "#FFC107"
 		            }]
 		          },
@@ -363,7 +365,7 @@ import json from '../../../public/counties.json'
 
 		          tooltip: {
 		            formatter: function(){
-		              return this.point.COUNTY_NAM
+		              return _.startCase(_.toLower(this.point.COUNTY_NAM)) + "<br/> Facilities: " + this.point.value
 		            }
 		          }
 		        }
