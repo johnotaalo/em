@@ -64,7 +64,7 @@
                            <a class="nav-link {{ Active::checkRoute(['home', 'index', 'home-index']) }}" href="{{ route('home') }}">Snapshot</a>
                        </li>
                        <li class="nav-item">
-                           <a class="nav-link {{ Active::checkRoute('county-dashboard') }}" href="{{ route('county-dashboard') }}">County</a>
+                           <a class="nav-link {{ Active::checkRoute('county-breakdown') }}" href="{{ route('county-breakdown') }}">County</a>
                        </li>
                        <li class="nav-item">
                            <a class="nav-link" href="#">Resource Materials</a>
