@@ -12,6 +12,10 @@ class CountyController extends Controller
     }
 
     function breakdown(Request $request){
+    	if (!$request->county) {
+    		$county = \App\County::where('cto_id', '!=', null)->inRandomOrder()->first();
+    		$request->county = $county->county;
+    	}
     	return view('dashboard.county.breakdown')->with(['county' => $request->county]);
     }
 }
