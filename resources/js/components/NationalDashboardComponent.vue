@@ -20,6 +20,7 @@
 								<small class="text-muted">Click on a county to view analytics</small>
 							</div>
 							<div class="card-body">
+								<center><small style="font-size: .7rem"><span v-for="(breakdown, key) in facilityBreakdown" :key="key">{{ breakdown.type | pluralize(breakdown.count) }} {{ breakdown.count }} | </span></small></center>
 								<loading :active.sync="mapLoading" :color="loaderColor" :can-cancel="false" :is-full-page="false"></loading>
 								<highmaps :options="mapData" style="height: 400px;"></highmaps>
 							</div>

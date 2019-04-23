@@ -76,6 +76,7 @@ Vue.component('uploader-component', require('./components/UploaderComponent.vue'
 Vue.component('temporary-data-component', require('./components/TemporaryDataComponent.vue').default);
 Vue.component('directory-component', require('./components/DirectoryComponent.vue').default);
 Vue.component('facility-component', require('./components/FacilityComponent.vue').default);
+Vue.component('county-breakdown-component', require('./components/CountyBreakdownComponent.vue').default);
 Vue.component('loading', VueLoading)
 /**
  * Next, we will create a fresh Vue application instance and attach it to

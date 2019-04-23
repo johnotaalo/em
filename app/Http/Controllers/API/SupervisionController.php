@@ -198,4 +198,16 @@ class SupervisionController extends Controller
 
         return $counties;
     }
+
+    function getSubcounties(Request $request){
+        $subcounties = \DB::select("SELECT DISTINCT(sub_county) FROM supervision_data WHERE county = '{$request->county}';");
+
+        return $subcounties;
+    }
+
+    function getfacilities(Request $request){
+        $facilities = \DB::select("SELECT DISTINCT(facility_name) FROM supervision_data WHERE sub_county = '{$request->subcounty}';");
+
+        return $facilities;
+    }
 }

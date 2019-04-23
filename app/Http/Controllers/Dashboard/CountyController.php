@@ -10,4 +10,8 @@ class CountyController extends Controller
     function index(){
     	return view('dashboard.county.index');
     }
+
+    function breakdown(Request $request){
+    	return view('dashboard.county.breakdown')->with(['county' => $request->county]);
+    }
 }

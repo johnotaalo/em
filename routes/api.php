@@ -38,4 +38,7 @@ Route::prefix('data')->group(function(){
 	Route::get('assessmentTypes', 'API\SupervisionController@getAssessmentTypes');
 
 	Route::get('county-facilities-supervisions', 'API\SupervisionController@getCountiesFacilitySupervision');
+
+	Route::get('subcounties/{county}', 'API\SupervisionController@getSubcounties');
+	Route::get('facilities/{subcounty}', 'API\SupervisionController@getfacilities');
 });

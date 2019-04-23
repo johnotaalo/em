@@ -61,7 +61,7 @@
                     <ul class="navbar-nav ml-auto">
                         <!-- Authentication Links -->
                        <li class="nav-item">
-                           <a class="nav-link {{ Active::checkRoute(['home', 'index', 'home-index']) }}" href="{{ route('home') }}">Dashboard</a>
+                           <a class="nav-link {{ Active::checkRoute(['home', 'index', 'home-index']) }}" href="{{ route('home') }}">Snapshot</a>
                        </li>
                        <li class="nav-item">
                            <a class="nav-link {{ Active::checkRoute('county-dashboard') }}" href="{{ route('county-dashboard') }}">County</a>
