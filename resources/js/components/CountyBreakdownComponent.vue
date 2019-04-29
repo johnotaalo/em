@@ -43,7 +43,7 @@
 
 												<highcharts :options="pneumoniaLoCPPSupervision1" style = "height: 400px;"></highcharts>
 
-												<highcharts :options="pneumoniaLoCPPSupervision2" style = "height: 400px;"></highcharts>
+												<!-- <highcharts :options="pneumoniaLoCPPSupervision2" style = "height: 400px;"></highcharts> -->
 											</div>
 											<!-- <highcharts :options="pneumoniaSubCountyClassifications" style = "height: 400px;"></highcharts> -->
 										</div>
