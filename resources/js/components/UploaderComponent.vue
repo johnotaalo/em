@@ -22,7 +22,7 @@
 					</div>
 
 					<div class="form-group"> 
-						<label class="control-label">Select the period</label>
+						<label class="control-label">Select the period <span class="text-danger" v-if="form.assessmentType == 3">when the budget was approved</span></label>
 						<div class="row">
 							<div class="col-sm">
 								<label class="control-label">Month</label>
@@ -33,6 +33,9 @@
 								<b-form-select v-model="form.duration.year" :options="years"></b-form-select>
 							</div>
 						</div>
+						<!-- <b-form-text id="password-help-block" v-if="form.assessmentType == 3">
+							This is only applicable for facility supervision activities
+						</b-form-text> -->
 					</div>
 				</b-card>
 			</div>
@@ -42,7 +45,7 @@
 
 				<div class="mt-3 float-right">
 					<b-button variant="outline-success" @click="downloadTemplate">Download CSV Template</b-button>
-					<b-button variant="outline-info" @click="submitUpload">Upload Data</b-button>
+					<b-button variant="info" @click="submitUpload" v-if="uploadBtnDisplay">Upload Data</b-button>
 				</div>
 			</div>
 		</div>
@@ -60,6 +63,7 @@ export default {
 		vueDropzone: vue2Dropzone
 	},
 	data(){
+		var em = this
 		return {
 			dropzoneOptions: {
 				url: '/api/data/uploadData',
@@ -75,12 +79,21 @@ export default {
 						alert("You cannot upload more than 1 File");
 						this.removeFile(file);
 					})
+
+					this.on("addedfile", function(file){
+						em.uploadBtnDisplay = true
+					})
+
+					this.on("removedfile", function(file){
+						em.uploadBtnDisplay = false
+					})
 				},
 				success: function(){
 					this.isLoading = false
 					location.reload();
 				}
 			},
+			uploadBtnDisplay: false,
 			isLoading: false,
 			fullPage: true,
 			counties: [],

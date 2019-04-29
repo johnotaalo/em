@@ -265,6 +265,7 @@ import json from '../../../public/counties.json'
 			this.pneumoniaTreatmentLoading = true;
 			axios.get('/api/data/treatments/pneumonia')
 			.then((response) => {
+				console.log(response)
 				var data = response.data;
 				this.treatmentData.pneumonia = data;
 				this.pneumoniaTreatmentLoading = false;

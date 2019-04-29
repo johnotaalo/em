@@ -50,11 +50,41 @@ class SupervisionController extends Controller
     }
 
     function getPneumoniaData(){
-    	$data = \DB::table('supervision_data')->select(\DB::raw("SUM(IFNULL(sev_oxygen, 0) + IFNULL(pn_oxygen, 0) + IFNULL(noc_oxygen, 0) + IFNULL(noclass_oxygen, 0)) AS `OXYGEN` ,SUM(IFNULL(sev_amoxdt, 0) + IFNULL(pn_amox, 0) + IFNULL(noc_amox, 0) + IFNULL(noclass_amox, 0)) AS `AMOXDT`, SUM(IFNULL(sev_amoxsy, 0) + IFNULL(pn_amoxsy, 0) + IFNULL(noc_amoxsy, 0) + IFNULL(noclass_amoxsy, 0)) AS `AMOX_SYRUP`, SUM(IFNULL(sev_ctx, 0) + IFNULL(pn_ctx, 0) + IFNULL(noc_ctx, 0) + IFNULL(noclass_ctx, 0)) AS `CTX`,  SUM(IFNULL(sev_gent, 0) + IFNULL(pn_gent, 0) + IFNULL(noc_gent, 0) + IFNULL(noclass_gent, 0) + IFNULL(sev_benz, 0) + IFNULL(pn_benz, 0) + IFNULL(noc_benz, 0) + IFNULL(noclass_benz, 0) + IFNULL(sev_benzgent, 0) + IFNULL(pn_benzgent, 0) + IFNULL(noc_benzgent, 0) + IFNULL(noclass_benzgent, 0)) AS `INJECTABLES`, SUM(IFNULL(sev_anti, 0) + IFNULL(pn_anti, 0) + IFNULL(noc_anti, 0) + IFNULL(noclass_anti, 0) + IFNULL(sev_other, 0) + IFNULL(pn_other, 0) + IFNULL(noc_other, 0) + IFNULL(noclass_other, 0)) AS `OTHER`, SUM(IFNULL(sev_notx, 0) + IFNULL(pn_notx, 0) + IFNULL(noc_notx, 0) + IFNULL(noclass_notx, 0)) AS `NOTX`"))->first();
+        $sql = "SELECT
+SUM(AMOXDT) AS AMOXDT,
+SUM(AMOX_SYRUP) AS AMOX_SYRUP,
+    SUM( OXYGEN ) AS OXYGEN,
+    SUM(CTX) AS CTX,
+SUM(INJECTABLES) AS INJECTABLES,
+SUM(OTHER) AS OTHER,
+SUM(NOTX) AS NOTX
+FROM
+    (
+    SELECT
+        t.county,
+        SUM( OXYGEN ) AS OXYGEN,
+        SUM( AMOXDT ) AS AMOXDT,
+        SUM( AMOX_SYRUP ) AS AMOX_SYRUP,
+        SUM( CTX ) AS CTX,
+        SUM( BENZ ) AS BENZ,
+        SUM( BENZ_GENT ) AS BENZ_GENT,
+        SUM( GENT ) AS GENT,
+        ( SUM( BENZ ) + SUM( BENZ_GENT ) + SUM( GENT ) ) AS INJECTABLES,
+        ( SUM( ANTI_OTHER ) ) AS OTHER,
+        c.NOTX 
+    FROM
+        `pneumonia_treatment_data` t
+        JOIN ( SELECT county, SUM( NOTX_AFTER_DIF ) AS NOTX FROM pneumonia_tx_classification_agg_combined GROUP BY county ) c ON c.county = t.county 
+    GROUP BY
+    t.county 
+    ) v";
+    // echo $sql;die;
+    $data = \DB::select($sql);
+    	// $data = \DB::table('supervision_data')->select(\DB::raw("SUM(IFNULL(sev_oxygen, 0) + IFNULL(pn_oxygen, 0) + IFNULL(noc_oxygen, 0) + IFNULL(noclass_oxygen, 0)) AS `OXYGEN` ,SUM(IFNULL(sev_amoxdt, 0) + IFNULL(pn_amox, 0) + IFNULL(noc_amox, 0) + IFNULL(noclass_amox, 0)) AS `AMOXDT`, SUM(IFNULL(sev_amoxsy, 0) + IFNULL(pn_amoxsy, 0) + IFNULL(noc_amoxsy, 0) + IFNULL(noclass_amoxsy, 0)) AS `AMOX_SYRUP`, SUM(IFNULL(sev_ctx, 0) + IFNULL(pn_ctx, 0) + IFNULL(noc_ctx, 0) + IFNULL(noclass_ctx, 0)) AS `CTX`,  SUM(IFNULL(sev_gent, 0) + IFNULL(pn_gent, 0) + IFNULL(noc_gent, 0) + IFNULL(noclass_gent, 0) + IFNULL(sev_benz, 0) + IFNULL(pn_benz, 0) + IFNULL(noc_benz, 0) + IFNULL(noclass_benz, 0) + IFNULL(sev_benzgent, 0) + IFNULL(pn_benzgent, 0) + IFNULL(noc_benzgent, 0) + IFNULL(noclass_benzgent, 0)) AS `INJECTABLES`, SUM(IFNULL(sev_anti, 0) + IFNULL(pn_anti, 0) + IFNULL(noc_anti, 0) + IFNULL(noclass_anti, 0) + IFNULL(sev_other, 0) + IFNULL(pn_other, 0) + IFNULL(noc_other, 0) + IFNULL(noclass_other, 0)) AS `OTHER`, SUM(IFNULL(sev_notx, 0) + IFNULL(pn_notx, 0) + IFNULL(noc_notx, 0) + IFNULL(noclass_notx, 0)) AS `NOTX`"))->first();
 
     	$reponse = [];
 
-    	foreach ($data as $key => $value) {
+    	foreach ($data[0] as $key => $value) {
     		$response[$key] = $value;
     	}
 
@@ -163,6 +193,7 @@ class SupervisionController extends Controller
         $tempIDs = $tempData->pluck("id");
         $tempData = $tempData->get()->toArray();
         // dd($tempIDs);
+        // echo "<pre>";print_r($tempData);die;
 
         foreach($tempData as $key => $value) {
             unset($tempData[$key]['id']);
@@ -209,5 +240,58 @@ class SupervisionController extends Controller
         $facilities = \DB::select("SELECT DISTINCT(facility_name) FROM supervision_data WHERE sub_county = '{$request->subcounty}';");
 
         return $facilities;
+    }
+
+
+    function getSubcountyPneumoniaClassification(Request $request){
+        $classification = \DB::select("SELECT sub_county, TOTAL_CASES_AFTER_DIF FROM `pneumonia_subcounty_classification` WHERE county = '{$request->county}';");
+
+        return $classification;
+    }
+
+    function getSubcountyTreatmentData(Request $request){
+        $sql = "SELECT
+sub_county,
+        SUM(AMOXDT) AS AMOXDT,
+        SUM(AMOX_SYRUP) AS AMOX_SYRUP,
+            SUM( OXYGEN ) AS OXYGEN,
+            SUM(CTX) AS CTX,
+        SUM(INJECTABLES) AS INJECTABLES,
+        SUM(OTHER) AS OTHER,
+        SUM(NOTX) AS NOTX
+        FROM
+            (
+            SELECT
+                t.sub_county,
+                SUM( OXYGEN ) AS OXYGEN,
+                SUM( AMOXDT ) AS AMOXDT,
+                SUM( AMOX_SYRUP ) AS AMOX_SYRUP,
+                SUM( CTX ) AS CTX,
+                SUM( BENZ ) AS BENZ,
+                SUM( BENZ_GENT ) AS BENZ_GENT,
+                SUM( GENT ) AS GENT,
+                ( SUM( BENZ ) + SUM( BENZ_GENT ) + SUM( GENT ) ) AS INJECTABLES,
+                ( SUM( ANTI_OTHER ) ) AS OTHER,
+                c.NOTX 
+            FROM
+                `pneumonia_treatment_data` t
+                JOIN ( SELECT sub_county, SUM( NOTX_AFTER_DIF ) AS NOTX FROM pneumonia_tx_class_subcounty_agg GROUP BY sub_county ) c ON c.sub_county = t.sub_county
+                WHERE t.county = '{$request->county}' 
+            GROUP BY
+            t.sub_county 
+            ) v
+                        GROUP BY sub_county";
+            // echo $sql;die;
+        $data = \DB::select($sql);
+
+        // $reponse = [];
+
+        // foreach ($data as $key => $value) {
+        //     $response[$key] = $value;
+        // }
+
+        // echo "<pre>";print_r($response);die;
+
+        return $data;
     }
 }
