@@ -272,6 +272,7 @@
 			pneumoniaSubCountyClassifications(){
 				// Order by the third bar classified
 				var categories = _.map(this.subcounties, (o) => { return o.sub_county })
+				console.log(categories)
 				var seriesData = []
 
 				var cat = this.categories
@@ -284,6 +285,8 @@
 					_.forOwn(this.subcounties, (subcounty, k) => {
 						if(category != "Baseline" && k != 0){
 							obj.data.push(this.data.pneumoniaClass[subcounty.sub_county])
+						}else if(k == 0){
+							obj.data.push(0)
 						}
 						// obj.data.push(_.random(1, 20))
 					})
@@ -472,7 +475,6 @@
 			pneumoniaSubCountyTreatmentSupervision1(){
 				var categories = _.map(this.data.pneumoniaTreat, (o) => { return o.sub_county })
 				categories.unshift("<b>" + _.upperCase(this.county + " County") +" </b>")
-				console.log(categories)
 				var seriesData = []
 				var stacks = ["baseline", "supervision1", "supervision2"]
 
