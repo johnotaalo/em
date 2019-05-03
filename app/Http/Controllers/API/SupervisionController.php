@@ -352,4 +352,43 @@ FACILITY_TYPE,
             $data = \DB::select($sql);
             return $data;
     }
+
+    function getSubcountyDiarrhoeaClassification(){
+        $sql = "SELECT
+    `supervision_data`.`county` AS `county`,
+    `supervision_data`.`sub_county` AS `sub county`,
+    (
+    CASE
+            
+            WHEN ( `supervision_data`.`assessment_type_id` = 3 ) THEN
+            concat( `t`.`assessment_type`, ' ', CONVERT ( substring_index( `supervision_data`.`period`, ' ',- ( 1 ) ) USING utf8mb4 ) ) ELSE `t`.`assessment_type` 
+        END 
+        ) AS `assessment`,
+    (
+        ( ifnull( `supervision_data`.`sev_cases`, 0 ) + ifnull( `supervision_data`.`pneu_cases`, 0 ) ) + ifnull( `supervision_data`.`noc_cases`, 0 ) 
+    ) AS `PN_CLASSIFICATION`,
+    `supervision_data`.`noclass_cases` AS `PN_NO_CLASSIFICATION`,
+    (
+        (
+            (
+                ( ifnull( `supervision_data`.`d_shock_cases`, 0 ) + ifnull( `supervision_data`.`d_sev_cases`, 0 ) ) + ifnull( `supervision_data`.`d_some_cases`, 0 ) 
+            ) + ifnull( `supervision_data`.`d_nodehy_cases`, 0 ) 
+        ) + ifnull( `supervision_data`.`d_dys_cases`, 0 ) 
+    ) AS `DIA_CLASSIFICATION`,
+    `supervision_data`.`d_noclass_cases` AS `DIA_NO_CLASSIFICATION` 
+FROM
+    `supervision_data`
+    JOIN assessment_types t ON t.id = supervision_data.assessment_type_id
+    GROUP BY sub_county, (
+    CASE
+            
+            WHEN ( `supervision_data`.`assessment_type_id` = 3 ) THEN
+            concat( `t`.`assessment_type`, ' ', CONVERT ( substring_index( `supervision_data`.`period`, ' ',- ( 1 ) ) USING utf8mb4 ) ) ELSE `t`.`assessment_type` 
+        END 
+        )";
+
+        $classification = \DB::select($sql);
+
+        return $classification;
+    }
 }

@@ -136,7 +136,8 @@
 					pneumoniaClass: [],
 					pneumoniaLocClass: [],
 					pneumoniaTreat: {},
-					pneumoniaLocTreat: {}
+					pneumoniaLocTreat: {},
+					diarrhoeaClass: []
 				}
 			}
 		},
@@ -146,6 +147,7 @@
 			this.getPneumoniaTreatmentData()
 			this.getPneumoniaLocClassificationData()
 			this.getPneumoniaLocTreatmentData()
+			this.getDiarrhoeaClassifications()
 		},
 		methods: {
 			getSubCounties(){
@@ -205,6 +207,12 @@
 				axios.get('/api/data/pneumonia/treatment/loc/' + this.county)
 				.then(res => {
 					this.data.pneumoniaLocTreat = res.data
+				})
+			},
+			getDiarrhoeaClassifications(){
+				axios.get('/api/data/diarrhoea/classification/subcounties/' + this.county)
+				.then(res => {
+					this.data.diarrhoeaClass = res.data
 				})
 			}
 		},
