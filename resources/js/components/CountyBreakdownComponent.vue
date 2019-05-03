@@ -62,7 +62,7 @@
 										<div class="col">
 											<div class="row mb-3 mt-2">
 												<div class="col-4">
-													<b-form-select v-model="pneumonia.selectedSubcounty" :options="options.subcounties">
+													<b-form-select v-model="pneumonia.selectedSubcounty" :options="options.subcountiesList">
 														<template slot="first">
 															<option :value="null" disabled>Select Sub County</option>
 														</template>
@@ -126,26 +126,32 @@
 				},
 				options: {
 					subcounties: [],
+					subcountiesList: [],
 					graphTypes: [{ text: 'Line Chart', value: 'line' },
-								{ text: 'Column Chart', value: 'column' }]
+								{ text: 'Column Chart', value: 'column' }],
+					pneumoniaFacilityTypes: []
 				},
 				facilityChart: {},
 				data: {
 					pneumoniaClass: [],
-					pneumoniaTreat: {}
+					pneumoniaLocClass: [],
+					pneumoniaTreat: {},
+					pneumoniaLocTreat: {}
 				}
 			}
 		},
 		created(){
-			// this.getSubCounties()
+			this.getSubCounties()
 			this.getPneumoniaClassificationData()
 			this.getPneumoniaTreatmentData()
+			this.getPneumoniaLocClassificationData()
+			this.getPneumoniaLocTreatmentData()
 		},
 		methods: {
 			getSubCounties(){
 				axios.get('/api/data/subcounties/' + this.county)
 				.then(res => {
-					this.options.subcounties = _.map(res.data, subcounty => ({
+					this.options.subcountiesList = _.map(res.data, subcounty => ({
 						value: subcounty.sub_county,
 						text: subcounty.sub_county
 					}))
@@ -181,27 +187,55 @@
 					})
 					// console.log(this.subcounties)
 				})
+			},
+			getPneumoniaLocClassificationData(){
+				axios.get('/api/data/pneumonia/classification/loc/' + this.county)
+				.then(res => {
+					var pneumoniaLocClassData = {}
+					_.forOwn(res.data, data =>{
+						pneumoniaLocClassData[data.FACILITY_TYPE] = data.TOTAL_CASES_AFTER_DIF
+					})
+					// console.log(pneumoniaClassData)
+
+					this.data.pneumoniaLocClass = pneumoniaLocClassData
+					// console.log(this.subcounties)
+				})
+			},
+			getPneumoniaLocTreatmentData(){
+				axios.get('/api/data/pneumonia/treatment/loc/' + this.county)
+				.then(res => {
+					this.data.pneumoniaLocTreat = res.data
+				})
 			}
 		},
 		watch: {
 			'pneumonia.selectedSubcounty': function(newVal, oldVal){
-				axios.get('/api/data/facilities/' + newVal)
+				axios.get("/api/data/pneumonia/classification/facility/" + newVal)
 				.then(res => {
 					var categories = []
 					var seriesData = []
+					var resData = []
+					var cat = _.uniq(_.map(res.data, (o) => { return o.assessment }))
+
 					var categories = _.map(res.data, (o) => {
 						return o.facility_name
 					})
 
-					var cat = this.categories
-					cat.splice(3, 2)
-					
+					_.forOwn(res.data, (value) => {
+						if(typeof resData[value.assessment] === 'undefined'){
+							resData[value.assessment]= []
+						}
+						resData[value.assessment][value.facility_name] = value.TOTAL_CASES_AFTER_DIF
+					})
+
+					console.log(resData)
+
 					_.forOwn(cat, (category) => {
 						var obj = {};
 						obj.name = category
 						obj.data = []
-						_.forOwn(categories, (subcounty) => {
-							obj.data.push(_.random(1, 20))
+						_.forOwn(categories, (facility) => {
+							obj.data.push(resData[category][facility])
 						})
 
 						seriesData.push(obj)
@@ -264,6 +298,7 @@
 					}
 				})
 				.catch(error =>{
+					console.error(error)
 					alert("There was an error");
 				})
 			}
@@ -272,7 +307,6 @@
 			pneumoniaSubCountyClassifications(){
 				// Order by the third bar classified
 				var categories = _.map(this.subcounties, (o) => { return o.sub_county })
-				console.log(categories)
 				var seriesData = []
 
 				var cat = this.categories
@@ -560,7 +594,7 @@
 					obj.data = []
 					_.forOwn(categories, category => {
 						var scData = _.map(this.data.pneumoniaTreat, function(o){
-							if (o.sub_county == category) { console.log(o); return o}
+							if (o.sub_county == category) { return o}
 						})
 						obj.data.push(_.random(1, 20))
 					})
@@ -619,6 +653,13 @@
 				}
 			},
 			pneumoniaLoCTreatmentBaseline(){
+				var categories = ["<b>" + _.upperCase(this.county) + " COUNTY" + "</b>",];
+				var seriesData = [0];
+				_.forOwn(this.data.pneumoniaLocClass, (value, key) =>{
+					categories.push(key)
+					seriesData.push(value)
+				})
+					
 				return {
 				    chart: {
 				        type: 'column'
@@ -627,13 +668,7 @@
 				        text: 'Pneumonia Case Classification by Level of Care'
 				    },
 				    xAxis: {
-				        categories: [
-				        	"<b>" + _.upperCase(this.county) + " COUNTY" + "</b>",
-				            'County Hospital',
-				            'Sub County Hospital',
-				            'Health Center',
-				            'Dispensary',
-				        ],
+				        categories: categories,
 				        crosshair: true
 				    },
 				    yAxis: {
@@ -672,16 +707,8 @@
 				        }
 				    },
 				    series: [{
-				        name: 'Baseline',
-				        data: [49.9, 71.5, 106.4, 129.2, 144.0]
-
-				    }, {
 				        name: 'Facility Supervision 2018',
-				        data: [83.6, 78.8, 98.5, 93.4, 106.0]
-
-				    }, {
-				        name: 'Facility Supervision 2019',
-				        data: [48.9, 38.8, 39.3, 41.4, 47.0]
+				        data: seriesData
 
 				    }]
 				}
@@ -700,7 +727,7 @@
 					obj.name = treatment
 					obj.data = []
 					_.forOwn(categories, category => {
-						obj.data.push(_.random(1, 20))
+						// obj.data.push(_.random(1, 20))
 					})
 					seriesData.push(obj)
 				})
@@ -757,20 +784,38 @@
 				}
 			},
 			pneumoniaLoCPPSupervision1(){
-				var categories = ["<b>" + _.upperCase(this.county) + " COUNTY" + "</b>",
-				            'County Hospital',
-				            'Sub County Hospital',
-				            'Health Center',
-				            'Dispensary']
+				var categories = _.map(this.data.pneumoniaLocTreat, (o) => { return o.FACILITY_TYPE })
+				var specData = []
+				// console.log(categories)
+				_.forOwn(categories, (category) => {
+					_.forOwn(this.data.pneumoniaLocTreat, (value) => {
+						if (category == value.FACILITY_TYPE) {
+							delete value["FACILITY_TYPE"]
+							specData[category] = value
+						}
+					})
+				})
+
+				// console.log(specData)
+				
+
+				categories.unshift("<b>" + _.upperCase(this.county + " County") +" </b>")
 				var seriesData = []
+				
 				var stacks = ["baseline", "supervision1", "supervision2"]
 
-				_.forOwn(this.pneumoniaTreatmentLabels, (treatment) => {
+				
+
+				_.forOwn(this.pneumoniaTreatmentLabels, (treatment, key) => {
 					var obj = {}
 					obj.name = treatment
-					obj.data = []
-					_.forOwn(categories, category => {
-						obj.data.push(_.random(1, 20))
+					obj.data = [0]
+					// _.forOwn(categories, category => {
+					// 	if(typeof specData[category] != undefined)
+					// 		obj.data.push(specData[category][key])
+					// })
+					_.forOwn(specData, (val) => {
+						obj.data.push(val[key])
 					})
 					seriesData.push(obj)
 				})

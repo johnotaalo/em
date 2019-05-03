@@ -249,9 +249,29 @@ FROM
         return $classification;
     }
 
+    function getLOCPneumoniaClassification(Request $request){
+        $sql = "SELECT FACILITY_TYPE, SUM(TOTAL_CASES_AFTER_DIF) AS TOTAL_CASES_AFTER_DIF FROM pneumonia_loc_subcounty_classification WHERE county = '{$request->county}' GROUP BY FACILITY_TYPE";
+
+        // die($sql);
+
+        $classification = \DB::select($sql);
+
+        return $classification;
+    }
+
+    function getFacilityPneumoniaClassification(Request $request){
+        $sql = "SELECT * FROM pneumonia_facility_classification WHERE sub_county = '{$request->sub_county}'";
+        $classification = \DB::select($sql);
+        // $cleanedClassification = [];
+        // foreach ($classification as $class) {
+        //     $cleanedClassification[$class->assessment][] = $class;
+        // }
+
+        return $classification;
+    }
+
     function getSubcountyTreatmentData(Request $request){
-        $sql = "SELECT
-sub_county,
+        $sql = "SELECT sub_county,
         SUM(AMOXDT) AS AMOXDT,
         SUM(AMOX_SYRUP) AS AMOX_SYRUP,
             SUM( OXYGEN ) AS OXYGEN,
@@ -293,5 +313,43 @@ sub_county,
         // echo "<pre>";print_r($response);die;
 
         return $data;
+    }
+
+    function getSubcountyLocTreatmentData(Request $request){
+        $sql = "SELECT
+FACILITY_TYPE,
+        SUM(AMOXDT) AS AMOXDT,
+        SUM(AMOX_SYRUP) AS AMOX_SYRUP,
+            SUM( OXYGEN ) AS OXYGEN,
+            SUM(CTX) AS CTX,
+        SUM(INJECTABLES) AS INJECTABLES,
+        SUM(OTHER) AS OTHER,
+        SUM(NOTX) AS NOTX
+        FROM
+            (
+            SELECT
+                t.sub_county,
+                                t.FACILITY_TYPE,
+                SUM( OXYGEN ) AS OXYGEN,
+                SUM( AMOXDT ) AS AMOXDT,
+                SUM( AMOX_SYRUP ) AS AMOX_SYRUP,
+                SUM( CTX ) AS CTX,
+                SUM( BENZ ) AS BENZ,
+                SUM( BENZ_GENT ) AS BENZ_GENT,
+                SUM( GENT ) AS GENT,
+                ( SUM( BENZ ) + SUM( BENZ_GENT ) + SUM( GENT ) ) AS INJECTABLES,
+                ( SUM( ANTI_OTHER ) ) AS OTHER,
+                c.NOTX 
+            FROM
+                `pneumonia_loc_treatment_data` t
+                JOIN ( SELECT sub_county, SUM( NOTX_AFTER_DIF ) AS NOTX FROM pneumonia_loc_tx_class_subcounty_agg GROUP BY sub_county ) c ON c.sub_county = t.sub_county
+                WHERE t.county = '{$request->county}' 
+            GROUP BY
+            t.FACILITY_TYPE 
+            ) v
+                        GROUP BY FACILITY_TYPE";
+
+            $data = \DB::select($sql);
+            return $data;
     }
 }
