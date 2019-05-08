@@ -178,7 +178,7 @@
 				.then(res => {
 					var pneumoniaClassData = {}
 					_.forOwn(res.data, data =>{
-						pneumoniaClassData[data.sub_county] = data.TOTAL_CASES_AFTER_DIF
+						pneumoniaClassData[data.sub_county] = _.round((data.TOTAL_CLASSIFIED / data.TOTAL_CASES_AFTER_DIF) * 100)
 					})
 					// console.log(pneumoniaClassData)
 
@@ -195,7 +195,7 @@
 				.then(res => {
 					var pneumoniaLocClassData = {}
 					_.forOwn(res.data, data =>{
-						pneumoniaLocClassData[data.FACILITY_TYPE] = data.TOTAL_CASES_AFTER_DIF
+						pneumoniaLocClassData[data.FACILITY_TYPE] = _.round((data.TOTAL_CLASSIFIED / data.TOTAL_CASES_AFTER_DIF) * 100)
 					})
 					// console.log(pneumoniaClassData)
 
@@ -233,17 +233,23 @@
 						if(typeof resData[value.assessment] === 'undefined'){
 							resData[value.assessment]= []
 						}
-						resData[value.assessment][value.facility_name] = value.TOTAL_CASES_AFTER_DIF
+						resData[value.assessment][value.facility_name] = _.round((value.TOTAL_CLASSIFIED / value.TOTAL_CASES_AFTER_DIF) * 100)
 					})
 
-					console.log(resData)
+					// console.log(resData)
 
 					_.forOwn(cat, (category) => {
+						// console.log(category)
 						var obj = {};
 						obj.name = category
 						obj.data = []
 						_.forOwn(categories, (facility) => {
-							obj.data.push(resData[category][facility])
+							// console.log(facility)
+							var data = 0
+							if (typeof resData[category][facility] != "undefined") {
+								data = resData[category][facility]
+							}
+							obj.data.push(data)
 						})
 
 						seriesData.push(obj)
@@ -285,7 +291,7 @@
 					    tooltip: {
 					        formatter: function () {
 					            return '<b>' + this.x + '</b><br/>' +
-					                this.series.name + ': ' + this.y + '<br/>'
+					                this.series.name + ': ' + this.y + '%<br/>'
 					        }
 					    },
 
@@ -295,7 +301,8 @@
 					            dataLabels: {
 									enabled: true,
 									color: "#000",
-									borderColor: "#000"
+									borderColor: "#000",
+									format: "{point.y}%"
 								},
 								pointPadding: 0.2,
 	            				borderWidth: 0
@@ -368,7 +375,7 @@
 				    tooltip: {
 				        formatter: function () {
 				            return '<b>' + this.x + '</b><br/>' +
-				                this.series.name + ': ' + this.y + '<br/>'
+				                this.series.name + ': ' + this.y + '%<br/>'
 				        }
 				    },
 
@@ -378,7 +385,8 @@
 				            dataLabels: {
 								enabled: true,
 								color: "#000",
-								borderColor: "#000"
+								borderColor: "#000",
+								format: "{point.y}%"
 							},
 							pointPadding: 0.2,
             				borderWidth: 0
@@ -698,7 +706,7 @@
 				    tooltip: {
 				        headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
 				        pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-				            '<td style="padding:0"><b>{point.y}</b></td></tr>',
+				            '<td style="padding:0"><b>{point.y}%</b></td></tr>',
 				        footerFormat: '</table>',
 				        shared: true,
 				        useHTML: true
@@ -710,7 +718,8 @@
 				        dataLabels: {
 								enabled: true,
 								color: "#000",
-								borderColor: "#000"
+								borderColor: "#000",
+								format: "{point.y}%"
 							},
 				        }
 				    },

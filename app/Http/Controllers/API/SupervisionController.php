@@ -244,13 +244,13 @@ FROM
 
 
     function getSubcountyPneumoniaClassification(Request $request){
-        $classification = \DB::select("SELECT sub_county, TOTAL_CASES_AFTER_DIF FROM `pneumonia_subcounty_classification` WHERE county = '{$request->county}';");
+        $classification = \DB::select("SELECT sub_county, TOTAL_CLASSIFIED, TOTAL_CASES_AFTER_DIF FROM `pneumonia_subcounty_classification` WHERE county = '{$request->county}';");
 
         return $classification;
     }
 
     function getLOCPneumoniaClassification(Request $request){
-        $sql = "SELECT FACILITY_TYPE, SUM(TOTAL_CASES_AFTER_DIF) AS TOTAL_CASES_AFTER_DIF FROM pneumonia_loc_subcounty_classification WHERE county = '{$request->county}' GROUP BY FACILITY_TYPE";
+        $sql = "SELECT FACILITY_TYPE, SUM(TOTAL_CLASSIFIED) AS TOTAL_CLASSIFIED, SUM(TOTAL_CASES_AFTER_DIF) AS TOTAL_CASES_AFTER_DIF FROM pneumonia_loc_subcounty_classification WHERE county = '{$request->county}' GROUP BY FACILITY_TYPE";
 
         // die($sql);
 
