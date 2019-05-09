@@ -244,13 +244,17 @@ FROM
 
 
     function getSubcountyPneumoniaClassification(Request $request){
-        $classification = \DB::select("SELECT sub_county, TOTAL_CLASSIFIED, TOTAL_CASES_AFTER_DIF FROM `pneumonia_subcounty_classification` WHERE county = '{$request->county}';");
+        $sql = "SELECT assessment, sub_county, SUM(TOTAL_CLASSIFIED) AS TOTAL_CLASSIFIED, SUM(TOTAL_CASES_AFTER_DIF) AS TOTAL_CASES_AFTER_DIF FROM pneumonia_facility_classification WHERE county = '{$request->county}' GROUP BY sub_county, assessment";
+        // $oldSql = "SELECT sub_county, TOTAL_CLASSIFIED, TOTAL_CASES_AFTER_DIF FROM `pneumonia_subcounty_classification` WHERE county = '{$request->county}';"
+        // die($sql);
+        $classification = \DB::select($sql);
 
         return $classification;
     }
 
     function getLOCPneumoniaClassification(Request $request){
-        $sql = "SELECT FACILITY_TYPE, SUM(TOTAL_CLASSIFIED) AS TOTAL_CLASSIFIED, SUM(TOTAL_CASES_AFTER_DIF) AS TOTAL_CASES_AFTER_DIF FROM pneumonia_loc_subcounty_classification WHERE county = '{$request->county}' GROUP BY FACILITY_TYPE";
+        $sql = "SELECT county, FACILITY_TYPE, assessment, SUM( TOTAL_CLASSIFIED ) AS TOTAL_CLASSIFIED, SUM( TOTAL_CASES_AFTER_DIF ) AS TOTAL_CASES_AFTER_DIF FROM `pneumonia_facility_classification` WHERE county = '{$request->county}' GROUP BY county, FACILITY_TYPE, assessment";
+        // $oldSql = "SELECT FACILITY_TYPE, SUM(TOTAL_CLASSIFIED) AS TOTAL_CLASSIFIED, SUM(TOTAL_CASES_AFTER_DIF) AS TOTAL_CASES_AFTER_DIF FROM pneumonia_loc_subcounty_classification WHERE county = '{$request->county}' GROUP BY FACILITY_TYPE";
 
         // die($sql);
 
@@ -262,16 +266,12 @@ FROM
     function getFacilityPneumoniaClassification(Request $request){
         $sql = "SELECT * FROM pneumonia_facility_classification WHERE sub_county = '{$request->sub_county}'";
         $classification = \DB::select($sql);
-        // $cleanedClassification = [];
-        // foreach ($classification as $class) {
-        //     $cleanedClassification[$class->assessment][] = $class;
-        // }
 
         return $classification;
     }
 
     function getSubcountyTreatmentData(Request $request){
-        $sql = "SELECT sub_county,
+        $sql = "SELECT sub_county, assessment,
         SUM(AMOXDT) AS AMOXDT,
         SUM(AMOX_SYRUP) AS AMOX_SYRUP,
             SUM( OXYGEN ) AS OXYGEN,
@@ -282,6 +282,7 @@ FROM
         FROM
             (
             SELECT
+                                c.assessment,
                 t.sub_county,
                 SUM( OXYGEN ) AS OXYGEN,
                 SUM( AMOXDT ) AS AMOXDT,
@@ -294,13 +295,13 @@ FROM
                 ( SUM( ANTI_OTHER ) ) AS OTHER,
                 c.NOTX 
             FROM
-                `pneumonia_treatment_data` t
-                JOIN ( SELECT sub_county, SUM( NOTX_AFTER_DIF ) AS NOTX FROM pneumonia_tx_class_subcounty_agg GROUP BY sub_county ) c ON c.sub_county = t.sub_county
+                `pneumonia_facility_treatment_data` t
+                JOIN ( SELECT sub_county, assessment, SUM( NOTX_AFTER_DIF ) AS NOTX FROM pneumonia_facility_tx_class_facility_agg GROUP BY sub_county ) c ON c.sub_county = t.sub_county
                 WHERE t.county = '{$request->county}' 
             GROUP BY
             t.sub_county 
             ) v
-                        GROUP BY sub_county";
+                        GROUP BY sub_county, assessment";
             // echo $sql;die;
         $data = \DB::select($sql);
 
@@ -311,13 +312,17 @@ FROM
         // }
 
         // echo "<pre>";print_r($response);die;
+        $cleanedData = [];
 
-        return $data;
+        foreach ($data as $d) {
+            $cleanedData[$d->assessment][] = $d;
+        }
+
+        return $cleanedData;
     }
 
     function getSubcountyLocTreatmentData(Request $request){
-        $sql = "SELECT
-FACILITY_TYPE,
+        $sql = "SELECT FACILITY_TYPE, assessment,
         SUM(AMOXDT) AS AMOXDT,
         SUM(AMOX_SYRUP) AS AMOX_SYRUP,
             SUM( OXYGEN ) AS OXYGEN,
@@ -328,8 +333,9 @@ FACILITY_TYPE,
         FROM
             (
             SELECT
+                                c.assessment,
+                                                                c.FACILITY_TYPE,
                 t.sub_county,
-                                t.FACILITY_TYPE,
                 SUM( OXYGEN ) AS OXYGEN,
                 SUM( AMOXDT ) AS AMOXDT,
                 SUM( AMOX_SYRUP ) AS AMOX_SYRUP,
@@ -341,16 +347,22 @@ FACILITY_TYPE,
                 ( SUM( ANTI_OTHER ) ) AS OTHER,
                 c.NOTX 
             FROM
-                `pneumonia_loc_treatment_data` t
-                JOIN ( SELECT sub_county, SUM( NOTX_AFTER_DIF ) AS NOTX FROM pneumonia_loc_tx_class_subcounty_agg GROUP BY sub_county ) c ON c.sub_county = t.sub_county
+                `pneumonia_facility_treatment_data` t
+                JOIN ( SELECT fname, FACILITY_TYPE, sub_county, assessment, SUM( NOTX_AFTER_DIF ) AS NOTX FROM pneumonia_facility_tx_class_facility_agg GROUP BY FACILITY_TYPE, assessment ) c ON c.fname = t.fname
                 WHERE t.county = '{$request->county}' 
             GROUP BY
-            t.FACILITY_TYPE 
+            t.fname, c.assessment
             ) v
-                        GROUP BY FACILITY_TYPE";
+                        GROUP BY FACILITY_TYPE, assessment";
 
-            $data = \DB::select($sql);
-            return $data;
+        $data = \DB::select($sql);
+        $cleanedData = [];
+
+        foreach ($data as $d) {
+            $cleanedData[$d->assessment][] = $d;
+        }
+
+        return $cleanedData;
     }
 
     function getSubcountyDiarrhoeaClassification(){
