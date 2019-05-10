@@ -321,6 +321,53 @@ FROM
         return $cleanedData;
     }
 
+    function getFacilityPneumoniaTreatment(Request $request){
+        $sql = "SELECT fname, facility_name, sub_county, assessment,
+        SUM(AMOXDT) AS AMOXDT,
+        SUM(AMOX_SYRUP) AS AMOX_SYRUP,
+            SUM( OXYGEN ) AS OXYGEN,
+            SUM(CTX) AS CTX,
+        SUM(INJECTABLES) AS INJECTABLES,
+        SUM(OTHER) AS OTHER,
+        SUM(NOTX) AS NOTX
+        FROM
+            (
+            SELECT
+                t.fname,
+                t.facility_name,
+                                c.assessment,
+                t.sub_county,
+                SUM( OXYGEN ) AS OXYGEN,
+                SUM( AMOXDT ) AS AMOXDT,
+                SUM( AMOX_SYRUP ) AS AMOX_SYRUP,
+                SUM( CTX ) AS CTX,
+                SUM( BENZ ) AS BENZ,
+                SUM( BENZ_GENT ) AS BENZ_GENT,
+                SUM( GENT ) AS GENT,
+                ( SUM( BENZ ) + SUM( BENZ_GENT ) + SUM( GENT ) ) AS INJECTABLES,
+                ( SUM( ANTI_OTHER ) ) AS OTHER,
+                c.NOTX 
+            FROM
+                `pneumonia_facility_treatment_data` t
+                JOIN ( SELECT sub_county, fname, facility_name, assessment, SUM( NOTX_AFTER_DIF ) AS NOTX FROM pneumonia_facility_tx_class_facility_agg GROUP BY sub_county ) c ON c.sub_county = t.sub_county
+                WHERE t.sub_county = '{$request->subcounty}' 
+            GROUP BY
+            t.fname 
+            ) v
+                        GROUP BY fname, assessment";
+
+                        // die($sql);
+
+        $data = \DB::select($sql);
+        $cleanedData = [];
+
+        foreach ($data as $d) {
+            $cleanedData[$d->assessment][] = $d;
+        }
+
+        return $cleanedData;
+    }
+
     function getSubcountyLocTreatmentData(Request $request){
         $sql = "SELECT FACILITY_TYPE, assessment,
         SUM(AMOXDT) AS AMOXDT,
@@ -404,5 +451,62 @@ FROM
         $classification = \DB::select($sql);
 
         return $classification;
+    }
+
+    function getFacilityPneumoniaClassificationX(Request $request){
+        $sql = "SELECT sub_county, FACILITY_TYPE, assessment, SUM( TOTAL_CLASSIFIED ) AS TOTAL_CLASSIFIED, SUM( TOTAL_CASES_AFTER_DIF ) AS TOTAL_CASES_AFTER_DIF FROM `pneumonia_facility_classification` WHERE county = '{$request->subcounty}' GROUP BY sub_county, FACILITY_TYPE, assessment";
+        // $oldSql = "SELECT FACILITY_TYPE, SUM(TOTAL_CLASSIFIED) AS TOTAL_CLASSIFIED, SUM(TOTAL_CASES_AFTER_DIF) AS TOTAL_CASES_AFTER_DIF FROM pneumonia_loc_subcounty_classification WHERE county = '{$request->county}' GROUP BY FACILITY_TYPE";
+
+        // die($sql);
+
+        $classification = \DB::select($sql);
+
+        return $classification;   
+    }
+
+    function getFacilityPneumoniaTreatmentData(Request $request){
+        $sql = "SELECT FACILITY_TYPE, assessment,
+        SUM(AMOXDT) AS AMOXDT,
+        SUM(AMOX_SYRUP) AS AMOX_SYRUP,
+            SUM( OXYGEN ) AS OXYGEN,
+            SUM(CTX) AS CTX,
+        SUM(INJECTABLES) AS INJECTABLES,
+        SUM(OTHER) AS OTHER,
+        SUM(NOTX) AS NOTX
+        FROM
+            (
+            SELECT
+                                c.assessment,
+                                                                c.FACILITY_TYPE,
+                t.sub_county,
+                SUM( OXYGEN ) AS OXYGEN,
+                SUM( AMOXDT ) AS AMOXDT,
+                SUM( AMOX_SYRUP ) AS AMOX_SYRUP,
+                SUM( CTX ) AS CTX,
+                SUM( BENZ ) AS BENZ,
+                SUM( BENZ_GENT ) AS BENZ_GENT,
+                SUM( GENT ) AS GENT,
+                ( SUM( BENZ ) + SUM( BENZ_GENT ) + SUM( GENT ) ) AS INJECTABLES,
+                ( SUM( ANTI_OTHER ) ) AS OTHER,
+                c.NOTX 
+            FROM
+                `pneumonia_facility_treatment_data` t
+                JOIN ( SELECT fname, FACILITY_TYPE, sub_county, assessment, SUM( NOTX_AFTER_DIF ) AS NOTX FROM pneumonia_facility_tx_class_facility_agg GROUP BY sub_county, FACILITY_TYPE, assessment ) c ON c.fname = t.fname
+                WHERE t.sub_county = '{$request->subcounty}' 
+            GROUP BY
+            t.sub_county, c.FACILITY_TYPE, c.assessment
+            ) v
+                        GROUP BY FACILITY_TYPE, assessment";
+
+                        // die($sql);
+
+        $data = \DB::select($sql);
+        $cleanedData = [];
+
+        foreach ($data as $d) {
+            $cleanedData[$d->assessment][] = $d;
+        }
+
+        return $cleanedData;
     }
 }

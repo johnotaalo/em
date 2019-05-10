@@ -9,12 +9,11 @@
 	import exportingInit from 'highcharts/modules/exporting'
 	exportingInit(Highcharts)
 	export default {
-		name: 'GraphComponent',
+		name: 'FacilitySubCountyComponent',
 		props: {
 			title: { type: null, default: null },
 			data: { type: null, default: null },
-			county: { type: null, default: null },
-			subcounties: { type: null, default: null }
+			subcounty: { type: null, default: null }
 		},
 		data(){
 			return {
@@ -41,10 +40,11 @@
 		},
 		computed: {
 			graphOptions(){
-				var categories = _.map(this.data, (o) => { return o.sub_county })
+				// console.log(this.data)
+				var categories = _.map(this.data, (o) => { return o.FACILITY_TYPE })
 				var seriesData = []
 				categories.sort()
-				categories.unshift("<b>" + _.upperCase(this.county + " County") +" </b>")
+				categories.unshift("<b>" + _.upperCase(this.subcounty + " SubCounty") +" </b>")
 
 				_.forOwn(this.pneumoniaTreatmentLabels, (treatment, id) => {
 					var obj = {}
@@ -54,7 +54,7 @@
 					_.forOwn(categories, (category, key) => {
 						if(key != 0){
 							var scData = _.map(this.data, function(o){
-								if (o.sub_county == category) { return o}
+								if (o.FACILITY_TYPE == category) { return o}
 							})
 
 							scData = _.without(scData, undefined)

@@ -25,6 +25,16 @@
 					INJECTABLES: "Injectables",
 					OXYGEN: "Oxygen",
 					OTHER: "Other Treatment",
+				},
+				pneumoniaTreatmentColors: {
+					NOTX: "#EF9A9A",
+					AMOXDT: "#00B0FF",
+					AMOX_SYRUP: "#66BB6A",
+					CTX: "#9E9E9E",
+					INJECTABLES: "#FF9800",
+					OXYGEN: "#7C4DFF",
+					OTHER: "#FFFF00",
+					
 				}
 			}
 		},
@@ -40,6 +50,7 @@
 					var obj = {}
 					obj.name = treatment
 					obj.data = []
+					obj.color = this.pneumoniaTreatmentColors[id]
 					_.forOwn(categories, (category, key) => {
 						if(key != 0){
 							var scData = _.map(this.data, function(o){
@@ -55,6 +66,8 @@
 					})
 					seriesData.push(obj)
 				})
+
+				console.log(seriesData)
 
 				return {
 					chart: {
@@ -100,6 +113,11 @@
 								color: "#000",
 								borderColor: "#000"
 							},
+							events: {
+								legendItemClick: function () {
+									return false; 
+								}
+							}
 				        }
 				    },
 

@@ -83,8 +83,21 @@
 													</b-form-select>
 												</div>
 											</div>
+											<h1><center>{{ this.pneumonia.selectedSubcounty }}</center></h1>
+											<div class="row">
+												<div class="col-7">
+													<highcharts :options="facilityChart" style = "height: 400px;"></highcharts>
+
+													<center><h2 class="mt-6">Prescription Pattern</h2></center>
+													<facility-graph-component v-for="(treatmentData, assessment) in data.facilityTreatmentData" :key="assessment" :title = "assessment" :data = "treatmentData" :subcounty="pneumonia.selectedSubcounty" :treatmentLabels = "pneumoniaTreatmentLabels"></facility-graph-component>
+												</div>
+												<div class="col-5">
+													<highcharts :options="pneumoniaFacilityClassification" style = "height: 400px;"></highcharts>
+													<center><h2 class="mt-6">Prescription Pattern</h2></center>
+													<facility-sub-county-component v-for="(treatmentData, assessment) in data.facilityLocData" :key="assessment" :title = "assessment" :data = "treatmentData" :subcounty="pneumonia.selectedSubcounty" :treatmentLabels = "pneumoniaTreatmentLabels"></facility-sub-county-component>
+												</div>
+											</div>
 											
-											<highcharts :options="facilityChart" style = "height: 500px;"></highcharts>
 										</div>
 									</div>
 							 	</b-tab>
@@ -101,7 +114,7 @@
 							</template>
 							<div class="row">
 								<div class="col">
-									<highcharts :options="pneumoniaSubCountyClassifications" style = "height: 400px;"></highcharts>
+									<highcharts :options="diarrhoeaSubCountyClassifications" style = "height: 400px;"></highcharts>
 								</div>
 							</div>
 						</b-tab>
@@ -118,13 +131,15 @@
 	import exportingInit from 'highcharts/modules/exporting'
 	import GraphComponent from './graphs/GraphComponent'
 	import LocGraphComponent from './graphs/LocGraphComponent'
+	import FacilityGraphComponent from './graphs/FacilityGraphComponent'
+	import FacilitySubCountyComponent from './graphs/FacilitySubCountyComponent'
 
 	exportingInit(Highcharts)
 	export default {
 		props: {
 			county: { type: null, default: null }
 		},
-		components: { GraphComponent, LocGraphComponent },
+		components: { GraphComponent, LocGraphComponent, FacilityGraphComponent, FacilitySubCountyComponent },
 		data(){
 			return {
 				counties: [],
@@ -133,6 +148,7 @@
 					value: this.county,
 					text: this.county
 				},
+				pneumoniaColor: "#66BB6A",
 				pneumoniaSubCounties: [],
 				pneumoniaTreatmentLabels: {NOTX: "No Treatment",
 					AMOXDT: "Amox DT",
@@ -161,7 +177,11 @@
 					pneumoniaTreat: {},
 					pneumoniaLocTreat: {},
 					diarrhoeaClass: [],
-					facilityTypes: []
+					facilityTypes: [],
+					xfacilityTypes: [],
+					facilityTreatmentData: [],
+					pneumoniaFacilityTreat: [],
+					facilityLocData: []
 				}
 			}
 		},
@@ -269,6 +289,42 @@
 				.then(res => {
 					this.data.diarrhoeaClass = res.data
 				})
+			},
+			getPneumoniaFacilityTreatmentData(subcounty){
+				axios.get('/api/data/pneumonia/treatment/facilities/' + subcounty)
+				.then(res => {
+					this.data.facilityTreatmentData = res.data
+				})
+			},
+			getFacilityClassificationData(subcounty){
+				axios.get('/api/data/pneumonia/classification/facility/' + subcounty)
+				.then(res => {
+					var pneumoniaLocClassData = {}
+					var facility_type = []
+					_.forOwn(res.data, data =>{
+						if(typeof pneumoniaLocClassData[data.assessment] == "undefined"){
+							pneumoniaLocClassData[data.assessment] = {};
+						}
+
+						var ftype = (data.FACILITY_TYPE == null) ? "Unknown" : data.FACILITY_TYPE
+						pneumoniaLocClassData[data.assessment][ftype] = _.round((data.TOTAL_CLASSIFIED / data.TOTAL_CASES_AFTER_DIF) * 100)
+						
+
+						facility_type.push(ftype)
+					})
+					// console.log(pneumoniaClassData)
+					// console.log(pneumoniaLocClassData)
+					this.data.pneumoniaFacilityTreat = pneumoniaLocClassData
+					facility_type = _.uniq(facility_type)
+					this.data.xfacilityTypes = facility_type
+					// this.data.pneumoniaFacilityTreat = res.data
+				})
+			},
+			getFacilityLocTreatementData(subcounty){
+				axios.get('/api/data/pneumonia/treatment/facilitydata/loc/' + subcounty)
+				.then(res => {
+					this.data.facilityLocData = res.data
+				})
 			}
 		},
 		watch: {
@@ -299,6 +355,7 @@
 						var obj = {};
 						obj.name = category
 						obj.data = []
+						obj.color = this.pneumoniaColor
 						_.forOwn(categories, (facility) => {
 							// console.log(facility)
 							var data = 0
@@ -372,12 +429,19 @@
 					console.error(error)
 					alert("There was an error");
 				})
+
+				this.getPneumoniaFacilityTreatmentData(newVal)
+				this.getFacilityClassificationData(newVal)
+				this.getFacilityLocTreatementData(newVal)
 			},
 			selectedCounty: function(county){
 				window.location.href = "/dashboard/county/breakdown/" + county
 			}
 		},
 		computed: {
+			diarrhoeaSubCountyClassifications() {
+
+			},
 			pneumoniaSubCountyClassifications(){
 				// Order by the third bar classified
 				var cat = Object.keys(this.data.pneumoniaClass);
@@ -395,6 +459,7 @@
 					var obj = {};
 					obj.name = category
 					obj.data = []
+					obj.color = this.pneumoniaColor
 					_.forOwn(this.pneumoniaSubCounties, (subcounty, k) => {
 						if(k != 0){
 							if(typeof this.data.pneumoniaClass[category][subcounty.sub_county] == "undefined"){
@@ -461,6 +526,81 @@
 				        }
 				    },
 
+				    series: seriesData
+				}
+			},
+			pneumoniaFacilityClassification(){
+				var categories = ["<b>" + _.upperCase(this.subcounty) + " SUB COUNTY" + "</b>",];
+				categories = categories.concat(this.data.xfacilityTypes)
+				var seriesData = [];
+				var cat = Object.keys(this.data.pneumoniaFacilityTreat)
+				_.forOwn(cat, (category) => {
+					var obj = {};
+					obj.name = category
+					obj.data = []
+					obj.color = this.pneumoniaColor
+					_.forOwn(categories, (ftype, k) => {
+						if(k != 0){
+							if(typeof this.data.pneumoniaLocClass[category][ftype] == "undefined"){
+								obj.data.push(0)
+							}else{
+								obj.data.push(this.data.pneumoniaLocClass[category][ftype])
+							}
+						}else{
+							obj.data.push(0)
+						}
+					})
+
+					seriesData.push(obj)
+				})
+					
+				return {
+				    chart: {
+				        type: 'column'
+				    },
+				    title: {
+				        text: 'Pneumonia Case Classification by Level of Care'
+				    },
+				    xAxis: {
+				        categories: categories,
+				        crosshair: true
+				    },
+				    yAxis: {
+				        min: 0,
+				        title: {
+				            text: 'Cases'
+				        },allowDecimals: false,
+				        min: 0,
+				        title: {
+				            text: 'Cases'
+				        },
+				        gridLineWidth: 0,
+						minorGridLineWidth: 0,
+						labels:
+						{
+							enabled: false
+						}
+				    },
+				    tooltip: {
+				        headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+				        pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+				            '<td style="padding:0"><b>{point.y}%</b></td></tr>',
+				        footerFormat: '</table>',
+				        shared: true,
+				        useHTML: true
+				    },
+				    plotOptions: {
+				        column: {
+				            pointPadding: 0.2,
+				            borderWidth: 0,
+				        dataLabels: {
+								enabled: true,
+								color: "#000",
+								borderColor: "#000",
+								format: "{point.y}%"
+							},
+				        }
+				    },
 				    series: seriesData
 				}
 			},
@@ -745,6 +885,7 @@
 					var obj = {};
 					obj.name = category
 					obj.data = []
+					obj.color = this.pneumoniaColor
 					_.forOwn(categories, (ftype, k) => {
 						if(k != 0){
 							if(typeof this.data.pneumoniaLocClass[category][ftype] == "undefined"){
