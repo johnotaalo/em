@@ -355,7 +355,7 @@ FROM
             ) v
                         GROUP BY FACILITY_TYPE, assessment";
 
-                        die($sql);
+                        // die($sql);
 
         $data = \DB::select($sql);
         $cleanedData = [];
