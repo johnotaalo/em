@@ -30,7 +30,7 @@
 		},
 		computed: {
 			graphOptions(){
-				console.log(this.data)
+				// console.log(this.data)
 				var categories = _.map(this.data, (o) => { return o.FACILITY_TYPE })
 				var seriesData = []
 				categories.sort()

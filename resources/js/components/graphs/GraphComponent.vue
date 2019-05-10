@@ -13,7 +13,8 @@
 		props: {
 			title: { type: null, default: null },
 			data: { type: null, default: null },
-			county: { type: null, default: null }
+			county: { type: null, default: null },
+			subcounties: { type: null, default: null }
 		},
 		data(){
 			return {

@@ -32,7 +32,7 @@
 									</template>
 							 		<div class="row">
 										<div class="col-7 border border-left-0 border-top-0 border-bottom-0" >
-											<h1><center>SUB COUNTY LEVEL</center></h1>
+											<!-- <h1><center>SUB COUNTY LEVEL</center></h1> -->
 											<highcharts :options="pneumoniaSubCountyClassifications" style = "height: 300px;"></highcharts>
 											<hr>
 											<center><h2 class="mt-6">Prescription Pattern</h2></center>
@@ -43,11 +43,11 @@
 
 												<highcharts :options="pneumoniaSubCountyTreatmentSupervision2" style = "height: 400px;"></highcharts>
 											</div> -->
-											<graph-component v-for="(treatmentData, assessment) in data.pneumoniaTreat" :key="assessment" :title = "assessment" :data = "treatmentData" :county="county" :treatmentLabels = "pneumoniaTreatmentLabels"></graph-component>
+											<graph-component v-for="(treatmentData, assessment) in data.pneumoniaTreat" :key="assessment" :title = "assessment" :data = "treatmentData" :county="county" :treatmentLabels = "pneumoniaTreatmentLabels" :subcounties="subcounties"></graph-component>
 											
 										</div>
 										<div class="col-5">
-											<h1><center>BY LEVEL OF CARE</center></h1>
+											<!-- <h1><center>BY LEVEL OF CARE</center></h1> -->
 											<highcharts :options="pneumoniaLoCTreatmentBaseline" style = "height: 300px;"></highcharts>
 											<hr>
 											<center><h2 class="mt-6">Prescription Pattern</h2></center>
@@ -760,7 +760,7 @@
 					seriesData.push(obj)
 				})
 
-				console.log(seriesData)
+				// console.log(seriesData)
 				
 				_.forOwn(this.data.pneumoniaLocClass, (value, key) =>{
 					// categories.push(key)
