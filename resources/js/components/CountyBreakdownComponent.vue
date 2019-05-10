@@ -154,7 +154,9 @@
 				selectedCounty: null,
 				facilityNo: 0,
 				pneumoniaColor: "#66BB6A",
+				diarrhoeaColor: "#03A9F4",
 				pneumoniaSubCounties: [],
+				diarrhoeaSubCounties: [],
 				pneumoniaTreatmentLabels: {NOTX: "No Treatment",
 					AMOXDT: "Amox DT",
 					AMOX_SYRUP: "Amox Syrup",
@@ -186,7 +188,8 @@
 					xfacilityTypes: [],
 					facilityTreatmentData: [],
 					pneumoniaFacilityTreat: [],
-					facilityLocData: []
+					facilityLocData: [],
+					diarrhoeaClass: []
 				}
 			}
 		},
@@ -197,7 +200,7 @@
 			this.getPneumoniaTreatmentData()
 			this.getPneumoniaLocClassificationData()
 			this.getPneumoniaLocTreatmentData()
-			this.getDiarrhoeaClassifications()
+			this.getDiarrhoeaSubcountyClassificationData()
 		},
 		methods: {
 			getCounties(){
@@ -228,6 +231,32 @@
 			},
 			getFacilities(){
 				
+			},
+
+			getDiarrhoeaSubcountyClassificationData(){
+				axios.get('/api/data/diarrhoea/classification/subcounties/' + this.county)
+				.then(res => {
+					var diarrhoeaClassData = {}
+					_.forOwn(res.data, data =>{
+						if(typeof diarrhoeaClassData[data.assessment] == 'undefined'){
+							diarrhoeaClassData[data.assessment] = {}
+						}
+
+						diarrhoeaClassData[data.assessment][data.sub_county] = _.round((data.TOTAL_CLASSIFIED / data.TOTAL_CASES_AFTER_DIFF) * 100)
+					})
+					// console.log(pneumoniaClassData)
+
+					this.data.diarrhoeaClass = diarrhoeaClassData
+					this.diarrhoeaSubCounties = [{sub_county: "<b>" + _.upperCase(this.county + " County") +" </b>"}]
+					var subcounties = _.map(res.data, subcounty => {
+						var sc = {"sub_county": subcounty.sub_county}
+						if(!_.some(this.diarrhoeaSubCounties, sc)){
+							this.diarrhoeaSubCounties.push(sc)
+						}
+						
+					})
+					// console.log(this.subcounties)
+				})
 			},
 			getPneumoniaTreatmentData(){
 				axios.get('/api/data/pneumonia/treatment/subcounty/' + this.county)
@@ -447,7 +476,92 @@
 		},
 		computed: {
 			diarrhoeaSubCountyClassifications() {
+				// Order by the third bar classified
+				var cat = Object.keys(this.data.diarrhoeaClass);
+				console.log(cat)
+				var categories = _.uniq(_.map(this.diarrhoeaSubCounties, (o) => { return o.sub_county }))
+				categories.sort()
+				// console.log(categories)
+				var seriesData = []
+				var resData = []
 
+				// var cat = this.categories
+				// cat.splice(3, 2)
+				// console.log(this.data.pneumoniaClass)
+				
+				_.forOwn(cat, (category) => {
+					var obj = {};
+					obj.name = category
+					obj.data = []
+					obj.color = this.diarrhoeaColor
+					_.forOwn(this.diarrhoeaSubCounties, (subcounty, k) => {
+						if(k != 0){
+							if(typeof this.data.diarrhoeaClass[category][subcounty.sub_county] == "undefined"){
+								obj.data.push(0)
+							}else{
+								obj.data.push(this.data.diarrhoeaClass[category][subcounty.sub_county])
+							}
+						}else{
+							obj.data.push(0)
+						}
+						// obj.data.push(_.random(1, 20))
+					})
+
+					seriesData.push(obj)
+				})
+
+				return {
+
+				    chart: {
+				        type: 'column'
+				    },
+
+				    title: {
+				        text: 'Diarrhoea Case Classification'
+				    },
+
+				    xAxis: {
+				        categories: categories
+				    },
+
+				    yAxis: {
+				       
+				        allowDecimals: false,
+				        min: 0,
+				        title: {
+				            text: 'Cases'
+				        },
+				        gridLineWidth: 0,
+						minorGridLineWidth: 0,
+						labels:
+						{
+							enabled: false
+						}
+				    },
+
+				    tooltip: {
+				        formatter: function () {
+				            return '<b>' + this.x + '</b><br/>' +
+				                this.series.name + ': ' + this.y + '%<br/>'
+				        }
+				    },
+
+				    plotOptions: {
+				        column: {
+				   //          stacking: 'percent',
+				            dataLabels: {
+								enabled: true,
+								color: "#000",
+								borderColor: "#000",
+								format: "{point.y}%"
+							},
+							pointPadding: 0.2,
+            				borderWidth: 0
+				        }
+				    },
+
+				    series: seriesData
+				}
 			},
 			pneumoniaSubCountyClassifications(){
 				// Order by the third bar classified

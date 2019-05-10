@@ -509,4 +509,25 @@ FROM
 
         return $cleanedData;
     }
+
+    function getDiarrhoaClassificationData(Request $request){
+        $sql = "SELECT
+                    sub_county,
+                    assessment,
+                    SUM(classified) AS TOTAL_CLASSIFIED,
+                    SUM( NO_CLASS_CASES ) AS NO_CLASS_CASES,
+                    SUM( total_cases + ( IF ( DIFFERENCE > 0, NO_CLASS_CASES + DIFFERENCE, NO_CLASS_CASES ) ) ) AS TOTAL_CASES_AFTER_DIFF,
+                    SUM( IF ( DIFFERENCE < 0, NOTX + abs( DIFFERENCE ), NOTX ) ) AS NOTX_AFTER_DIFF 
+                FROM
+                    `diarrhoea_case_tx_aggreagate` 
+                WHERE
+                    county = '{$request->county}'
+                GROUP BY
+                    sub_county,
+                    assessment ";
+
+        $data = \DB::select($sql);
+
+        return $data;
+    }
 }
