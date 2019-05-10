@@ -7,8 +7,12 @@
 				</div>
 				
 				<div class="float-right">
-					<label>Select a County</label>
-			 		<b-select v-model="selectedCounty" :options="counties" :change="openNewCounty"></b-select>
+					<!-- <label>Select a County</label> -->
+			 		<b-form-select v-model="selectedCounty" :options="counties" :change="openNewCounty">
+			 			<template slot="first">
+							<option :value="null" disabled>Select County</option>
+						</template>
+			 		</b-form-select>
 			 	</div>
 			</div>
 		</div>
@@ -83,7 +87,10 @@
 													</b-form-select>
 												</div>
 											</div>
-											<h1><center>{{ this.pneumonia.selectedSubcounty }}</center></h1>
+											<center>
+												<h1>{{ this.pneumonia.selectedSubcounty }} - {{ this.facilityNo }} Facilities</h1>
+											</center>
+
 											<div class="row">
 												<div class="col-7">
 													<highcharts :options="facilityChart" style = "height: 400px;"></highcharts>
@@ -144,10 +151,8 @@
 			return {
 				counties: [],
 				subcounties: [],
-				selectedCounty: {
-					value: this.county,
-					text: this.county
-				},
+				selectedCounty: null,
+				facilityNo: 0,
 				pneumoniaColor: "#66BB6A",
 				pneumoniaSubCounties: [],
 				pneumoniaTreatmentLabels: {NOTX: "No Treatment",
@@ -339,6 +344,8 @@
 					var categories = _.map(res.data, (o) => {
 						return o.facility_name
 					})
+
+					this.facilityNo = categories.length
 					categories.sort()
 
 					_.forOwn(res.data, (value) => {
