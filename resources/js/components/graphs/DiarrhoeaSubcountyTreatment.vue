@@ -27,7 +27,7 @@
 					OTHER: "Other Treatment",
 				},
 				diarrhoeaTreatmentColors: {
-					NOTX: "#EF9A9A",
+					NOTX: "#FFFFFF",
 					ANTIBIOTICS: "#00B0FF",
 					IV: "#66BB6A",
 					COP: "#9E9E9E",
@@ -50,6 +50,9 @@
 					var obj = {}
 					obj.name = treatment
 					obj.data = []
+					if (id == "NOTX") {
+						obj.borderColor = "red"
+					}
 					obj.color = this.diarrhoeaTreatmentColors[id]
 					_.forOwn(categories, (category, key) => {
 						if(key != 0){

@@ -27,7 +27,7 @@
 					OTHER: "Other Treatment",
 				},
 				pneumoniaTreatmentColors: {
-					NOTX: "#EF9A9A",
+					NOTX: "#FFFFFF",
 					AMOXDT: "#00B0FF",
 					AMOX_SYRUP: "#66BB6A",
 					CTX: "#9E9E9E",
@@ -50,6 +50,9 @@
 					var obj = {}
 					obj.name = treatment
 					obj.data = []
+					if (id == "NOTX") {
+						obj.borderColor = "red"
+					}
 					obj.color = this.pneumoniaTreatmentColors[id]
 					_.forOwn(categories, (category, key) => {
 						if(key != 0){
