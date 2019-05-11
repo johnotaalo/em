@@ -101,7 +101,7 @@
 												<div class="col-5">
 													<highcharts :options="pneumoniaFacilityClassification" style = "height: 400px;"></highcharts>
 													<center><h2 class="mt-6">Prescription Pattern</h2></center>
-													<facility-sub-county-component v-for="(treatmentData, assessment) in data.facilityLocData" :key="assessment" :title = "assessment" :data = "treatmentData" :subcounty="pneumonia.selectedSubcounty" :treatmentLabels = "pneumoniaTreatmentLabels"></facility-sub-county-component>
+													<facility-sub-county-component v-for="(treatmentData, assessment) in data.facilityLocData" :key="assessment" :title = "assessment" :data = "treatmentData" :county="county" :subcounties="subcounties"></facility-sub-county-component>
 												</div>
 											</div>
 											
@@ -119,11 +119,37 @@
 									DIARRHOEA
 								</h5>
 							</template>
-							<div class="row">
-								<div class="col">
-									<highcharts :options="diarrhoeaSubCountyClassifications" style = "height: 400px;"></highcharts>
-								</div>
-							</div>
+							<b-tabs pills>
+								<b-tab>
+									<template slot="title">
+									 	<h6>
+											SUB COUNTY LEVEL
+										</h6>
+									</template>
+									<div class="row">
+										<div class="col-7">
+											<highcharts :options="diarrhoeaSubCountyClassifications" style = "height: 400px;"></highcharts>
+
+											<h4><center>Prescription Pattern</center></h4>
+											<diarrhoea-subcounty-treatment v-for="(treatmentData, assessment) in data.diarrhoeaTreat" :key="assessment" :title = "assessment" :data = "treatmentData" :county="county" :treatmentLabels = "pneumoniaTreatmentLabels"></diarrhoea-subcounty-treatment>
+										</div>
+
+										<div class="col-5">
+											<highcharts :options="diarrhoeaLoCTreatment" style = "height: 400px;"></highcharts>
+
+											<h4><center>Prescription Pattern</center></h4>
+											<diarrhoea-loc-treatments v-for="(treatmentData, assessment) in data.diarrhoeaLocTreat" :key="assessment" :title = "assessment" :data = "treatmentData" :county="county"></diarrhoea-loc-treatments>
+										</div>
+									</div>
+								</b-tab>
+
+								<b-tab>
+									<template slot = "title">
+										<h6>FACILITY LEVEL</h6>
+									</template>
+								</b-tab>
+							</b-tabs>
+							
 						</b-tab>
 					</b-tabs>
 				</b-card>
@@ -140,13 +166,15 @@
 	import LocGraphComponent from './graphs/LocGraphComponent'
 	import FacilityGraphComponent from './graphs/FacilityGraphComponent'
 	import FacilitySubCountyComponent from './graphs/FacilitySubCountyComponent'
+	import DiarrhoeaSubcountyTreatment from './graphs/DiarrhoeaSubcountyTreatment'
+	import DiarrhoeaLocTreatments from './graphs/DiarrhoeaLocTreatments'
 
 	exportingInit(Highcharts)
 	export default {
 		props: {
 			county: { type: null, default: null }
 		},
-		components: { GraphComponent, LocGraphComponent, FacilityGraphComponent, FacilitySubCountyComponent },
+		components: { GraphComponent, LocGraphComponent, FacilityGraphComponent, FacilitySubCountyComponent, DiarrhoeaSubcountyTreatment, DiarrhoeaLocTreatments },
 		data(){
 			return {
 				counties: [],
@@ -157,6 +185,7 @@
 				diarrhoeaColor: "#03A9F4",
 				pneumoniaSubCounties: [],
 				diarrhoeaSubCounties: [],
+				diarrhoeaSubCountiesX: [],
 				pneumoniaTreatmentLabels: {NOTX: "No Treatment",
 					AMOXDT: "Amox DT",
 					AMOX_SYRUP: "Amox Syrup",
@@ -186,10 +215,14 @@
 					diarrhoeaClass: [],
 					facilityTypes: [],
 					xfacilityTypes: [],
+					facilityTypesX: [],
 					facilityTreatmentData: [],
 					pneumoniaFacilityTreat: [],
 					facilityLocData: [],
-					diarrhoeaClass: []
+					diarrhoeaClass: [],
+					diarrhoeaTreat: [],
+					diarrhoeaLocClass: [],
+					diarrhoeaLocTreat: []
 				}
 			}
 		},
@@ -201,6 +234,9 @@
 			this.getPneumoniaLocClassificationData()
 			this.getPneumoniaLocTreatmentData()
 			this.getDiarrhoeaSubcountyClassificationData()
+			this.getDiarrhoeaTreatmentData()
+			this.getDiarrhoeaSubcountyLocClassificationData()
+			this.getDiarrhoeaLocTreatmentData()
 		},
 		methods: {
 			getCounties(){
@@ -258,10 +294,47 @@
 					// console.log(this.subcounties)
 				})
 			},
+
+			getDiarrhoeaSubcountyLocClassificationData(){
+				axios.get('/api/data/diarrhoea/classification/loc/' + this.county)
+				.then(res => {
+					var diarrhoeaLocClassData = {}
+					var facility_type = []
+					_.forOwn(res.data, data =>{
+						if(typeof diarrhoeaLocClassData[data.assessment] == 'undefined'){
+							diarrhoeaLocClassData[data.assessment] = {}
+						}
+
+						var ftype = (data.FACILITY_TYPE == null) ? "Unknown" : data.FACILITY_TYPE
+						diarrhoeaLocClassData[data.assessment][ftype] = _.round((data.TOTAL_CLASSIFIED / data.TOTAL_CASES_AFTER_DIFF) * 100)
+						facility_type.push(ftype)
+					})
+					// console.log(diarrhoeaLocClassData)
+
+					this.data.diarrhoeaLocClass = diarrhoeaLocClassData
+					// this.diarrhoeaLocFtypes = [{sub_county: "<b>" + _.upperCase(this.county + " County") +" </b>"}]
+					facility_type = _.uniq(facility_type)
+					this.data.facilityTypesX = facility_type
+					// console.log(this.subcounties)
+				})
+			},
+
+			getDiarrhoeaLocTreatmentData(){
+				axios.get('/api/data/diarrhoea/treatment/loc/' + this.county)
+				.then(res => {
+					this.data.diarrhoeaLocTreat = res.data
+				})
+			},
 			getPneumoniaTreatmentData(){
 				axios.get('/api/data/pneumonia/treatment/subcounty/' + this.county)
 				.then(res => {
 					this.data.pneumoniaTreat = res.data
+				})
+			},
+			getDiarrhoeaTreatmentData(){
+				axios.get('/api/data/diarrhoea/treatment/subcounty/' + this.county)
+				.then(res => {
+					this.data.diarrhoeaTreat = res.data
 				})
 			},
 			getPneumoniaClassificationData(){
@@ -478,7 +551,6 @@
 			diarrhoeaSubCountyClassifications() {
 				// Order by the third bar classified
 				var cat = Object.keys(this.data.diarrhoeaClass);
-				console.log(cat)
 				var categories = _.uniq(_.map(this.diarrhoeaSubCounties, (o) => { return o.sub_county }))
 				categories.sort()
 				// console.log(categories)
@@ -1076,6 +1148,87 @@
 							},
 				        }
 				    },
+				    series: seriesData
+				}
+			},
+			diarrhoeaLoCTreatment(){
+				var categories = ["<b>" + _.upperCase(this.county) + " COUNTY" + "</b>",];
+				categories = categories.concat(this.data.facilityTypesX)
+				var seriesData = [];
+				var cat = Object.keys(this.data.diarrhoeaLocClass)
+				
+				_.forOwn(cat, (category) => {
+					var obj = {};
+					obj.name = category
+					obj.data = []
+					obj.color = this.diarrhoeaColor
+					_.forOwn(categories, (ftype, k) => {
+						if(k != 0){
+							if(typeof this.data.diarrhoeaLocClass[category][ftype] == "undefined"){
+								obj.data.push(0)
+							}else{
+								obj.data.push(this.data.diarrhoeaLocClass[category][ftype])
+							}
+						}else{
+							obj.data.push(0)
+						}
+					})
+
+					seriesData.push(obj)
+				})
+
+				console.log(seriesData)
+
+				return {
+
+				    chart: {
+				        type: 'column'
+				    },
+
+				    title: {
+				        text: 'Diarrhoea Case Classification by Level of Care'
+				    },
+
+				    xAxis: {
+				        categories: categories
+				    },
+
+				    yAxis: {
+				       
+				        allowDecimals: false,
+				        min: 0,
+				        title: {
+				            text: 'Cases'
+				        },
+				        gridLineWidth: 0,
+						minorGridLineWidth: 0,
+						labels:
+						{
+							enabled: false
+						}
+				    },
+
+				    tooltip: {
+				        formatter: function () {
+				            return '<b>' + this.x + '</b><br/>' +
+				                this.series.name + ': ' + this.y + '%<br/>'
+				        }
+				    },
+
+				    plotOptions: {
+				        column: {
+				   //          stacking: 'percent',
+				            dataLabels: {
+								enabled: true,
+								color: "#000",
+								borderColor: "#000",
+								format: "{point.y}%"
+							},
+							pointPadding: 0.2,
+            				borderWidth: 0
+				        }
+				    },
+
 				    series: seriesData
 				}
 			},
