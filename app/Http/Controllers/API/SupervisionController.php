@@ -611,4 +611,108 @@ FROM
 
         return $cleanedData;
     }
+
+    function getFacilityDiarrhoeaClassification(Request $request){
+        $sql = "SELECT
+                    assessment,
+                    facility_name,
+                    SUM(classified) AS TOTAL_CLASSIFIED,
+                    SUM( NO_CLASS_CASES ) AS NO_CLASS_CASES,
+                    SUM( total_cases + ( IF ( DIFFERENCE > 0, NO_CLASS_CASES + DIFFERENCE, NO_CLASS_CASES ) ) ) AS TOTAL_CASES_AFTER_DIFF,
+                    SUM( IF ( DIFFERENCE < 0, NOTX + abs( DIFFERENCE ), NOTX ) ) AS NOTX_AFTER_DIFF 
+                FROM
+                    `diarrhoea_case_tx_aggreagate` 
+                WHERE
+                    sub_county = '{$request->subcounty}'
+                GROUP BY
+                    facility_name,
+                    assessment ";
+
+        // die($sql);
+
+        $data = \DB::select($sql);
+
+        return $data;
+    }
+
+    function getFacilityDiarrhoeaTreatment(Request $request){
+        $sql = "SELECT
+                    facility_name,
+                    assessment,
+                    SUM( ANTIBIOTICS ) AS ANTIBIOTICS,
+                    SUM(IV) AS IV,
+                    SUM(COP) AS COP,
+                    SUM(ZINC) AS ZINC,
+                    SUM(ORS) AS ORS,
+                    SUM(OTHER) AS OTHER,
+                    SUM(NOTX) AS NOTX
+                FROM
+                    `diarrhoea_case_tx_aggreagate` 
+                WHERE
+                    sub_county = '{$request->subcounty}' 
+                GROUP BY
+                    facility_name,
+                    assessment";
+
+        $data = \DB::select($sql);
+        $cleanedData = [];
+
+        foreach ($data as $d) {
+            $cleanedData[$d->assessment][] = $d;
+        }
+
+        return $cleanedData;
+    }
+
+    function getDiarrhoeaSubcountyLocClassification(Request $request){
+        $sql = "SELECT
+                    assessment,
+                    FACILITY_TYPE,
+                    SUM(classified) AS TOTAL_CLASSIFIED,
+                    SUM( NO_CLASS_CASES ) AS NO_CLASS_CASES,
+                    SUM( total_cases + ( IF ( DIFFERENCE > 0, NO_CLASS_CASES + DIFFERENCE, NO_CLASS_CASES ) ) ) AS TOTAL_CASES_AFTER_DIFF,
+                    SUM( IF ( DIFFERENCE < 0, NOTX + abs( DIFFERENCE ), NOTX ) ) AS NOTX_AFTER_DIFF 
+                FROM
+                    `diarrhoea_case_tx_aggreagate` 
+                WHERE
+                    sub_county = '{$request->subcounty}'
+                GROUP BY
+                    FACILITY_TYPE,
+                    assessment ";
+
+        // die($sql);
+
+        $data = \DB::select($sql);
+
+        return $data;
+    }
+
+    function getDiarrhoeaLocTreatmentData(Request $request){
+         $sql = "SELECT
+                    FACILITY_TYPE,
+                    assessment,
+                    SUM( ANTIBIOTICS ) AS ANTIBIOTICS,
+                    SUM(IV) AS IV,
+                    SUM(COP) AS COP,
+                    SUM(ZINC) AS ZINC,
+                    SUM(ORS) AS ORS,
+                    SUM(OTHER) AS OTHER,
+                    SUM(NOTX) AS NOTX
+                FROM
+                    `diarrhoea_case_tx_aggreagate` 
+                WHERE
+                    sub_county = '{$request->subcounty}' 
+                GROUP BY
+                    FACILITY_TYPE,
+                    assessment";
+
+        $data = \DB::select($sql);
+        $cleanedData = [];
+
+        foreach ($data as $d) {
+            $cleanedData[$d->assessment][] = $d;
+        }
+
+        return $cleanedData;
+    }
 }

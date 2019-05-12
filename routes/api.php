@@ -58,4 +58,9 @@ Route::prefix('data')->group(function(){
 	Route::get('diarrhoea/treatment/subcounty/{county}', 'API\SupervisionController@getSubcountyDiarrhoeaTreatmentData');
 	Route::get('diarrhoea/classification/loc/{county}', 'API\SupervisionController@getLOCDiarrhoeaClassification');
 	Route::get('diarrhoea/treatment/loc/{county}', 'API\SupervisionController@getLOCDiarrhoeaTreatment');
+	Route::get('diarrhoea/classification/facility/{subcounty}', 'API\SupervisionController@getFacilityDiarrhoeaClassification');
+	Route::get('diarrhoea/treatment/facilities/{subcounty}', 'API\SupervisionController@getFacilityDiarrhoeaTreatment');
+	Route::get('diarrhoea/classification/facility/loc/{subcounty}', 'API\SupervisionController@getDiarrhoeaSubcountyLocClassification');
+
+	Route::get('diarrhoea/treatment/scloc/{subcounty}', 'API\SupervisionController@getDiarrhoeaLocTreatmentData');
 });
