@@ -101,7 +101,7 @@
 												<div class="col-5">
 													<highcharts :options="pneumoniaFacilityClassification" style = "height: 400px;"></highcharts>
 													<center><h2 class="mt-6">Prescription Pattern</h2></center>
-													<facility-sub-county-component v-for="(treatmentData, assessment) in data.facilityLocData" :key="assessment" :title = "assessment" :data = "treatmentData" :county="county" :subcounties="subcounties"></facility-sub-county-component>
+													<facility-sub-county-component v-for="(treatmentData, assessment) in data.facilityLocData" :key="assessment" :title = "assessment" :data = "treatmentData" :county="county" :subcounties="subcounties" :subcounty="pneumonia.selectedSubcounty"></facility-sub-county-component>
 												</div>
 											</div>
 											
@@ -131,14 +131,14 @@
 											<highcharts :options="diarrhoeaSubCountyClassifications" style = "height: 400px;"></highcharts>
 
 											<h4><center>Prescription Pattern</center></h4>
-											<diarrhoea-subcounty-treatment v-for="(treatmentData, assessment) in data.diarrhoeaTreat" :key="assessment" :title = "assessment" :data = "treatmentData" :county="county" :treatmentLabels = "pneumoniaTreatmentLabels"></diarrhoea-subcounty-treatment>
+											<diarrhoea-subcounty-treatment v-for="(treatmentData, assessment) in data.diarrhoeaTreat" :key="assessment" :title = "assessment" :data = "treatmentData" :county="county" :treatmentLabels = "diarrhoea.treatmentLabels" :treatmentColors="diarrhoea.colors"></diarrhoea-subcounty-treatment>
 										</div>
 
 										<div class="col-5">
 											<highcharts :options="diarrhoeaLoCTreatment" style = "height: 400px;"></highcharts>
 
 											<h4><center>Prescription Pattern</center></h4>
-											<diarrhoea-loc-treatments v-for="(treatmentData, assessment) in data.diarrhoeaLocTreat" :key="assessment" :title = "assessment" :data = "treatmentData" :county="county"></diarrhoea-loc-treatments>
+											<diarrhoea-loc-treatments v-for="(treatmentData, assessment) in data.diarrhoeaLocTreat" :key="assessment" :title = "assessment" :data = "treatmentData" :county="county" :treatmentLabels = "diarrhoea.treatmentLabels" :treatmentColors="diarrhoea.colors"></diarrhoea-loc-treatments>
 										</div>
 									</div>
 								</b-tab>
@@ -164,15 +164,15 @@
 
 											<div class="row">
 												<div class="col-7">
-													<highcharts :options="facilityChart" style = "height: 400px;"></highcharts>
+													<highcharts :options="xfacilityChart" style = "height: 400px;"></highcharts>
 
 													<center><h2 class="mt-6">Prescription Pattern</h2></center>
-													<diarrhoea-facility-prescription-pattern v-for="(treatmentData, assessment) in diarrhoea.facilityTreatmentData" :key="assessment" :title = "assessment" :data = "treatmentData" :subcounty="diarrhoea.selectedSubcounty"></diarrhoea-facility-prescription-pattern>
+													<diarrhoea-facility-prescription-pattern v-for="(treatmentData, assessment) in diarrhoea.facilityTreatmentData" :key="assessment" :title = "assessment" :data = "treatmentData" :subcounty="diarrhoea.selectedSubcounty" :treatmentLabels = "diarrhoea.treatmentLabels" :treatmentColors="diarrhoea.colors"></diarrhoea-facility-prescription-pattern>
 												</div>
 												<div class="col-5">
 													<highcharts :options="diarrhoeaFacilityClassification" style = "height: 400px;"></highcharts>
 													<center><h2 class="mt-6">Prescription Pattern</h2></center>
-													<diarrhoea-loc-prescription-pattern v-for="(treatmentData, assessment) in diarrhoea.locTreatmentData" :key="assessment" :title = "assessment" :data = "treatmentData" :county="county" :subcounties="subcounties"></diarrhoea-loc-prescription-pattern>
+													<diarrhoea-loc-prescription-pattern v-for="(treatmentData, assessment) in diarrhoea.locTreatmentData" :key="assessment" :title = "assessment" :data = "treatmentData" :county="county" :subcounties="subcounties" :subcounty="diarrhoea.selectedSubcounty" :treatmentLabels = "diarrhoea.treatmentLabels" :treatmentColors="diarrhoea.colors"></diarrhoea-loc-prescription-pattern>
 												</div>
 											</div>
 											
@@ -238,7 +238,25 @@
 					facilityNo: 0,
 					facilityTreatmentData: [],
 					diarrhoeaLocClass: [],
-					locTreatmentData: []
+					locTreatmentData: [],
+					treatmentLabels: {
+						NOTX: "No Treatment",
+						ANTIBIOTICS: "Antibiotics",
+						// IV: "IV Fluids",
+						COP: "Co-Pack",
+						ZINC: "Zinc",
+						ORS: "ORS",
+						OTHER: "Other Treatment",
+					},
+					colors: {
+						NOTX: "#FFFFFF",
+						ANTIBIOTICS: "#FFFF00",
+						// IV: "#66BB6A",
+						COP: "#03A9F4",
+						ZINC: "#9E9E9E",
+						ORS: "#FF9800",
+						OTHER: "#A5D6A7",
+					}
 				},
 				options: {
 					subcounties: [],
@@ -248,6 +266,7 @@
 					pneumoniaFacilityTypes: []
 				},
 				facilityChart: {},
+				xfacilityChart: {},
 				data: {
 					pneumoniaClass: [],
 					pneumoniaLocClass: [],
@@ -527,6 +546,7 @@
 
 					this.facilityNo = categories.length
 					categories.sort()
+					categories.unshift("<b>" + _.upperCase(newVal + " Sub County") +" </b>")
 
 					_.forOwn(res.data, (value) => {
 						if(typeof resData[value.assessment] === 'undefined'){
@@ -543,14 +563,21 @@
 						obj.name = category
 						obj.data = []
 						obj.color = this.pneumoniaColor
-						_.forOwn(categories, (facility) => {
+						_.forOwn(categories, (facility, k) => {
 							// console.log(facility)
-							var data = 0
-							if (typeof resData[category][facility] != "undefined") {
-								data = resData[category][facility]
+							if(k != 0){
+								var data = 0
+								if (typeof resData[category][facility] != "undefined") {
+									data = resData[category][facility]
+								}
+								obj.data.push(data)
 							}
-							obj.data.push(data)
 						})
+
+						var data = obj.data;
+
+						var average = _.round(_.mean(data), 1)
+						obj.data.unshift(average)
 
 						seriesData.push(obj)
 					})
@@ -578,7 +605,7 @@
 					        allowDecimals: false,
 					        min: 0,
 					        title: {
-					            text: 'Cases'
+					            text: null
 					        },
 					        gridLineWidth: 0,
 							minorGridLineWidth: 0,
@@ -635,7 +662,7 @@
 
 					this.diarrhoea.facilityNo = categories.length
 					categories.sort()
-
+					categories.unshift("<b>" + _.upperCase(newVal + " Sub County") +" </b>")
 					_.forOwn(res.data, (value) => {
 						if(typeof resData[value.assessment] === 'undefined'){
 							resData[value.assessment]= []
@@ -651,19 +678,26 @@
 						obj.name = category
 						obj.data = []
 						obj.color = this.diarrhoeaColor
-						_.forOwn(categories, (facility) => {
+						_.forOwn(categories, (facility, k) => {
 							// console.log(facility)
-							var data = 0
-							if (typeof resData[category][facility] != "undefined") {
-								data = resData[category][facility]
+							if(k != 0){
+								var data = 0
+								if (typeof resData[category][facility] != "undefined") {
+									data = resData[category][facility]
+								}
+								obj.data.push(data)
 							}
-							obj.data.push(data)
 						})
+
+						var data = obj.data;
+
+						var average = _.round(_.mean(data), 1)
+						obj.data.unshift(average)
 
 						seriesData.push(obj)
 					})
 
-					this.facilityChart = {
+					this.xfacilityChart = {
 
 					    chart: {
 					        type: this.pneumonia.selectedChart
@@ -686,7 +720,7 @@
 					        allowDecimals: false,
 					        min: 0,
 					        title: {
-					            text: 'Cases'
+					            text: null
 					        },
 					        gridLineWidth: 0,
 							minorGridLineWidth: 0,
@@ -752,18 +786,21 @@
 					obj.name = category
 					obj.data = []
 					obj.color = this.diarrhoeaColor
-					_.forOwn(this.diarrhoeaSubCounties, (subcounty, k) => {
+					_.forOwn(categories, (subcounty, k) => {
 						if(k != 0){
-							if(typeof this.data.diarrhoeaClass[category][subcounty.sub_county] == "undefined"){
+							if(typeof this.data.diarrhoeaClass[category][subcounty] == "undefined"){
 								obj.data.push(0)
 							}else{
-								obj.data.push(this.data.diarrhoeaClass[category][subcounty.sub_county])
+								obj.data.push(this.data.diarrhoeaClass[category][subcounty])
 							}
-						}else{
-							obj.data.push(0)
 						}
 						// obj.data.push(_.random(1, 20))
 					})
+
+					var data = obj.data;
+
+					var average = _.round(_.mean(data), 1)
+					obj.data.unshift(average)
 
 					seriesData.push(obj)
 				})
@@ -787,7 +824,7 @@
 				        allowDecimals: false,
 				        min: 0,
 				        title: {
-				            text: 'Cases'
+				            text: null
 				        },
 				        gridLineWidth: 0,
 						minorGridLineWidth: 0,
@@ -839,18 +876,21 @@
 					obj.name = category
 					obj.data = []
 					obj.color = this.pneumoniaColor
-					_.forOwn(this.pneumoniaSubCounties, (subcounty, k) => {
+					_.forOwn(categories, (subcounty, k) => {
 						if(k != 0){
-							if(typeof this.data.pneumoniaClass[category][subcounty.sub_county] == "undefined"){
+							if(typeof this.data.pneumoniaClass[category][subcounty] == "undefined"){
 								obj.data.push(0)
 							}else{
-								obj.data.push(this.data.pneumoniaClass[category][subcounty.sub_county])
+								obj.data.push(this.data.pneumoniaClass[category][subcounty])
 							}
-						}else{
-							obj.data.push(0)
 						}
 						// obj.data.push(_.random(1, 20))
 					})
+
+					var data = obj.data;
+
+					var average = _.round(_.mean(data), 1)
+					obj.data.unshift(average)
 
 					seriesData.push(obj)
 				})
@@ -874,7 +914,7 @@
 				        allowDecimals: false,
 				        min: 0,
 				        title: {
-				            text: 'Cases'
+				            text: null
 				        },
 				        gridLineWidth: 0,
 						minorGridLineWidth: 0,
@@ -909,7 +949,7 @@
 				}
 			},
 			diarrhoeaFacilityClassification(){
-				var categories = ["<b>" + _.upperCase(this.county) + " SUB COUNTY" + "</b>",];
+				var categories = ["<b>" + _.upperCase(this.diarrhoea.selectedSubcounty) + " SUB COUNTY" + "</b>",];
 				categories = categories.concat(this.data.facilityTypesX)
 				var seriesData = [];
 				var cat = Object.keys(this.diarrhoea.diarrhoeaLocClass)
@@ -926,10 +966,13 @@
 							}else{
 								obj.data.push(this.diarrhoea.diarrhoeaLocClass[category][ftype])
 							}
-						}else{
-							obj.data.push(0)
 						}
 					})
+
+					var data = obj.data;
+
+					var average = _.round(_.mean(data), 1)
+					obj.data.unshift(average)
 
 					seriesData.push(obj)
 				})
@@ -953,7 +996,7 @@
 				        allowDecimals: false,
 				        min: 0,
 				        title: {
-				            text: 'Cases'
+				            text: null
 				        },
 				        gridLineWidth: 0,
 						minorGridLineWidth: 0,
@@ -988,7 +1031,7 @@
 				}
 			},
 			pneumoniaFacilityClassification(){
-				var categories = ["<b>" + _.upperCase(this.subcounty) + " SUB COUNTY" + "</b>",];
+				var categories = ["<b>" + _.upperCase(this.pneumonia.selectedSubcounty) + " SUB COUNTY" + "</b>",];
 				categories = categories.concat(this.data.xfacilityTypes)
 				var seriesData = [];
 				var cat = Object.keys(this.data.pneumoniaFacilityTreat)
@@ -1004,10 +1047,13 @@
 							}else{
 								obj.data.push(this.data.pneumoniaLocClass[category][ftype])
 							}
-						}else{
-							obj.data.push(0)
 						}
 					})
+
+					var data = obj.data;
+
+					var average = _.round(_.mean(data), 1)
+					obj.data.unshift(average)
 
 					seriesData.push(obj)
 				})
@@ -1026,12 +1072,9 @@
 				    yAxis: {
 				        min: 0,
 				        title: {
-				            text: 'Cases'
+				            text: null
 				        },allowDecimals: false,
 				        min: 0,
-				        title: {
-				            text: 'Cases'
-				        },
 				        gridLineWidth: 0,
 						minorGridLineWidth: 0,
 						labels:
@@ -1095,7 +1138,7 @@
 					        allowDecimals: false,
 					        min: 0,
 					        title: {
-					            text: 'Cases'
+					            text: null
 					        },
 					        gridLineWidth: 0,
 							minorGridLineWidth: 0,
@@ -1155,7 +1198,7 @@
 				        allowDecimals: false,
 				        min: 0,
 				        title: {
-				            text: 'Cases'
+				            text: null
 				        },
 				        gridLineWidth: 0,
 						minorGridLineWidth: 0,
@@ -1232,7 +1275,7 @@
 				        allowDecimals: false,
 				        min: 0,
 				        title: {
-				            text: 'Cases'
+				            text: null
 				        },
 				        gridLineWidth: 0,
 						minorGridLineWidth: 0,
@@ -1301,7 +1344,7 @@
 				        allowDecimals: false,
 				        min: 0,
 				        title: {
-				            text: 'Cases'
+				            text: null
 				        },
 				        gridLineWidth: 0,
 						minorGridLineWidth: 0,
@@ -1351,10 +1394,13 @@
 							}else{
 								obj.data.push(this.data.pneumoniaLocClass[category][ftype])
 							}
-						}else{
-							obj.data.push(0)
 						}
 					})
+
+					var data = obj.data;
+
+					var average = _.round(_.mean(data), 1)
+					obj.data.unshift(average)
 
 					seriesData.push(obj)
 				})
@@ -1380,12 +1426,9 @@
 				    yAxis: {
 				        min: 0,
 				        title: {
-				            text: 'Cases'
+				            text: null
 				        },allowDecimals: false,
 				        min: 0,
-				        title: {
-				            text: 'Cases'
-				        },
 				        gridLineWidth: 0,
 						minorGridLineWidth: 0,
 						labels:
@@ -1434,10 +1477,13 @@
 							}else{
 								obj.data.push(this.data.diarrhoeaLocClass[category][ftype])
 							}
-						}else{
-							obj.data.push(0)
 						}
 					})
+
+					var data = obj.data;
+
+					var average = _.round(_.mean(data), 1)
+					obj.data.unshift(average)
 
 					seriesData.push(obj)
 				})
@@ -1461,7 +1507,7 @@
 				        allowDecimals: false,
 				        min: 0,
 				        title: {
-				            text: 'Cases'
+				            text: null
 				        },
 				        gridLineWidth: 0,
 						minorGridLineWidth: 0,
@@ -1532,7 +1578,7 @@
 				        allowDecimals: false,
 				        min: 0,
 				        title: {
-				            text: 'Cases'
+				            text: null
 				        },
 				        gridLineWidth: 0,
 						minorGridLineWidth: 0,
@@ -1620,7 +1666,7 @@
 				        allowDecimals: false,
 				        min: 0,
 				        title: {
-				            text: 'Cases'
+				            text: null
 				        },
 				        gridLineWidth: 0,
 						minorGridLineWidth: 0,
@@ -1690,7 +1736,7 @@
 				        allowDecimals: false,
 				        min: 0,
 				        title: {
-				            text: 'Cases'
+				            text: null
 				        },
 				        gridLineWidth: 0,
 						minorGridLineWidth: 0,

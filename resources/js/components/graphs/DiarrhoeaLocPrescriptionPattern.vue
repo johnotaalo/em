@@ -13,60 +13,48 @@
 		props: {
 			title: { type: null, default: null },
 			data: { type: null, default: null },
-			subcounty: { type: null, default: null }
+			subcounty: { type: null, default: null },
+			treatmentLabels: { type: null, default: null },
+			treatmentColors: { type: null, default: null }
 		},
 		data(){
 			return {
-				diarrhoeaTreatmentLabels: {
-					NOTX: "No Treatment",
-					ANTIBIOTICS: "Antibiotics",
-					IV: "IV Fluids",
-					COP: "Copack",
-					ZINC: "Zinc",
-					ORS: "ORS",
-					OTHER: "Other Treatment",
-				},
-				diarrhoeaTreatmentColors: {
-					NOTX: "#FFFFFF",
-					ANTIBIOTICS: "#00B0FF",
-					IV: "#66BB6A",
-					COP: "#9E9E9E",
-					ZINC: "#FF9800",
-					ORS: "#7C4DFF",
-					OTHER: "#FFFF00",
-					
-				}
+				
 			}
 		},
 		computed: {
 			graphOptions(){
 				// console.log(this.data)
-				var categories = _.map(this.data, (o) => { return o.facility_name })
+				var categories = _.map(this.data, (o) => { return o.FACILITY_TYPE })
 				var seriesData = []
 				categories.sort()
 				categories.unshift("<b>" + _.upperCase(this.subcounty + " SubCounty") +" </b>")
 
-				_.forOwn(this.diarrhoeaTreatmentLabels, (treatment, id) => {
+				_.forOwn(this.treatmentLabels, (treatment, id) => {
 					var obj = {}
 					obj.name = treatment
 					obj.data = []
 					if (id == "NOTX") {
 						obj.borderColor = "red"
 					}
-					obj.color = this.diarrhoeaTreatmentColors[id]
+					obj.color = this.treatmentColors[id]
 					_.forOwn(categories, (category, key) => {
 						if(key != 0){
 							var scData = _.map(this.data, function(o){
-								if (o.facility_name == category) { return o}
+								if (o.FACILITY_TYPE == category) { return o}
 							})
 
 							scData = _.without(scData, undefined)
 							obj.data.push(scData[0][id])
-						}else{
-							obj.data.push(0)
 						}
 						
 					})
+					
+					var data = obj.data;
+
+					var average = _.round(_.mean(data), 1)
+					obj.data.unshift(average)
+
 					seriesData.push(obj)
 				})
 
@@ -87,7 +75,7 @@
 				        allowDecimals: false,
 				        min: 0,
 				        title: {
-				            text: 'Cases'
+				            text: null
 				        },
 				        gridLineWidth: 0,
 						minorGridLineWidth: 0,

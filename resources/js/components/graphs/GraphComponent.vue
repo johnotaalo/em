@@ -62,11 +62,14 @@
 
 							scData = _.without(scData, undefined)
 							obj.data.push(scData[0][id])
-						}else{
-							obj.data.push(0)
 						}
 						
 					})
+					var data = obj.data;
+
+					var average = _.round(_.mean(data), 1)
+					obj.data.unshift(average)
+					
 					seriesData.push(obj)
 				})
 
@@ -87,7 +90,7 @@
 				        allowDecimals: false,
 				        min: 0,
 				        title: {
-				            text: 'Cases'
+				            text: null
 				        },
 				        gridLineWidth: 0,
 						minorGridLineWidth: 0,
