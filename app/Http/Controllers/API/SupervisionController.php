@@ -398,7 +398,9 @@ FROM
     }
 
     function getSubcountyLocTreatmentData(Request $request){
-        $sql = "SELECT FACILITY_TYPE, assessment,
+        $sql = "SELECT 
+        FACILITY_TYPE, 
+        assessment,
         SUM(AMOXDT) AS AMOXDT,
         SUM(AMOX_SYRUP) AS AMOX_SYRUP,
             SUM( OXYGEN ) AS OXYGEN,
@@ -424,7 +426,7 @@ FROM
                 c.NOTX 
             FROM
                 `pneumonia_facility_treatment_data` t
-                JOIN ( SELECT fname, FACILITY_TYPE, sub_county, assessment, SUM( NOTX_AFTER_DIF ) AS NOTX FROM pneumonia_facility_tx_class_facility_agg GROUP BY FACILITY_TYPE, assessment ) c ON c.fname = t.fname
+                JOIN ( SELECT fname, FACILITY_TYPE, sub_county, assessment, SUM( NOTX_AFTER_DIF ) AS NOTX FROM pneumonia_facility_tx_class_facility_agg GROUP BY county, FACILITY_TYPE, assessment ) c ON c.fname = t.fname
                 WHERE t.county = '{$request->county}' 
             GROUP BY
             t.fname, c.assessment
