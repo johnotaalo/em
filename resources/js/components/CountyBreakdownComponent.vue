@@ -16,6 +16,24 @@
 			 	</div>
 			</div>
 		</div>
+
+		<b-card>
+			<div class="row">
+				<div class="col">
+					<b-form-group label="Assessments">
+						<b-form-radio-group
+						id="radio-group-1"
+						v-model="selectedAssessment"
+						:options="assessmentOptions"
+						name="radio-options"
+						></b-form-radio-group>
+					</b-form-group>
+				</div>
+				<div class="col">
+					<highcharts :options="facilityDistributionChart" style="height: 300px;"></highcharts>
+				</div>
+			</div>
+		</b-card>
 		
 		<div class="row">
 			<div class="col">
@@ -205,11 +223,14 @@
 	exportingInit(Highcharts)
 	export default {
 		props: {
-			county: { type: null, default: null }
+			county: { type: null, default: null },
+			assessments: { type: null, default: null },
+			facilitydistribution: { type: null, default: null }
 		},
 		components: { GraphComponent, LocGraphComponent, FacilityGraphComponent, FacilitySubCountyComponent, DiarrhoeaSubcountyTreatment, DiarrhoeaLocTreatments, DiarrhoeaFacilityPrescriptionPattern, DiarrhoeaLocPrescriptionPattern },
 		data(){
 			return {
+				selectedAssessment: "",
 				counties: [],
 				subcounties: [],
 				selectedCounty: null,
@@ -768,6 +789,66 @@
 			}
 		},
 		computed: {
+			facilityDistributionChart() {
+				var data = [];
+				_.forOwn(this.facilitydistribution, (dist) => {
+					var arr = [];
+					arr = [dist.FACILITY_TYPE, dist.facilities]
+					data.push(arr)
+				})
+
+				console.log(data)
+				return {
+    chart: {
+        plotBackgroundColor: null,
+        plotBorderWidth: 0,
+        plotShadow: false
+    },
+    title: {
+        text: 'Facility Distribution',
+        align: 'center',
+        verticalAlign: 'middle',
+        y: 40
+    },
+    tooltip: {
+        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+    },
+    plotOptions: {
+        pie: {
+            dataLabels: {
+                enabled: true,
+                distance: -50,
+                style: {
+                    fontWeight: 'bold',
+                    color: 'white'
+                }
+            },
+            startAngle: -90,
+            endAngle: 90,
+            center: ['50%', '75%'],
+            size: '110%'
+        }
+    },
+    series: [{
+        type: 'pie',
+        name: 'Facility Distribution',
+        innerSize: '50%',
+        data: data
+    }]
+};
+			},
+			assessmentOptions(){
+				var options = _.map( this.assessments, (o) => {
+					return {
+						text: o.assessment,
+						value: o.assessment
+					}
+				})
+
+				this.selectedAssessment = options[0].value
+
+				return options
+			},
 			diarrhoeaSubCountyClassifications() {
 				// Order by the third bar classified
 				var cat = Object.keys(this.data.diarrhoeaClass);
