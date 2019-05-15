@@ -237,6 +237,10 @@
 				facilityNo: 0,
 				pneumoniaColor: "#66BB6A",
 				diarrhoeaColor: "#03A9F4",
+				notclassifiedColor: {
+					border: "red",
+					color: "#ffffff"
+				},
 				pneumoniaSubCounties: [],
 				diarrhoeaSubCounties: [],
 				diarrhoeaSubCountiesX: [],
@@ -578,30 +582,49 @@
 
 					// console.log(resData)
 
-					_.forOwn(cat, (category) => {
+					// _.forOwn(cat, (category) => {
 						// console.log(category)
 						var obj = {};
-						obj.name = category
+						var notClassifiedObj = {};
+
+						obj.name = "Classified"
+						notClassifiedObj.name = "Not Classified";
+
 						obj.data = []
+						notClassifiedObj.data = []
+
 						obj.color = this.pneumoniaColor
+						notClassifiedObj.color = this.notclassifiedColor.color
+						notClassifiedObj.borderColor = "red"
+
+						var categoryData = resData[this.selectedAssessment]
+
 						_.forOwn(categories, (facility, k) => {
 							// console.log(facility)
 							if(k != 0){
 								var data = 0
-								if (typeof resData[category][facility] != "undefined") {
-									data = resData[category][facility]
+								var noData = 100;
+								if (typeof categoryData[facility] != "undefined") {
+									data = categoryData[facility]
+									noData = noData - data
 								}
 								obj.data.push(data)
+								notClassifiedObj.data.push(noData)
 							}
 						})
 
 						var data = obj.data;
+						var noData = notClassifiedObj.data;
 
 						var average = _.round(_.mean(data), 1)
-						obj.data.unshift(average)
+						var noAverage = _.round(_.mean(noData), 1)
 
+						obj.data.unshift(average)
+						notClassifiedObj.data.unshift(noAverage)
+
+						seriesData.push(notClassifiedObj)
 						seriesData.push(obj)
-					})
+					// })
 
 					this.facilityChart = {
 
@@ -645,7 +668,7 @@
 
 					    plotOptions: {
 					        column: {
-					            stacking: 'normal',
+					            stacking: 'percent',
 					            dataLabels: {
 									enabled: true,
 									color: "#000",
@@ -653,7 +676,7 @@
 									format: "{point.y}%"
 								},
 								pointPadding: 0.2,
-	            				borderWidth: 0
+	            				borderWidth: 1
 					        }
 					    },
 
@@ -799,43 +822,43 @@
 
 				console.log(data)
 				return {
-    chart: {
-        plotBackgroundColor: null,
-        plotBorderWidth: 0,
-        plotShadow: false
-    },
-    title: {
-        text: 'Facility Distribution',
-        align: 'center',
-        verticalAlign: 'middle',
-        y: 40
-    },
-    tooltip: {
-        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-    },
-    plotOptions: {
-        pie: {
-            dataLabels: {
-                enabled: true,
-                distance: -50,
-                style: {
-                    fontWeight: 'bold',
-                    color: 'white'
-                }
-            },
-            startAngle: -90,
-            endAngle: 90,
-            center: ['50%', '75%'],
-            size: '110%'
-        }
-    },
-    series: [{
-        type: 'pie',
-        name: 'Facility Distribution',
-        innerSize: '50%',
-        data: data
-    }]
-};
+				     chart: {
+				        plotBackgroundColor: null,
+				        plotBorderWidth: 0,
+				        plotShadow: false
+				    },
+				    title: {
+				        text: 'Facility Distribution',
+				        align: 'center',
+				        verticalAlign: 'middle',
+				        y: 40
+				    },
+				    tooltip: {
+				        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+				    },
+				    plotOptions: {
+				        pie: {
+				            dataLabels: {
+				                enabled: true,
+				                distance: -50,
+				                style: {
+				                    fontWeight: 'bold',
+				                    color: 'white'
+				                }
+				            },
+				            startAngle: -90,
+				            endAngle: 90,
+				            center: ['50%', '75%'],
+				            size: '110%'
+				        }
+				    },
+				    series: [{
+				        type: 'pie',
+				        name: 'Facility Distribution',
+				        innerSize: '50%',
+				        data: data
+				    }]
+				};
 			},
 			assessmentOptions(){
 				var options = _.map( this.assessments, (o) => {
@@ -942,6 +965,9 @@
 			pneumoniaSubCountyClassifications(){
 				// Order by the third bar classified
 				var cat = Object.keys(this.data.pneumoniaClass);
+				// console.log(cat)
+				var categoryData = this.data.pneumoniaClass[this.selectedAssessment]
+				// console.log(categoryData)
 				var categories = _.uniq(_.map(this.pneumoniaSubCounties, (o) => { return o.sub_county }))
 				categories.sort()
 				// console.log(categories)
@@ -952,29 +978,45 @@
 				// cat.splice(3, 2)
 				// console.log(this.data.pneumoniaClass)
 				
-				_.forOwn(cat, (category) => {
-					var obj = {};
-					obj.name = category
-					obj.data = []
-					obj.color = this.pneumoniaColor
-					_.forOwn(categories, (subcounty, k) => {
-						if(k != 0){
-							if(typeof this.data.pneumoniaClass[category][subcounty] == "undefined"){
-								obj.data.push(0)
-							}else{
-								obj.data.push(this.data.pneumoniaClass[category][subcounty])
-							}
+				// _.forOwn(cat, (category) => {
+				var obj = {};
+				var notClassifiedObj = {};
+
+				obj.name = "Classified"
+				notClassifiedObj.name = "Not Classified";
+
+				obj.data = []
+				notClassifiedObj.data = []
+
+				obj.color = this.pneumoniaColor
+				notClassifiedObj.color = this.notclassifiedColor.color
+				notClassifiedObj.borderColor = "red"
+
+				_.forOwn(categories, (subcounty, k) => {
+					if(k != 0){
+						if(typeof categoryData[subcounty] == "undefined"){
+							obj.data.push(0)
+							notClassifiedObj.data.push(100)
+						}else{
+							obj.data.push(categoryData[subcounty])
+							notClassifiedObj.data.push(100 - categoryData[subcounty])
 						}
-						// obj.data.push(_.random(1, 20))
-					})
-
-					var data = obj.data;
-
-					var average = _.round(_.mean(data), 1)
-					obj.data.unshift(average)
-
-					seriesData.push(obj)
+					}
 				})
+
+				var data = obj.data;
+				var noData = notClassifiedObj.data;
+
+				var average = _.round(_.mean(data), 1)
+				var noAverage = _.round(_.mean(noData), 1)
+
+				obj.data.unshift(average)
+				notClassifiedObj.data.unshift(noAverage)
+
+				seriesData.push(notClassifiedObj)
+				seriesData.push(obj)
+				
+				// })
 
 				return {
 
@@ -1014,7 +1056,7 @@
 
 				    plotOptions: {
 				        column: {
-				   //          stacking: 'percent',
+				            stacking: 'percent',
 				            dataLabels: {
 								enabled: true,
 								color: "#000",
@@ -1022,7 +1064,7 @@
 								format: "{point.y}%"
 							},
 							pointPadding: 0.2,
-            				borderWidth: 0
+            				borderWidth: 1
 				        }
 				    },
 
@@ -1463,28 +1505,44 @@
 				categories = categories.concat(this.data.facilityTypes)
 				var seriesData = [];
 				var cat = Object.keys(this.data.pneumoniaLocClass)
-				_.forOwn(cat, (category) => {
+				var categoryData = this.data.pneumoniaLocClass[this.selectedAssessment]
+				// _.forOwn(cat, (category) => {
 					var obj = {};
-					obj.name = category
+					var notClassifiedObj = {};
+
+					obj.name = "Classified"
+					notClassifiedObj.name = "Not Classified";
+
 					obj.data = []
+					notClassifiedObj.data = []
+
 					obj.color = this.pneumoniaColor
+					notClassifiedObj.color = this.notclassifiedColor.color
+					notClassifiedObj.borderColor = "red"
 					_.forOwn(categories, (ftype, k) => {
 						if(k != 0){
-							if(typeof this.data.pneumoniaLocClass[category][ftype] == "undefined"){
+							if(typeof categoryData[ftype] == "undefined"){
 								obj.data.push(0)
+								notClassifiedObj.data.push(100)
 							}else{
-								obj.data.push(this.data.pneumoniaLocClass[category][ftype])
+								obj.data.push(categoryData[ftype])
+								notClassifiedObj.data.push(100 - categoryData[ftype])
 							}
 						}
 					})
 
 					var data = obj.data;
+					var noData = notClassifiedObj.data;
 
 					var average = _.round(_.mean(data), 1)
-					obj.data.unshift(average)
+					var noAverage = _.round(_.mean(noData), 1)
 
+					obj.data.unshift(average)
+					notClassifiedObj.data.unshift(noAverage)
+
+					seriesData.push(notClassifiedObj)
 					seriesData.push(obj)
-				})
+				// })
 
 				// console.log(seriesData)
 				
@@ -1527,8 +1585,9 @@
 				    },
 				    plotOptions: {
 				        column: {
+				        	stacking: 'percent',
 				            pointPadding: 0.2,
-				            borderWidth: 0,
+				            borderWidth: 1,
 				        dataLabels: {
 								enabled: true,
 								color: "#000",
