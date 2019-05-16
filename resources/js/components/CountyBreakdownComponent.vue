@@ -5,7 +5,13 @@
 				<div class="float-left">
 					<h2 class="text-primary text-uppercase text-center display-4">{{ county }} County</h2>
 				</div>
-				
+			</div>
+
+			<div class="col">
+				<highcharts :options="facilityDistributionChart" style="height: 100px;"></highcharts>
+			</div>
+
+			<div class="col">
 				<div class="float-right">
 					<!-- <label>Select a County</label> -->
 			 		<b-form-select v-model="selectedCounty" :options="counties" :change="openNewCounty">
@@ -28,9 +34,6 @@
 						name="radio-options"
 						></b-form-radio-group>
 					</b-form-group>
-				</div>
-				<div class="col">
-					<highcharts :options="facilityDistributionChart" style="height: 300px;"></highcharts>
 				</div>
 			</div>
 		</b-card>
@@ -832,49 +835,43 @@
 			facilityDistributionChart() {
 				var data = [];
 				_.forOwn(this.facilitydistribution, (dist) => {
-					var arr = [];
-					arr = [dist.FACILITY_TYPE, dist.facilities]
-					data.push(arr)
+					var obj = {};
+					obj.name = dist.FACILITY_TYPE
+					obj.data = []
+					obj.data.push(dist.facilities)
+					data.push(obj)
 				})
 
-				console.log(data)
+				// console.log(data)
 				return {
-				     chart: {
-				        plotBackgroundColor: null,
-				        plotBorderWidth: 0,
-				        plotShadow: false
+				    chart: {
+				        type: 'bar'
 				    },
 				    title: {
-				        text: 'Facility Distribution',
-				        align: 'center',
-				        verticalAlign: 'middle',
-				        y: 40
+				        text: null
 				    },
-				    tooltip: {
-				        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+				    xAxis: {
+				        categories: ['Facilities'],
+				        visible: false
 				    },
-				    plotOptions: {
-				        pie: {
-				            dataLabels: {
-				                enabled: true,
-				                distance: -50,
-				                style: {
-				                    fontWeight: 'bold',
-				                    color: 'white'
-				                }
-				            },
-				            startAngle: -90,
-				            endAngle: 90,
-				            center: ['50%', '75%'],
-				            size: '110%'
+				    yAxis: {
+				        min: 0,
+				        gridLineWidth: 0,
+				        minorGridLineWidth: 0,
+				        visible: false,
+				        title: {
+				            text: null
 				        }
 				    },
-				    series: [{
-				        type: 'pie',
-				        name: 'Facility Distribution',
-				        innerSize: '50%',
-				        data: data
-				    }]
+				    legend: {
+				        reversed: true
+				    },
+				    plotOptions: {
+				        series: {
+				            stacking: 'percentage'
+				        }
+				    },
+				    series: data
 				};
 			},
 			assessmentOptions(){
