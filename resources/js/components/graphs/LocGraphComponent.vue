@@ -120,6 +120,7 @@
 								color: "#000",
 								borderColor: "#000"
 							},
+							borderWidth: 2,
 							events: {
 								legendItemClick: function () {
 									return false; 

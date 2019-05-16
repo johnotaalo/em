@@ -676,7 +676,7 @@
 									format: "{point.y}%"
 								},
 								pointPadding: 0.2,
-	            				borderWidth: 1
+	            				borderWidth: 2
 					        }
 					    },
 
@@ -808,7 +808,7 @@
 									format: "{point.y}%"
 								},
 								pointPadding: 0.2,
-	            				borderWidth: 1
+	            				borderWidth: 2
 					        }
 					    },
 
@@ -1098,7 +1098,7 @@
 								format: "{point.y}%"
 							},
 							pointPadding: 0.2,
-            				borderWidth: 1
+            				borderWidth: 2
 				        }
 				    },
 
@@ -1197,7 +1197,7 @@
 								format: "{point.y}%"
 							},
 							pointPadding: 0.2,
-            				borderWidth: 1
+            				borderWidth: 2
 				        }
 				    },
 
@@ -1656,7 +1656,7 @@
 				        column: {
 				        	stacking: 'percent',
 				            pointPadding: 0.2,
-				            borderWidth: 1,
+				            borderWidth: 2,
 				        dataLabels: {
 								enabled: true,
 								color: "#000",
@@ -1760,7 +1760,7 @@
 								format: "{point.y}%"
 							},
 							pointPadding: 0.2,
-            				borderWidth: 1
+            				borderWidth: 2
 				        }
 				    },
 
