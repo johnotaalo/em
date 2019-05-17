@@ -22,9 +22,9 @@
 					NOTX: "No Treatment",
 					AMOXDT: "Amox DT",
 					AMOX_SYRUP: "Amox Syrup",
+					OXYGEN: "Oxygen",
 					CTX: "CTX",
 					INJECTABLES: "Injectables",
-					OXYGEN: "Oxygen",
 					OTHER: "Other Treatment",
 				},
 				pneumoniaTreatmentColors: {

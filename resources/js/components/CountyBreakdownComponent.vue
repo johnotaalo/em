@@ -269,21 +269,21 @@
 					locTreatmentData: [],
 					treatmentLabels: {
 						NOTX: "No Treatment",
-						ANTIBIOTICS: "Antibiotics",
-						// IV: "IV Fluids",
 						COP: "Co-Pack",
 						ZINC: "Zinc",
 						ORS: "ORS",
+						ANTIBIOTICS: "Antibiotics",
+						IV: "IV Fluids",
 						OTHER: "Other Treatment",
 					},
 					colors: {
 						NOTX: "#FFFFFF",
 						ANTIBIOTICS: "#FFFF00",
-						// IV: "#66BB6A",
+						IV: "#000000",
 						COP: "#03A9F4",
 						ZINC: "#9E9E9E",
 						ORS: "#FF9800",
-						OTHER: "#A5D6A7",
+						OTHER: "#EF9A9A",
 					}
 				},
 				options: {
@@ -366,7 +366,12 @@
 							diarrhoeaClassData[data.assessment] = {}
 						}
 
-						diarrhoeaClassData[data.assessment][data.sub_county] = _.round((data.TOTAL_CLASSIFIED / data.TOTAL_CASES_AFTER_DIFF) * 100)
+						if(typeof diarrhoeaClassData[data.assessment][data.sub_county] == 'undefined'){
+							diarrhoeaClassData[data.assessment][data.sub_county] = {}
+						}
+
+						diarrhoeaClassData[data.assessment][data.sub_county]['classified'] = data.TOTAL_CLASSIFIED; 
+						diarrhoeaClassData[data.assessment][data.sub_county]['notClassified'] = data.TOTAL_CASES_AFTER_DIFF - data.TOTAL_CLASSIFIED
 					})
 					// console.log(pneumoniaClassData)
 
@@ -386,6 +391,7 @@
 			getDiarrhoeaSubcountyLocClassificationData(){
 				axios.get('/api/data/diarrhoea/classification/loc/' + this.county)
 				.then(res => {
+					console.log(res.data)
 					var diarrhoeaLocClassData = {}
 					var facility_type = []
 					_.forOwn(res.data, data =>{
@@ -394,7 +400,13 @@
 						}
 
 						var ftype = (data.FACILITY_TYPE == null) ? "Unknown" : data.FACILITY_TYPE
-						diarrhoeaLocClassData[data.assessment][ftype] = _.round((data.TOTAL_CLASSIFIED / data.TOTAL_CASES_AFTER_DIFF) * 100)
+
+						if(typeof diarrhoeaLocClassData[data.assessment][ftype] == 'undefined'){
+							diarrhoeaLocClassData[data.assessment][ftype] = {}
+						}
+
+						diarrhoeaLocClassData[data.assessment][ftype]['classified'] = data.TOTAL_CLASSIFIED
+						diarrhoeaLocClassData[data.assessment][ftype]['notClassified'] = data.TOTAL_CASES_AFTER_DIFF - data.TOTAL_CLASSIFIED
 						facility_type.push(ftype)
 					})
 					// console.log(diarrhoeaLocClassData)
@@ -590,7 +602,13 @@
 						if(typeof resData[value.assessment] === 'undefined'){
 							resData[value.assessment]= []
 						}
-						resData[value.assessment][value.facility_name] = _.round((value.TOTAL_CLASSIFIED / value.TOTAL_CASES_AFTER_DIF) * 100)
+
+						if(typeof resData[value.assessment][value.facility_name] === 'undefined'){
+							resData[value.assessment][value.facility_name]= []
+						}
+
+						resData[value.assessment][value.facility_name]['classified'] = value.TOTAL_CLASSIFIED
+						resData[value.assessment][value.facility_name]['notClassified'] = value.TOTAL_CASES_AFTER_DIF - value.TOTAL_CLASSIFIED
 					})
 
 					// console.log(resData)
@@ -618,8 +636,8 @@
 								var data = 0
 								var noData = 100;
 								if (typeof categoryData[facility] != "undefined") {
-									data = categoryData[facility]
-									noData = noData - data
+									data = categoryData[facility]['classified']
+									noData = categoryData[facility]['notClassified']
 								}
 								obj.data.push(data)
 								notClassifiedObj.data.push(noData)
@@ -675,7 +693,7 @@
 					    tooltip: {
 					        formatter: function () {
 					            return '<b>' + this.x + '</b><br/>' +
-					                this.series.name + ': ' + this.y + '%<br/>'
+					                this.series.name + ': ' + this.y + '<br/>'
 					        }
 					    },
 
@@ -686,7 +704,7 @@
 									enabled: true,
 									color: "#000",
 									borderColor: "#000",
-									format: "{point.y}%"
+									format: "{point.percentage:.0f}%"
 								},
 								pointPadding: 0.2,
 	            				borderWidth: 2
@@ -928,10 +946,10 @@
 						if(k != 0){
 							if(typeof categoryData[subcounty] == "undefined"){
 								obj.data.push(0)
-								notClassifiedObj.data.push(100)
+								notClassifiedObj.data.push(0)
 							}else{
-								obj.data.push(categoryData[subcounty])
-								notClassifiedObj.data.push(100 - categoryData[subcounty])
+								obj.data.push(categoryData[subcounty]['classified'])
+								notClassifiedObj.data.push(categoryData[subcounty]['notClassified'])
 							}
 						}
 						// obj.data.push(_.random(1, 20))
@@ -957,7 +975,7 @@
 				    },
 
 				    title: {
-				        text: 'Diarrhoea Case Classification'
+				        text: 'Diarrhoea Case Classification' 
 				    },
 
 				    xAxis: {
@@ -982,7 +1000,7 @@
 				    tooltip: {
 				        formatter: function () {
 				            return '<b>' + this.x + '</b><br/>' +
-				                this.series.name + ': ' + this.y + '%<br/>'
+				                this.series.name + ': ' + this.y + '<br/>'
 				        }
 				    },
 
@@ -993,7 +1011,7 @@
 								enabled: true,
 								color: "#000",
 								borderColor: "#000",
-								format: "{point.y}%"
+								format: "{point.percentage:.0f}%"
 							},
 							pointPadding: 0.2,
             				borderWidth: 2
@@ -1120,7 +1138,7 @@
 				var categoryData = this.diarrhoea.diarrhoeaLocClass[this.selectedAssessment]
 
 				// console.log(categoryData)
-				
+				if(typeof categoryData !== "undefined"){
 				// _.forOwn(cat, (category) => {
 					var obj = {};
 					var notClassifiedObj = {};
@@ -1211,6 +1229,12 @@
 				    },
 
 				    series: seriesData
+				}
+				}
+				else{
+					return {
+
+					}
 				}
 			},
 			pneumoniaFacilityClassification(){
@@ -1683,6 +1707,7 @@
 				var seriesData = [];
 				var cat = Object.keys(this.data.diarrhoeaLocClass)
 				var categoryData = this.data.diarrhoeaLocClass[this.selectedAssessment]
+				if(typeof categoryData != "undefined"){
 				
 				// _.forOwn(cat, (category) => {
 					var obj = {};
@@ -1700,12 +1725,12 @@
 
 					_.forOwn(categories, (ftype, k) => {
 						if(k != 0){
-							if(typeof categoryData[ftype] == "undefined"){
+							if(typeof categoryData[ftype] === "undefined"){
 								obj.data.push(0)
-								notClassifiedObj.data.push(100)
+								notClassifiedObj.data.push(0)
 							}else{
-								obj.data.push(categoryData[ftype])
-								notClassifiedObj.data.push(100 - categoryData[ftype])
+								obj.data.push(categoryData[ftype]['classified'])
+								notClassifiedObj.data.push(categoryData[ftype]['notClassified'])
 							}
 						}
 					})
@@ -1755,7 +1780,7 @@
 				    tooltip: {
 				        formatter: function () {
 				            return '<b>' + this.x + '</b><br/>' +
-				                this.series.name + ': ' + this.y + '%<br/>'
+				                this.series.name + ': ' + this.y + '<br/>'
 				        }
 				    },
 
@@ -1766,7 +1791,7 @@
 								enabled: true,
 								color: "#000",
 								borderColor: "#000",
-								format: "{point.y}%"
+								format: "{point.percentage:.0f}%"
 							},
 							pointPadding: 0.2,
             				borderWidth: 2
@@ -1774,6 +1799,9 @@
 				    },
 
 				    series: seriesData
+				}
+				}else{
+					return {}
 				}
 			},
 			pneumoniaLoCPPBaseline(){
