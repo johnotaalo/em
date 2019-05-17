@@ -351,42 +351,61 @@ FROM
     }
 
     function getFacilityPneumoniaTreatment(Request $request){
-        $sql = "SELECT fname, facility_name, sub_county, assessment,
-        SUM(AMOXDT) AS AMOXDT,
-        SUM(AMOX_SYRUP) AS AMOX_SYRUP,
-            SUM( OXYGEN ) AS OXYGEN,
-            SUM(CTX) AS CTX,
-        SUM(INJECTABLES) AS INJECTABLES,
-        SUM(OTHER) AS OTHER,
-        SUM(NOTX) AS NOTX
-        FROM
-            (
-            SELECT
-                t.fname,
-                t.facility_name,
-                                c.assessment,
-                t.sub_county,
-                SUM( OXYGEN ) AS OXYGEN,
-                SUM( AMOXDT ) AS AMOXDT,
-                SUM( AMOX_SYRUP ) AS AMOX_SYRUP,
-                SUM( CTX ) AS CTX,
-                SUM( BENZ ) AS BENZ,
-                SUM( BENZ_GENT ) AS BENZ_GENT,
-                SUM( GENT ) AS GENT,
-                ( SUM( BENZ ) + SUM( BENZ_GENT ) + SUM( GENT ) ) AS INJECTABLES,
-                ( SUM( ANTI_OTHER ) ) AS OTHER,
-                c.NOTX 
-            FROM
-                `pneumonia_facility_treatment_data` t
-                JOIN ( SELECT sub_county, fname, facility_name, assessment, SUM( NOTX_AFTER_DIF ) AS NOTX FROM pneumonia_facility_tx_class_facility_agg GROUP BY sub_county ) c ON c.sub_county = t.sub_county
-                WHERE t.sub_county = '{$request->subcounty}' 
-            GROUP BY
-            t.fname 
-            ) v
-                        GROUP BY fname, assessment";
+        // $sql = "SELECT fname, facility_name, sub_county, assessment,
+        // SUM(AMOXDT) AS AMOXDT,
+        // SUM(AMOX_SYRUP) AS AMOX_SYRUP,
+        //     SUM( OXYGEN ) AS OXYGEN,
+        //     SUM(CTX) AS CTX,
+        // SUM(INJECTABLES) AS INJECTABLES,
+        // SUM(OTHER) AS OTHER,
+        // SUM(NOTX) AS NOTX
+        // FROM
+        //     (
+        //     SELECT
+        //         t.fname,
+        //         t.facility_name,
+        //                         c.assessment,
+        //         t.sub_county,
+        //         SUM( OXYGEN ) AS OXYGEN,
+        //         SUM( AMOXDT ) AS AMOXDT,
+        //         SUM( AMOX_SYRUP ) AS AMOX_SYRUP,
+        //         SUM( CTX ) AS CTX,
+        //         SUM( BENZ ) AS BENZ,
+        //         SUM( BENZ_GENT ) AS BENZ_GENT,
+        //         SUM( GENT ) AS GENT,
+        //         ( SUM( BENZ ) + SUM( BENZ_GENT ) + SUM( GENT ) ) AS INJECTABLES,
+        //         ( SUM( ANTI_OTHER ) ) AS OTHER,
+        //         c.NOTX 
+        //     FROM
+        //         `pneumonia_facility_treatment_data` t
+        //         JOIN ( SELECT sub_county, fname, facility_name, assessment, SUM( NOTX_AFTER_DIF ) AS NOTX FROM pneumonia_facility_tx_class_facility_agg GROUP BY sub_county ) c ON c.sub_county = t.sub_county
+        //         WHERE t.sub_county = '{$request->subcounty}' 
+        //     GROUP BY
+        //     t.fname 
+        //     ) v
+        //                 GROUP BY fname, assessment";
 
                         // die($sql);
-
+        $sql= "SELECT
+t.assessment,
+    f.facility_name,
+    SUM( OXYGEN ) AS OXYGEN,
+    SUM( AMOXDT ) AS AMOXDT,
+    SUM( AMOX_SYRUP ) AS AMOX_SYRUP,
+    SUM( CTX ) AS CTX,
+    SUM( BENZ ) AS BENZ,
+    SUM( BENZ_GENT ) AS BENZ_GENT,
+    SUM( GENT ) AS GENT,
+    ( SUM( BENZ ) + SUM( BENZ_GENT ) + SUM( GENT ) ) AS INJECTABLES,
+    ( SUM( ANTI_OTHER ) ) AS OTHER,
+   ( SUM(fa.NOTX_AFTER_DIF) ) AS NOTX
+FROM
+    `pneumonia_facility_treatment_data` t
+    LEFT JOIN facilities f ON t.fname = f.SURVEY_CTO_ID
+    LEFT JOIN pneumonia_facility_tx_class_facility_agg fa ON fa.fname = t.fname
+    WHERE
+    f.sub_county = '{$request->subcounty}'
+    GROUP BY f.SURVEY_CTO_ID, assessment";
         $data = \DB::select($sql);
         $cleanedData = [];
 
@@ -471,12 +490,14 @@ FROM
     }
 
     function getFacilityPneumoniaClassificationX(Request $request){
-        $sql = "SELECT sub_county, FACILITY_TYPE, assessment, SUM( TOTAL_CLASSIFIED ) AS TOTAL_CLASSIFIED, SUM( TOTAL_CASES_AFTER_DIF ) AS TOTAL_CASES_AFTER_DIF FROM `pneumonia_facility_classification` WHERE county = '{$request->subcounty}' GROUP BY sub_county, FACILITY_TYPE, assessment";
+        $sql = "SELECT sub_county, FACILITY_TYPE, assessment, SUM( TOTAL_CLASSIFIED ) AS TOTAL_CLASSIFIED, SUM( TOTAL_CASES_AFTER_DIF ) AS TOTAL_CASES_AFTER_DIF FROM `pneumonia_facility_classification` WHERE sub_county = '{$request->subcounty}' GROUP BY sub_county, FACILITY_TYPE, assessment";
         // $oldSql = "SELECT FACILITY_TYPE, SUM(TOTAL_CLASSIFIED) AS TOTAL_CLASSIFIED, SUM(TOTAL_CASES_AFTER_DIF) AS TOTAL_CASES_AFTER_DIF FROM pneumonia_loc_subcounty_classification WHERE county = '{$request->county}' GROUP BY FACILITY_TYPE";
 
         // die($sql);
 
         $classification = \DB::select($sql);
+
+        // echo "<pre>";print_r($classification);die;
 
         return $classification;   
     }
@@ -594,7 +615,7 @@ FROM
                     facility_name,
                     SUM(classified) AS TOTAL_CLASSIFIED,
                     SUM( NO_CLASS_CASES ) AS NO_CLASS_CASES,
-                    SUM( total_cases + ( IF ( DIFFERENCE > 0, NO_CLASS_CASES + DIFFERENCE, NO_CLASS_CASES ) ) ) AS TOTAL_CASES_AFTER_DIFF,
+                    SUM( classified + ( IF ( DIFFERENCE > 0, NO_CLASS_CASES + DIFFERENCE, NO_CLASS_CASES ) ) ) AS TOTAL_CASES_AFTER_DIFF,
                     SUM( IF ( DIFFERENCE < 0, NOTX + abs( DIFFERENCE ), NOTX ) ) AS NOTX_AFTER_DIFF 
                 FROM
                     `diarrhoea_case_tx_aggreagate` 
@@ -646,7 +667,7 @@ FROM
                     FACILITY_TYPE,
                     SUM(classified) AS TOTAL_CLASSIFIED,
                     SUM( NO_CLASS_CASES ) AS NO_CLASS_CASES,
-                    SUM( total_cases + ( IF ( DIFFERENCE > 0, NO_CLASS_CASES + DIFFERENCE, NO_CLASS_CASES ) ) ) AS TOTAL_CASES_AFTER_DIFF,
+                    SUM( classified + ( IF ( DIFFERENCE > 0, NO_CLASS_CASES + DIFFERENCE, NO_CLASS_CASES ) ) ) AS TOTAL_CASES_AFTER_DIFF,
                     SUM( IF ( DIFFERENCE < 0, NOTX + abs( DIFFERENCE ), NOTX ) ) AS NOTX_AFTER_DIFF 
                 FROM
                     `diarrhoea_case_tx_aggreagate` 
@@ -673,7 +694,7 @@ FROM
                     SUM(ZINC) AS ZINC,
                     SUM(ORS) AS ORS,
                     SUM(OTHER) AS OTHER,
-                    SUM(NOTX) AS NOTX
+                    sum(IF (DIFFERENCE < 0, NOTX - DIFFERENCE, NOTX)) AS NOTX
                 FROM
                     `diarrhoea_case_tx_aggreagate` 
                 WHERE

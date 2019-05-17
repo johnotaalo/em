@@ -430,7 +430,12 @@
 						}
 
 						var ftype = (data.FACILITY_TYPE == null) ? "Unknown" : data.FACILITY_TYPE
-						diarrhoeaLocClassData[data.assessment][ftype] = _.round((data.TOTAL_CLASSIFIED / data.TOTAL_CASES_AFTER_DIFF) * 100)
+						if(typeof diarrhoeaLocClassData[data.assessment][ftype] == 'undefined'){
+							diarrhoeaLocClassData[data.assessment][ftype] = {}
+						}
+						diarrhoeaLocClassData[data.assessment][ftype]['classified'] = data.TOTAL_CLASSIFIED
+						diarrhoeaLocClassData[data.assessment][ftype]['notClassified'] = data.TOTAL_CASES_AFTER_DIFF - data.TOTAL_CLASSIFIED
+
 						facility_type.push(ftype)
 					})
 					// console.log(diarrhoeaLocClassData)
@@ -551,7 +556,7 @@
 				})
 			},
 			getFacilityClassificationData(subcounty){
-				axios.get('/api/data/pneumonia/classification/facility/' + subcounty)
+				axios.get('/api/data/pneumonia/classification/locfacility/' + subcounty)
 				.then(res => {
 					var pneumoniaLocClassData = {}
 					var facility_type = []
@@ -561,7 +566,11 @@
 						}
 
 						var ftype = (data.FACILITY_TYPE == null) ? "Unknown" : data.FACILITY_TYPE
-						pneumoniaLocClassData[data.assessment][ftype] = _.round((data.TOTAL_CLASSIFIED / data.TOTAL_CASES_AFTER_DIF) * 100)
+						if(typeof pneumoniaLocClassData[data.assessment][ftype] == "undefined"){
+							pneumoniaLocClassData[data.assessment][ftype] = {};
+						}
+						pneumoniaLocClassData[data.assessment][ftype]['classified'] = data.TOTAL_CLASSIFIED
+						pneumoniaLocClassData[data.assessment][ftype]['notClassified'] = data.TOTAL_CASES_AFTER_DIF - data.TOTAL_CLASSIFIED
 						
 
 						facility_type.push(ftype)
@@ -742,7 +751,12 @@
 						if(typeof resData[value.assessment] === 'undefined'){
 							resData[value.assessment]= []
 						}
-						resData[value.assessment][value.facility_name] = _.round((value.TOTAL_CLASSIFIED / value.TOTAL_CASES_AFTER_DIFF) * 100)
+
+						if(typeof resData[value.assessment][value.facility_name] === 'undefined'){
+							resData[value.assessment][value.facility_name]= []
+						}
+						resData[value.assessment][value.facility_name]['classified'] = value.TOTAL_CLASSIFIED
+						resData[value.assessment][value.facility_name]['notClassified'] = value.TOTAL_CASES_AFTER_DIFF - value.TOTAL_CLASSIFIED
 					})
 
 					// console.log(resData)
@@ -766,10 +780,10 @@
 							// console.log(facility)
 							if(k != 0){
 								var data = 0
-								var noData = 100;
+								var noData = 0;
 								if (typeof categoryData[facility] != "undefined") {
-									data = categoryData[facility]
-									noData = noData - data
+									data = categoryData[facility]['classified']
+									noData = categoryData[facility]['notClassified']
 								}
 								obj.data.push(data)
 								notClassifiedObj.data.push(noData)
@@ -825,18 +839,18 @@
 					    tooltip: {
 					        formatter: function () {
 					            return '<b>' + this.x + '</b><br/>' +
-					                this.series.name + ': ' + this.y + '%<br/>'
+					                this.series.name + ': ' + this.y + '<br/>'
 					        }
 					    },
 
 					    plotOptions: {
 					        column: {
-					            stacking: 'percentage',
+					            stacking: 'percent',
 					            dataLabels: {
 									enabled: true,
 									color: "#000",
 									borderColor: "#000",
-									format: "{point.y}%"
+									format: "{point.percentage:.0f}%"
 								},
 								pointPadding: 0.2,
 	            				borderWidth: 2
@@ -1157,10 +1171,10 @@
 						if(k != 0){
 							if(typeof categoryData[ftype] == "undefined"){
 								obj.data.push(0)
-								notClassifiedObj.data.push(100)
+								notClassifiedObj.data.push(0)
 							}else{
-								obj.data.push(categoryData[ftype])
-								notClassifiedObj.data.push(100 - categoryData[ftype])
+								obj.data.push(categoryData[ftype]['classified'])
+								notClassifiedObj.data.push(categoryData[ftype]['notClassified'])
 							}
 						}
 					})
@@ -1210,7 +1224,7 @@
 				    tooltip: {
 				        formatter: function () {
 				            return '<b>' + this.x + '</b><br/>' +
-				                this.series.name + ': ' + this.y + '%<br/>'
+				                this.series.name + ': ' + this.y + '<br/>'
 				        }
 				    },
 
@@ -1221,7 +1235,7 @@
 								enabled: true,
 								color: "#000",
 								borderColor: "#000",
-								format: "{point.y}%"
+								format: "{point.percentage:.0f}%"
 							},
 							pointPadding: 0.2,
             				borderWidth: 2
@@ -1261,10 +1275,10 @@
 						if(k != 0){
 							if(typeof categoryData[ftype] == "undefined"){
 								obj.data.push(0)
-								notClassifiedObj.data.push(100)
+								notClassifiedObj.data.push(0)
 							}else{
-								obj.data.push(categoryData[ftype])
-								notClassifiedObj.data.push(100 - categoryData[ftype])
+								obj.data.push(categoryData[ftype]['classified'])
+								notClassifiedObj.data.push(categoryData[ftype]['notClassified'])
 							}
 						}
 					})
@@ -1309,21 +1323,21 @@
 				    tooltip: {
 				        headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
 				        pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-				            '<td style="padding:0"><b>{point.y}%</b></td></tr>',
+				            '<td style="padding:0"><b>{point.y}</b></td></tr>',
 				        footerFormat: '</table>',
 				        shared: true,
 				        useHTML: true
 				    },
 				    plotOptions: {
 				        column: {
-				        	stacking: 'percentage',
+				        	stacking: 'percent',
 				            pointPadding: 0.2,
 				            borderWidth: 2,
 				        	dataLabels: {
 								enabled: true,
 								color: "#000",
 								borderColor: "#000",
-								format: "{point.y}%"
+								format: "{point.percentage:.0f}%"
 							},
 				        }
 				    },
