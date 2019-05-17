@@ -398,40 +398,26 @@ FROM
     }
 
     function getSubcountyLocTreatmentData(Request $request){
-        $sql = "SELECT 
-        FACILITY_TYPE, 
-        assessment,
-        SUM(AMOXDT) AS AMOXDT,
-        SUM(AMOX_SYRUP) AS AMOX_SYRUP,
-            SUM( OXYGEN ) AS OXYGEN,
-            SUM(CTX) AS CTX,
-        SUM(INJECTABLES) AS INJECTABLES,
-        SUM(OTHER) AS OTHER,
-        SUM(NOTX) AS NOTX
-        FROM
-            (
-            SELECT
-                                c.assessment,
-                                                                c.FACILITY_TYPE,
-                t.sub_county,
-                SUM( OXYGEN ) AS OXYGEN,
-                SUM( AMOXDT ) AS AMOXDT,
-                SUM( AMOX_SYRUP ) AS AMOX_SYRUP,
-                SUM( CTX ) AS CTX,
-                SUM( BENZ ) AS BENZ,
-                SUM( BENZ_GENT ) AS BENZ_GENT,
-                SUM( GENT ) AS GENT,
-                ( SUM( BENZ ) + SUM( BENZ_GENT ) + SUM( GENT ) ) AS INJECTABLES,
-                ( SUM( ANTI_OTHER ) ) AS OTHER,
-                c.NOTX 
-            FROM
-                `pneumonia_facility_treatment_data` t
-                JOIN ( SELECT fname, FACILITY_TYPE, sub_county, assessment, SUM( NOTX_AFTER_DIF ) AS NOTX FROM pneumonia_facility_tx_class_facility_agg GROUP BY county, FACILITY_TYPE, assessment ) c ON c.fname = t.fname
-                WHERE t.county = '{$request->county}' 
-            GROUP BY
-            t.fname, c.assessment
-            ) v
-                        GROUP BY FACILITY_TYPE, assessment";
+        $sql = "SELECT
+t.assessment,
+    f.FACILITY_TYPE,
+    SUM( OXYGEN ) AS OXYGEN,
+    SUM( AMOXDT ) AS AMOXDT,
+    SUM( AMOX_SYRUP ) AS AMOX_SYRUP,
+    SUM( CTX ) AS CTX,
+    SUM( BENZ ) AS BENZ,
+    SUM( BENZ_GENT ) AS BENZ_GENT,
+    SUM( GENT ) AS GENT,
+    ( SUM( BENZ ) + SUM( BENZ_GENT ) + SUM( GENT ) ) AS INJECTABLES,
+    ( SUM( ANTI_OTHER ) ) AS OTHER,
+   ( SUM(fa.NOTX_AFTER_DIF) ) AS NOTX
+FROM
+    `pneumonia_facility_treatment_data` t
+    LEFT JOIN facilities f ON t.fname = f.SURVEY_CTO_ID
+    LEFT JOIN pneumonia_facility_tx_class_facility_agg fa ON fa.fname = t.fname
+    WHERE
+    f.county = '{$request->county}'
+    GROUP BY f.FACILITY_TYPE, assessment";
 
                         // die($sql);
 

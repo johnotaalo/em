@@ -30,8 +30,8 @@
 					NOTX: "#FFFFFF",
 					AMOXDT: "#00B0FF",
 					AMOX_SYRUP: "#66BB6A",
-					CTX: "#9E9E9E",
-					INJECTABLES: "#FF9800",
+					CTX: "#FF9800",
+					INJECTABLES: "#9E9E9E",
 					OXYGEN: "#7C4DFF",
 					OTHER: "#FFFF00",
 					

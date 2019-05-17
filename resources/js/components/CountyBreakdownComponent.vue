@@ -456,8 +456,13 @@
 						if(typeof pneumoniaClassData[data.assessment] == 'undefined'){
 							pneumoniaClassData[data.assessment] = {}
 						}
+						if(typeof pneumoniaClassData[data.assessment][data.sub_county] == 'undefined'){
+							pneumoniaClassData[data.assessment][data.sub_county] = {}
+						}
 
-						pneumoniaClassData[data.assessment][data.sub_county] = _.round((data.TOTAL_CLASSIFIED / data.TOTAL_CASES_AFTER_DIF) * 100)
+						// pneumoniaClassData[data.assessment][data.sub_county] = _.round((data.TOTAL_CLASSIFIED / data.TOTAL_CASES_AFTER_DIF) * 100)
+						pneumoniaClassData[data.assessment][data.sub_county]['classified'] = data.TOTAL_CLASSIFIED;
+						pneumoniaClassData[data.assessment][data.sub_county]['notClassified'] = data.TOTAL_CASES_AFTER_DIF - data.TOTAL_CLASSIFIED
 					})
 					// console.log(pneumoniaClassData)
 
@@ -479,13 +484,18 @@
 					var pneumoniaLocClassData = {}
 					var facility_type = []
 					_.forOwn(res.data, data =>{
+						var ftype = (data.FACILITY_TYPE == null) ? "Unknown" : data.FACILITY_TYPE
 						if(typeof pneumoniaLocClassData[data.assessment] == "undefined"){
 							pneumoniaLocClassData[data.assessment] = {};
 						}
 
-						var ftype = (data.FACILITY_TYPE == null) ? "Unknown" : data.FACILITY_TYPE
-						pneumoniaLocClassData[data.assessment][ftype] = _.round((data.TOTAL_CLASSIFIED / data.TOTAL_CASES_AFTER_DIF) * 100)
-						
+						if(typeof pneumoniaLocClassData[data.assessment][ftype] == "undefined"){
+							pneumoniaLocClassData[data.assessment][ftype] = {};
+						}
+
+						// pneumoniaLocClassData[data.assessment][ftype] = _.round((data.TOTAL_CLASSIFIED / data.TOTAL_CASES_AFTER_DIF) * 100)
+						pneumoniaLocClassData[data.assessment][ftype]['classified'] = data.TOTAL_CLASSIFIED
+						pneumoniaLocClassData[data.assessment][ftype]['notClassified'] = data.TOTAL_CASES_AFTER_DIF - data.TOTAL_CLASSIFIED
 
 						facility_type.push(ftype)
 					})
@@ -1027,10 +1037,10 @@
 					if(k != 0){
 						if(typeof categoryData[subcounty] == "undefined"){
 							obj.data.push(0)
-							notClassifiedObj.data.push(100)
+							notClassifiedObj.data.push(0)
 						}else{
-							obj.data.push(categoryData[subcounty])
-							notClassifiedObj.data.push(100 - categoryData[subcounty])
+							obj.data.push(categoryData[subcounty]['classified'])
+							notClassifiedObj.data.push(categoryData[subcounty]['notClassified'])
 						}
 					}
 				})
@@ -1081,7 +1091,7 @@
 				    tooltip: {
 				        formatter: function () {
 				            return '<b>' + this.x + '</b><br/>' +
-				                this.series.name + ': ' + this.y + '%<br/>'
+				                this.series.name + ': ' + this.y + '<br/>'
 				        }
 				    },
 
@@ -1092,7 +1102,7 @@
 								enabled: true,
 								color: "#000",
 								borderColor: "#000",
-								format: "{point.y}%"
+								format: "{point.percentage:.0f}%"
 							},
 							pointPadding: 0.2,
             				borderWidth: 2
@@ -1108,6 +1118,8 @@
 				var seriesData = [];
 				var cat = Object.keys(this.diarrhoea.diarrhoeaLocClass)
 				var categoryData = this.diarrhoea.diarrhoeaLocClass[this.selectedAssessment]
+
+				// console.log(categoryData)
 				
 				// _.forOwn(cat, (category) => {
 					var obj = {};
@@ -1589,10 +1601,10 @@
 						if(k != 0){
 							if(typeof categoryData[ftype] == "undefined"){
 								obj.data.push(0)
-								notClassifiedObj.data.push(100)
+								notClassifiedObj.data.push(0)
 							}else{
-								obj.data.push(categoryData[ftype])
-								notClassifiedObj.data.push(100 - categoryData[ftype])
+								obj.data.push(categoryData[ftype]['classified'])
+								notClassifiedObj.data.push(categoryData[ftype]['notClassified'])
 							}
 						}
 					})
@@ -1644,7 +1656,7 @@
 				    tooltip: {
 				        headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
 				        pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-				            '<td style="padding:0"><b>{point.y}%</b></td></tr>',
+				            '<td style="padding:0"><b>{point.y}</b></td></tr>',
 				        footerFormat: '</table>',
 				        shared: true,
 				        useHTML: true
@@ -1658,7 +1670,7 @@
 								enabled: true,
 								color: "#000",
 								borderColor: "#000",
-								format: "{point.y}%"
+								format: "{point.percentage:.0f}%"
 							},
 				        }
 				    },
