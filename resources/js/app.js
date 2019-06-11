@@ -16,6 +16,7 @@ import VueLoading from 'vue-loading-overlay';
 import VuePluralize from 'vue-pluralize'
 
 // load these modules as your need
+import { genComponent } from 'vue-highcharts';
 import loadStock from 'highcharts/modules/stock.js';
 import loadMap from 'highcharts/modules/map.js';
 import loadGantt from 'highcharts/modules/gantt.js';
@@ -23,6 +24,7 @@ import loadDrilldown from 'highcharts/modules/drilldown.js';
 // some charts like solid gauge require `highcharts-more.js`, you can find it in official document.
 import loadHighchartsMore from 'highcharts/highcharts-more.js';
 import loadSolidGauge from 'highcharts/modules/solid-gauge.js';
+import More from 'highcharts/highcharts-more'
 
 require('highcharts-vue');
 /**
@@ -64,6 +66,7 @@ loadGantt(Highcharts);
 loadDrilldown(Highcharts);
 loadHighchartsMore(Highcharts);
 loadSolidGauge(Highcharts);
+More(Highcharts)
 
 Vue.use(VueHighcharts, { Highcharts });
 Vue.component('v-select', vSelect)
@@ -85,5 +88,8 @@ Vue.component('loading', VueLoading)
  */
 
 const app = new Vue({
-    el: '#app'
+    el: '#app',
+    components: {
+    	HighchartsSolidGauge: genComponent('HighchartsSolidGauge', Highcharts),
+    }
 });

@@ -25,7 +25,8 @@
 		</div>
 		<div class="card">
 			<div class="card-body">
-				<v-client-table small :data="filteredData" :columns="columns" :options="options"></v-client-table>
+				<v-client-table v-if="!islegacy" small :data="filteredData" :columns="columns" :options="options"></v-client-table>
+				<v-client-table v-if="islegacy" small :data="filteredData" :columns="legacyColumns" :options="options"></v-client-table>
 			</div>
 		</div>
 
@@ -39,6 +40,9 @@
 
 <script type="text/javascript">
 	export default{
+		props: {
+			islegacy: { type: null, default: null }
+		},
 		data() {
 			return {
 				warningShow: false,
@@ -151,19 +155,45 @@
 				'd_noclass_a',
 				'd_noclass_other',
 				'd_noclass_no'],
+				legacyColumns: [
+					'county',
+					'sub_county',
+					'facility_name',
+					'facility_code',
+					'sum_tx_ors_zn',
+					'sum_tx_ors',
+					'sum_tx_zn',
+					'sum_tx_antibiotics',
+					'sum_other',
+					'sum_tx_none',
+					'sum_no_dehydration',
+					'sum_some_dehydration',
+					'sum_sev_dehydration',
+					'sum_shock',
+					'sum_dysentry',
+					'sum_no_class',
+					'sum_tx_amox',
+					'sum_tx_cotri',
+					'sum_tx_benz',
+					'sum_tx_genta',
+					'sum_tx_chlor',
+					'sum_tx_pn_other',
+					'sum_tx_pn_none',
+					'sum_no_pneu',
+					'sum_pneu',
+					'sum_sev_pneu',
+					'sum_very_sev_dis',
+					'sum_no_pn_class'
+				],
 				selected : []
 			}
 		},
 		mounted() {
-			this.isLoading = true;
-			axios.get('/api/data/temporary')
-			.then((res) => {
-				this.isLoading = false;
-				this.temporaryData = res.data.temporaryData
-				this.upload = res.data.upload
-
-				this.warningShow = this.temporaryData.length > 500
-			});
+			if (this.islegacy) {
+				this.getLegacyTemporaryData();
+			}else{
+				this.getTemporaryData();
+			}
 		},
 		computed: {
 			counties: function(){
@@ -200,6 +230,28 @@
 			
 		},
 		methods: {
+			getTemporaryData(){
+				this.isLoading = true;
+				axios.get('/api/data/temporary')
+				.then((res) => {
+					this.isLoading = false;
+					this.temporaryData = res.data.temporaryData
+					this.upload = res.data.upload
+
+					this.warningShow = this.temporaryData.length > 500
+				});
+			},
+			getLegacyTemporaryData(){
+				this.isLoading = true;
+				axios.get('/api/data/temporary/legacy')
+				.then((res) => {
+					this.isLoading = false;
+					this.temporaryData = res.data.temporaryData
+					this.upload = res.data.upload
+
+					this.warningShow = this.temporaryData.length > 500
+				});
+			},
 			getUniqueValuesOfKey: (array, key) => {
 				return array.reduce(function(carry, item){
 					if(item[key] && !~carry.indexOf(item[key])) carry.push(item[key]);

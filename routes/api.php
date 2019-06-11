@@ -32,6 +32,7 @@ Route::prefix('data')->group(function(){
 
 	Route::post('uploadData', 'API\SupervisionController@uploadCSV');
 	Route::get('temporary', 'API\SupervisionController@getTemporaryData');
+	Route::get('temporary/legacy', 'API\SupervisionController@getLegacyTemporaryData');
 	Route::get('upload/{warning}', 'API\SupervisionController@uploadData');
 
 	Route::get('counties', 'API\SupervisionController@getCounties');

@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use App\SupervisionDataUploadTmp as SPUploadTmp;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\SupervisionDataImport;
+use App\Imports\SupervisionLegacyImport;
 
 use App\SupervisionUpload as Upload;
 
@@ -164,11 +165,18 @@ FROM
         $counties = (count($countyList)) ? implode(", ", $countyList) : $counties;
 
         $path =$request->file->store('data');
-        $upload = Upload::create([ "counties" => $counties, "path" => $path ]);
+        $is_legacy = ($request->input('isLegacyData') == "yes") ? true : false;
+        // var_dump($is_legacy);die;
+
+        $upload = Upload::create([ "counties" => $counties, "path" => $path, "is_legacy" => $is_legacy ]);
 
         $period = $request->input('duration')['month'] . " " . $request->input('duration')['year'];
 
-        Excel::import(new SupervisionDataImport($upload->id, $request->input('assessmentType'), $period), $path);
+        if(!$is_legacy){
+            Excel::import(new SupervisionDataImport($upload->id, $request->input('assessmentType'), $period), $path);
+        }else{
+            Excel::import(new SupervisionLegacyImport($upload->id, $request->input('assessmentType'), $period), $path);
+        }
     }
 
     function createCountiesData($data){
@@ -183,9 +191,23 @@ FROM
         return $data;
     }
 
-    function uploadData(Request $request){
+    function getLegacyTemporaryData(){
+        $data = [];
+        $data['temporaryData'] = \App\SupervisionDataLegacyTmp::all();
+        $upload = \App\SupervisionUpload::orderBy('id', 'DESC')->first();
+        $data['upload'] = $upload;
+        return $data;
+    }
 
-        $tempData = SPUploadTmp::exclude(['created_at', 'updated_at', 'upload_id']);
+    function uploadData(Request $request){
+        $legacyTmpData = \App\SupervisionDataLegacyTmp::count();
+        
+        if($legacyTmpData > 0){
+            $tempData = \App\SupervisionDataLegacyTmp::exclude(['created_at', 'updated_at', 'upload_id']);
+        }else{
+            $tempData = SPUploadTmp::exclude(['created_at', 'updated_at', 'upload_id']);
+        }
+
         if($request->warning == "true"){
             $tempData = $tempData->limit(500);
         }
@@ -200,13 +222,22 @@ FROM
         }
 
         // dd($tempData);
+        if($legacyTmpData > 0){
+            \DB::table('supervision_data_legacy')->insert($tempData);
 
-        \DB::table('supervision_data')->insert($tempData);
-
-        if($request->warning == "true"){
-            SPUploadTmp::destroy($tempIDs);
+            if($request->warning == "true"){
+                \App\SupervisionDataLegacyTmp::destroy($tempIDs);
+            }else{
+                \App\SupervisionDataLegacyTmp::query()->truncate();
+            }
         }else{
-            SPUploadTmp::query()->truncate();
+            \DB::table('supervision_data')->insert($tempData);
+
+            if($request->warning == "true"){
+                SPUploadTmp::destroy($tempIDs);
+            }else{
+                SPUploadTmp::query()->truncate();
+            }
         }
 
         return ['status' => 'success'];

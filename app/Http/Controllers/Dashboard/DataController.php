@@ -6,21 +6,29 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\SupervisionDataUploadTmp as SPUploadTmp;
 use App\SupervisionUpload;
+use App\SupervisionDataLegacyTmp;
 
 class DataController extends Controller
 {
     function uploadPage(){
     	$temporaryData = SPUploadTmp::all();
-    	if(!count($temporaryData)){
+      $legacyTmpData = SupervisionDataLegacyTmp::count();
+    	if(!count($temporaryData) && $legacyTmpData == 0){
        		return view('dashboard.data.uploadpage');
        	}else{
-       		return view('dashboard.data.temporaryData');
+          $isLegacy = ($legacyTmpData > 0) ? true : false;
+       		return view('dashboard.data.temporaryData')->with(['isLegacy' => $isLegacy]);
        	}
     }
 
     function cancelUpload(){
-      SPUploadTmp::query()->truncate();
-
+      $legacyTmpData = SupervisionDataLegacyTmp::count();
+      if($legacyTmpData > 0){
+        SupervisionDataLegacyTmp::query()->truncate();
+      }else{
+        SPUploadTmp::query()->truncate();
+      }
+  
       return redirect('/data/upload');
     }
 

@@ -8,7 +8,7 @@
 			</div>
 
 			<div class="col">
-				<highcharts :options="facilityDistributionChart" style="height: 100px;"></highcharts>
+				
 			</div>
 
 			<div class="col">
@@ -43,6 +43,63 @@
 				<b-card no-body>
 					<b-tabs pills card>
 						<b-tab active>
+							<template slot="title">
+							 	<h5>
+							 		COUNTY OVERVIEW
+							 	</h5>
+							 </template>
+
+							<div class="row">
+								<div class="col-md">
+									<div class="mb-5">
+										<h4 class="header-pretitle">
+										Sub Counties
+										</h4>
+										<h1 class="display-2">
+										{{ options.subcountiesList.length }}
+										</h1>
+										<h4 class="header-pretitle">Cases Assessed</h4>
+										<div class="mb-3">
+											<h6 class = "header-pretitle">Pneumonia</h6>
+											<h3>{{ pneumoniatotals.TOTAL_CASES_AFTER_DIF.toLocaleString('en') }}</h3>
+										</div>
+										<div class="mb-3">
+											<h6 class = "header-pretitle">Diarrhoea</h6>
+											<h3>{{ diarrhoeatotals.TOTAL_CASES_AFTER_DIFF.toLocaleString('en') }}</h3>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-5">
+									<highcharts :options="facilityDistributionChart" style="height: 300px;"></highcharts>
+								</div>
+								
+
+								<div class="col-md-6">
+									<center><h2>Classification</h2></center>
+									<div class="row">
+										<div class="col-lg-6">
+											<gauge-component :gdata="pneumoniaCountyClassification" title="Pneumonia"></gauge-component>
+										</div>
+										<div class="col-lg-6">
+											<gauge-component :gdata="diarrhoeaCountyClassification" title="Diarrhoea"></gauge-component>
+										</div>
+									</div>
+									<center><h2>Treatment</h2></center>
+									<div class="row">
+										<div class="col-lg-6">
+											<donut-treatment-donut title = "Pneumonia" :gdata="this.data.pneumoniaTreat[this.selectedAssessment]" :labels = "pneumonia.treatmentLabels" :colors="pneumonia.colors"></donut-treatment-donut>
+											<!-- <highcharts :options="gaugeExample"></highcharts> -->
+										</div>
+										<div class="col-lg-6">
+											<donut-treatment-donut title = "Diarrhoea" :gdata="this.data.diarrhoeaTreat[this.selectedAssessment]" :labels = "diarrhoea.treatmentLabels" :colors="diarrhoea.colors"></donut-treatment-donut>
+											<!-- <highcharts :options="gaugeExample"></highcharts> -->
+										</div>
+									</div>
+									
+								</div>
+							</div>
+						</b-tab>
+						<b-tab>
 							 <template slot="title">
 							 	<h5>
 							 		PNEUMONIA
@@ -214,6 +271,8 @@
 <script type="text/javascript">
 	import Highcharts from 'highcharts'
 	import exportingInit from 'highcharts/modules/exporting'
+	import GaugeComponent from './graphs/types/GaugeComponent'
+	import DonutTreatmentDonut from './graphs/types/DonutTreatmentDonut'
 	import GraphComponent from './graphs/GraphComponent'
 	import LocGraphComponent from './graphs/LocGraphComponent'
 	import FacilityGraphComponent from './graphs/FacilityGraphComponent'
@@ -224,13 +283,17 @@
 	import DiarrhoeaLocPrescriptionPattern from './graphs/DiarrhoeaLocPrescriptionPattern'
 
 	exportingInit(Highcharts)
+	
 	export default {
 		props: {
 			county: { type: null, default: null },
 			assessments: { type: null, default: null },
-			facilitydistribution: { type: null, default: null }
+			facilitydistribution: { type: null, default: null },
+			facilities: { type: null, default: null },
+			diarrhoeatotals: { type: null, default: null },
+			pneumoniatotals: { type: null, default: null }
 		},
-		components: { GraphComponent, LocGraphComponent, FacilityGraphComponent, FacilitySubCountyComponent, DiarrhoeaSubcountyTreatment, DiarrhoeaLocTreatments, DiarrhoeaFacilityPrescriptionPattern, DiarrhoeaLocPrescriptionPattern },
+		components: { GraphComponent, LocGraphComponent, FacilityGraphComponent, FacilitySubCountyComponent, DiarrhoeaSubcountyTreatment, DiarrhoeaLocTreatments, DiarrhoeaFacilityPrescriptionPattern, DiarrhoeaLocPrescriptionPattern, GaugeComponent, DonutTreatmentDonut },
 		data(){
 			return {
 				selectedAssessment: "",
@@ -243,6 +306,11 @@
 				notclassifiedColor: {
 					border: "red",
 					color: "#ffffff"
+				},
+				colors: {
+					'DISPENSARY'	: '#FFD600',
+					'HOSPITAL'		: '#FF6D00',
+					'HEALTH CENTRE'	: '#2962FF'
 				},
 				pneumoniaSubCounties: [],
 				diarrhoeaSubCounties: [],
@@ -259,6 +327,25 @@
 				pneumonia: {
 					selectedSubcounty: null,
 					selectedChart: 'column',
+					treatmentLabels: {
+						NOTX: "No Treatment",
+						AMOXDT: "Amox DT",
+						AMOX_SYRUP: "Amox Syrup",
+						OXYGEN: "Oxygen",
+						CTX: "CTX",
+						INJECTABLES: "Injectables",
+						OTHER: "Other Treatment",
+					},
+					colors: {
+						NOTX: "#FFFFFF",
+						AMOXDT: "#00B0FF",
+						AMOX_SYRUP: "#66BB6A",
+						CTX: "#FF9800",
+						INJECTABLES: "#9E9E9E",
+						OXYGEN: "#7C4DFF",
+						OTHER: "#FFFF00",
+					},
+					countyTreatment: []
 				},
 
 				diarrhoea: {
@@ -284,7 +371,8 @@
 						ZINC: "#9E9E9E",
 						ORS: "#FF9800",
 						OTHER: "#EF9A9A",
-					}
+					},
+					countyTreatment: []
 				},
 				options: {
 					subcounties: [],
@@ -876,21 +964,40 @@
 		computed: {
 			facilityDistributionChart() {
 				var data = [];
+				var facilityCount = 0;
 				_.forOwn(this.facilitydistribution, (dist) => {
 					var obj = {};
 					obj.name = dist.FACILITY_TYPE
-					obj.data = []
-					obj.data.push(dist.facilities)
+					obj.y = dist.facilities
+					obj.color = this.colors[dist.FACILITY_TYPE]
 					data.push(obj)
+					facilityCount = facilityCount + dist.facilities
+					// var arr = [];
+					// data.push([dist.FACILITY_TYPE, dist.facilities])
 				})
 
-				// console.log(data)
 				return {
 				    chart: {
-				        type: 'bar'
+				        type: 'pie',
+				        margin: 0,
+				        style: {
+							fontFamily: 'Nunito'
+						},
+						options3d: {
+							enabled: true,
+							alpha: 45
+						}
 				    },
+					credits: {
+						enabled: false
+					},
 				    title: {
-				        text: null
+				    	verticalAlign: 'middle',
+				    	loating: true,
+				        text: "<center><b>"+facilityCount+"</b> Facilities<br/>Assessed</center>",
+				        style: {
+				        	fontSize: "12px"
+				        }
 				    },
 				    xAxis: {
 				        categories: ['Facilities'],
@@ -909,12 +1016,25 @@
 				        reversed: true
 				    },
 				    plotOptions: {
-				        series: {
-				            stacking: 'percentage'
+				        pie: {
+				        	innerSize: '60%',
+				        	dataLabels: {
+				        		enabled: true,
+				        		format: '<b>{point.name}</b>, {point.y}'
+				        	}
 				        }
 				    },
-				    series: data
+				    series: [{
+				    	name: "Facilities",
+				    	data: data
+				    }]
 				};
+			},
+			pneumoniaCountyClassification(){
+				return _.round((this.pneumoniatotals.TOTAL_CLASSIFIED / this.pneumoniatotals.TOTAL_CASES_AFTER_DIF) * 100)
+			},
+			diarrhoeaCountyClassification(){
+				return _.round((this.diarrhoeatotals.TOTAL_CLASSIFIED / this.diarrhoeatotals.TOTAL_CASES_AFTER_DIFF) * 100)
 			},
 			assessmentOptions(){
 				var options = _.map( this.assessments, (o) => {

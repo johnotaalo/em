@@ -16,6 +16,11 @@
 						</b-form-group>
 					</div>
 
+					<b-form-group label="Is this legacy data? (Pre-format data)">
+						<b-form-radio v-model="form.isLegacyData" name="legacy-data" value="yes">Yes</b-form-radio>
+						<b-form-radio v-model="form.isLegacyData" name="legacy-data" value="no">No</b-form-radio>
+					</b-form-group>
+
 					<div class="form-group">
 						<label class="control-label">Select county</label>
 						<v-select v-model="form.county" :multiple="multiselect" label="text" :options="selectCounties"></v-select>
@@ -106,7 +111,8 @@ export default {
 				duration: {
 					month: "",
 					year: ""
-				}
+				},
+				isLegacyData: "no"
 			})
 		}
 	},
@@ -119,7 +125,10 @@ export default {
 			this.$refs.dropzone.processQueue();
 		},
 		downloadTemplate: function(){
-			window.location.href = "/templates/supervision_data_template.csv"
+			if(this.isLegacyData == "no")
+				window.location.href = "/templates/supervision_data_template.csv"
+			else
+				window.location.href = "/templates/supervision_data_legacy_template.csv"
 		},
 		getCounties: function(){
 			var _this = this;

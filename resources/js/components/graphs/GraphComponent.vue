@@ -115,7 +115,14 @@
 								enabled: true,
 								format: "{point.percentage:.0f}%",
 								color: "#000",
-								borderColor: "#000"
+								borderColor: "#000",
+								formatter: function(){
+									if(this.y != 0) {
+										return this.y
+									}else{
+										return ''
+									}
+								}
 							},
 							borderWidth: 2,
 							events: {

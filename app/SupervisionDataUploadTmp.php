@@ -230,6 +230,6 @@ class SupervisionDataUploadTmp extends Model
 
 	public function scopeExclude($query,$value = array()) 
 	{
-	return $query->select( array_diff( $this->columns,(array) $value) );
+		return $query->select( array_diff( $this->columns,(array) $value) );
 	}
 }

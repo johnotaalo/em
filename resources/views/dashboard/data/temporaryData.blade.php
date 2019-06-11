@@ -1,5 +1,5 @@
 @extends('layouts.app')
 
 @section('content')
-<temporary-data-component></temporary-data-component>
+<temporary-data-component {!! $isLegacy ? ':islegacy = "true"' : '' !!}></temporary-data-component>
 @endsection
