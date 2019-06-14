@@ -1041,7 +1041,7 @@
 				var options = [];
 				var legacyOptions = [];
 				var legacy_assessment_types = [];
-				
+				var assessment_types = [];
 
 				options = _.map( this.assessments, (o) => {
 					return {
