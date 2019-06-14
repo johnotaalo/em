@@ -414,7 +414,6 @@
 			this.getDiarrhoeaTreatmentData()
 			this.getDiarrhoeaSubcountyLocClassificationData()
 			this.getDiarrhoeaLocTreatmentData()
-			// this.diarrhoeatotals.TOTAL_CASES_AFTER_DIFF = 0;
 		},
 		methods: {
 			getCounties(){
@@ -1039,6 +1038,10 @@
 				return _.round((this.diarrhoeatotals.TOTAL_CLASSIFIED / this.diarrhoeatotals.TOTAL_CASES_AFTER_DIFF) * 100)
 			},
 			assessmentOptions(){
+				if (this.legacydata.length >  0){
+					var assessment_type = _.chain(legacydata).map('assessment_type').uniq().value()
+					console.log(assessment_type);
+				}
 				var options = _.map( this.assessments, (o) => {
 					return {
 						text: o.assessment,
