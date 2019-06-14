@@ -1038,9 +1038,8 @@
 				return _.round((this.diarrhoeatotals.TOTAL_CLASSIFIED / this.diarrhoeatotals.TOTAL_CASES_AFTER_DIFF) * 100)
 			},
 			assessmentOptions(){
-				console.log(this.legacydata);
 				if (this.legacydata.length >  0){
-					var assessment_type = _.chain(legacydata).map('assessment_type').uniq().value()
+					var assessment_type = _.chain(this.legacydata).map('assessment_type').uniq().value()
 					console.log(assessment_type);
 				}
 				var options = _.map( this.assessments, (o) => {
