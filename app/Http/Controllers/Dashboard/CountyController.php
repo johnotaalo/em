@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\County, AssesmentType;
 use App\Facility;
+use App\Supervision;
 use App\SupervisionDataLegacy;
 
 class CountyController extends Controller
@@ -20,7 +21,8 @@ class CountyController extends Controller
     		$request->county = $county->county;
     	}
         $distributions = $this->getFacilityDistribution($request->county);
-        $facilities = Facility::where('county', $request->county)->count();
+        // $facilities = Facility::where('county', $request->county)->count();
+        $facilities = Supervision::select('fname')->distinct()->count();
         $pneumoniaTotals = $this->getCountyPneumoniaTotals($request->county);
         $diarrhoeaTotals = $this->getCountyDiarrhoeaTotals($request->county);
         $supervisionLegacyData = \DB::select("SELECT * FROM supervision_legacy_data_view WHERE county = '{$request->county}'");
