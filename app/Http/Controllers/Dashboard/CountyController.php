@@ -84,8 +84,10 @@ class CountyController extends Controller
     }
 
     function getFacilityDistribution($county){
-        $sql = 'SELECT FACILITY_TYPE, count(SURVEY_CTO_ID) AS facilities FROM `facilities` WHERE county = "'.$county.'" GROUP BY FACILITY_TYPE';
+        // $sql = 'SELECT FACILITY_TYPE, count(SURVEY_CTO_ID) AS facilities FROM `facilities` WHERE county = "'.$county.'" GROUP BY FACILITY_TYPE';
         // die($sql);
+
+        $sql = "SELECT f.FACILITY_TYPE, COUNT(x.facility_code) AS facilities FROM (SELECT DISTINCT(fname) as facility_code FROM supervision_data WHERE county = '{$county}') x JOIN facilities f ON f.SURVEY_CTO_ID = x.facility_code GROUP BY f.FACILITY_TYPE";
 
         return \DB::select($sql);
     }
