@@ -291,7 +291,8 @@
 			facilitydistribution: { type: null, default: null },
 			facilities: { type: null, default: null },
 			diarrhoeatotals: { type: null, default: null },
-			pneumoniatotals: { type: null, default: null }
+			pneumoniatotals: { type: null, default: null },
+			legacydata: { type: null, default: null }
 		},
 		components: { GraphComponent, LocGraphComponent, FacilityGraphComponent, FacilitySubCountyComponent, DiarrhoeaSubcountyTreatment, DiarrhoeaLocTreatments, DiarrhoeaFacilityPrescriptionPattern, DiarrhoeaLocPrescriptionPattern, GaugeComponent, DonutTreatmentDonut },
 		data(){

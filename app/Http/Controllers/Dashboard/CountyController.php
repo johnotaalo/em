@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\County, AssesmentType;
 use App\Facility;
+use App\SupervisionDataLegacy;
 
 class CountyController extends Controller
 {
@@ -22,10 +23,11 @@ class CountyController extends Controller
         $facilities = Facility::where('county', $request->county)->count();
         $pneumoniaTotals = $this->getCountyPneumoniaTotals($request->county);
         $diarrhoeaTotals = $this->getCountyDiarrhoeaTotals($request->county);
+        $supervisionLegacyData = SupervisionDataLegacy::where('county', $request->county)->get();
         // $pneumoniaTotals = ['assessment' => '', 'TOTAL_CASES_AFTER_DIF' => 0];
         // $diarrhoeaTotals = ['TOTAL_CASES_AFTER_DIFF' => 0];
         // echo "<pre>";print_r($distributions);die;
-    	return view('dashboard.county.breakdown')->with(['county' => $request->county, 'assessments' => $this->getAssessmentTypes($request->county), 'distributions' => $distributions, 'facilities'=> $facilities, 'pneumoniaTotals' => $pneumoniaTotals, 'diarrhoeaTotals' => $diarrhoeaTotals]);
+    	return view('dashboard.county.breakdown')->with(['county' => $request->county, 'assessments' => $this->getAssessmentTypes($request->county), 'distributions' => $distributions, 'facilities'=> $facilities, 'pneumoniaTotals' => $pneumoniaTotals, 'diarrhoeaTotals' => $diarrhoeaTotals, 'legacy' => $supervisionLegacyData]);
     }
 
     function getCountyPneumoniaTotals($county){
