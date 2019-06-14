@@ -1038,16 +1038,33 @@
 				return _.round((this.diarrhoeatotals.TOTAL_CLASSIFIED / this.diarrhoeatotals.TOTAL_CASES_AFTER_DIFF) * 100)
 			},
 			assessmentOptions(){
-				if (this.legacydata.length >  0){
-					var assessment_type = _.chain(this.legacydata).map('assessment_type').uniq().value()
-					console.log(assessment_type);
-				}
-				var options = _.map( this.assessments, (o) => {
+				var options = [];
+				var legacyOptions = [];
+				var legacy_assessment_types = [];
+				
+
+				options = _.map( this.assessments, (o) => {
 					return {
 						text: o.assessment,
 						value: o.assessment
 					}
 				})
+
+				if (this.legacydata.length >  0){
+					assessment_types = _.chain(this.legacydata).map('assessment_type').uniq().value()
+					legacyOptions = _.map(assessment_types, (o) => {
+						return {
+							text: o,
+							value: o
+						}
+					})
+
+					_.each(legacyOptions, (option) => {
+						options.unshift(option)
+					})
+				}
+
+				
 
 				this.selectedAssessment = options[0].value
 
