@@ -414,7 +414,7 @@
 			this.getDiarrhoeaTreatmentData()
 			this.getDiarrhoeaSubcountyLocClassificationData()
 			this.getDiarrhoeaLocTreatmentData()
-			this.diarrhoeatotals.TOTAL_CASES_AFTER_DIFF = 0;
+			// this.diarrhoeatotals.TOTAL_CASES_AFTER_DIFF = 0;
 		},
 		methods: {
 			getCounties(){
