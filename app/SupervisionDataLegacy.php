@@ -9,7 +9,9 @@ class SupervisionDataLegacy extends Model
 	protected $table = 'supervision_data_legacy';
 	
     protected $fillable = ['county',
+    						'county_id',
 							'sub_county',
+							'sub_county_id',
 							'facility_name',
 							'facility_code',
 							'sum_tx_ors_zn',

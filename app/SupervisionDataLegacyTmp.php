@@ -8,7 +8,9 @@ class SupervisionDataLegacyTmp extends Model
 {
 	
     protected $fillable = ['county',
+    						'county_id',
 							'sub_county',
+							'sub_county_id',
 							'facility_name',
 							'facility_code',
 							'sum_tx_ors_zn',
@@ -41,7 +43,9 @@ class SupervisionDataLegacyTmp extends Model
 
 		protected $columns = ['id', 
 							'county',
+    						'county_id',
 							'sub_county',
+							'sub_county_id',
 							'facility_name',
 							'facility_code',
 							'sum_tx_ors_zn',
