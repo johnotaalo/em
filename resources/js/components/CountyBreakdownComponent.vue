@@ -1054,8 +1054,8 @@
 					assessment_types = _.chain(this.legacydata).map('assessment_type').uniq().value()
 					legacyOptions = _.map(assessment_types, (o) => {
 						return {
-							text: o,
-							value: o
+							text: o + "-legacy",
+							value: o + " (Legacy)"
 						}
 					})
 

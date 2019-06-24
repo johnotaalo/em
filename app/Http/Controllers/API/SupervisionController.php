@@ -4,9 +4,6 @@ namespace App\Http\Controllers\API;
 
 ini_set('max_execution_time', -1);
 
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-
 use App\SupervisionDataUploadTmp as SPUploadTmp;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\SupervisionDataImport;
