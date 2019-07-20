@@ -27,7 +27,7 @@ class CountyController extends Controller
         $facilities = Supervision::select('fname')->distinct()->where('county', $request->county)->count();
         $pneumoniaTotals = $this->getCountyPneumoniaTotals($request->county);
         $diarrhoeaTotals = $this->getCountyDiarrhoeaTotals($request->county);
-        $supervisionLegacyData = \DB::select("SELECT * FROM supervision_legacy_data_view WHERE county = \'{$request->county}\'");
+        $supervisionLegacyData = \DB::select("SELECT * FROM supervision_legacy_data_view WHERE county = '{$request->county}'");
         // $pneumoniaTotals = ['assessment' => '', 'TOTAL_CASES_AFTER_DIF' => 0];
         // $diarrhoeaTotals = ['TOTAL_CASES_AFTER_DIFF' => 0];
         // echo "<pre>";print_r($distributions);die;
