@@ -49,8 +49,8 @@
 				<vue-dropzone id="dropzone" ref = "dropzone" :options="dropzoneOptions" @vdropzone-sending="sendingEvent"></vue-dropzone>
 
 				<div class="mt-3 float-right">
-					<b-button variant="outline-success" @click="downloadTemplate">Current Format Template</b-button>
-					<b-button variant="outline-success" @click="downloadTemplate">Legacy Data Template</b-button>
+					<b-button variant="outline-success" @click="downloadTemplate('current')">Download Upload Template (Current Format)</b-button>
+					<b-button variant="outline-success" @click="downloadTemplate('legacy')">Download Upload Template (Legacy Format)</b-button>
 					<b-button variant="info" @click="submitUpload" v-if="uploadBtnDisplay">Upload Data</b-button>
 				</div>
 			</div>
@@ -125,11 +125,13 @@ export default {
 		submitUpload: function() {
 			this.$refs.dropzone.processQueue();
 		},
-		downloadTemplate: function(){
-			if(this.isLegacyData == "no")
+		downloadTemplate: function(format){
+			if(format == "current"){
 				window.location.href = "/templates/supervision_data_template.csv"
-			else
+			}
+			else{
 				window.location.href = "/templates/supervision_data_legacy_template.csv"
+			}
 		},
 		getCounties: function(){
 			var _this = this;
