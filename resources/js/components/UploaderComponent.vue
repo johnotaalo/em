@@ -49,7 +49,8 @@
 				<vue-dropzone id="dropzone" ref = "dropzone" :options="dropzoneOptions" @vdropzone-sending="sendingEvent"></vue-dropzone>
 
 				<div class="mt-3 float-right">
-					<b-button variant="outline-success" @click="downloadTemplate">Download CSV Template</b-button>
+					<b-button variant="outline-success" @click="downloadTemplate">Current Format Template</b-button>
+					<b-button variant="outline-success" @click="downloadTemplate">Legacy Data Template</b-button>
 					<b-button variant="info" @click="submitUpload" v-if="uploadBtnDisplay">Upload Data</b-button>
 				</div>
 			</div>

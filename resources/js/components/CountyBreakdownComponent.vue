@@ -35,6 +35,10 @@
 						></b-form-radio-group>
 					</b-form-group>
 				</div>
+
+				<div class="col">
+					<h1 class="float-right">{{ selectedAssessment }}</h1>
+				</div>
 			</div>
 		</b-card>
 		
@@ -1054,7 +1058,7 @@
 					assessment_types = _.chain(this.legacydata).map('assessment_type').uniq().value()
 					legacyOptions = _.map(assessment_types, (o) => {
 						return {
-							text: o + "-legacy",
+							text: o + " (Legacy)",
 							value: o + " (Legacy)"
 						}
 					})
@@ -1064,7 +1068,7 @@
 					})
 				}
 
-				
+				// console.log(options)
 
 				this.selectedAssessment = options[0].value
 
