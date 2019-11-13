@@ -310,7 +310,7 @@ import json from '../../../public/counties.json'
 				// console.log(response.data)
 				this.mapLoading = false;
 				var data = response.data
-				this.countyData = _.map(data, (county) => ([ _.toUpper(county.county), county.facilities.length ]))
+				this.countyData = _.map(data, (county) => ([ county.cto_id, _.toUpper(county.county), county.facilities.length ]))
 			});
 		},
 		computed: {
@@ -341,7 +341,7 @@ import json from '../../../public/counties.json'
 		          		points: {
 		          			events: {
 		          				click: function(){
-		          					console.log(this);
+		          					// console.log(this.series);
 		          				}
 		          			}
 		          		}
@@ -351,13 +351,20 @@ import json from '../../../public/counties.json'
 		          series: [{
 		          	showInLegend: false,
 		            data: this.countyData,
-		            keys: ["COUNTY_NAM", "value"],
+		            keys: ["cto_id", "COUNTY_NAM", "value"],
 		            name: 'County data',
 		            joinBy: 'COUNTY_NAM',
 		            states: {
 		              hover: {
 		                color: '#FFE082'
 		              }
+		            },
+		            point: {
+		            	events: {
+		            		click: function(){
+		            			window.location = `/dashboard/county/breakdown/${this.COUNTY_NAM}`
+		            		}
+		            	}
 		            },
 		            dataLabels: {
 		              enabled: false,

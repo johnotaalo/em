@@ -18,9 +18,12 @@ Auth::routes();
 
 Route::get('/dashboard/national', 'Dashboard\HomeController@index')->name('home');
 Route::get('dashboard/county', 'Dashboard\CountyController@index')->name('county-dashboard');
-Route::get('dashboard/county/breakdown/{county?}', 'Dashboard\CountyController@breakdown')->name('county-breakdown');
+Route::get('dashboard/county/breakdown/{county?}/{county_id?}', 'Dashboard\CountyController@breakdown')->name('county-breakdown');
 Route::get('data/upload', 'Dashboard\DataController@uploadPage')->name('upload-page');
 Route::get('data/upload/cancel', 'Dashboard\DataController@cancelUpload')->name('upload-page');
 Route::get('data/counties', 'Dashboard\DataController@countyPage')->name('county-page');
 
 Route::get('data/facilities', 'Dashboard\DataController@facilitiesPage')->name('facilities');
+Route::get('data/pull', 'Dashboard\DataController@pullCalculatedData');
+
+Route::get('directory', 'Dashboard\DataController@directory')->name('directory');

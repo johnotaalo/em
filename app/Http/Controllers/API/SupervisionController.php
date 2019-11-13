@@ -16,6 +16,17 @@ class SupervisionController extends Controller
     function counties(){
     }
 
+    function getCountyBreakdownData(Request $request){
+        $data = \App\PneumoniaCalculatedValue::where('cname', $request->county_id)->get();
+        $cleanedData = [];
+
+        foreach ($data as $d) {
+            $cleanedData[$d->assessment][] = $d;
+        }
+
+        return $cleanedData;
+    }
+
     function getClassificationData(){
     	$data = \DB::table('supervision_data_classification')->select(\DB::raw("SUM( PN_CLASSIFICATION ) AS SUM_PN_CLASSIFICATION, SUM( PN_NO_CLASSIFICATION ) AS SUM_PN_NO_CLASSIFICATION, SUM( DIA_CLASSIFICATION ) AS SUM_DIA_CLASSIFICATION, SUM( DIA_NO_CLASSIFICATION ) AS SUM_DIA_NO_CLASSIFICATION"))->first();
 

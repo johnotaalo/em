@@ -83,6 +83,9 @@
                                <a class="nav-link {{ Active::checkRoute('upload-page') }}" href="{{ route('upload-page') }}">Upload Data</a>
                            </li>
                            <li class="nav-item">
+                               <a class="nav-link" href="#">User Management</a>
+                           </li>
+                           <li class="nav-item">
                                <a class="nav-link" href="#">Directory</a>
                            </li>
                            <li class="nav-item">

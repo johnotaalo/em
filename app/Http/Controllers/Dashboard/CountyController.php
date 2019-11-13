@@ -16,22 +16,30 @@ class CountyController extends Controller
     }
 
     function breakdown(Request $request){
+        // $facilities = $supervisionLegacyData = [];
+        // $pneumoniaTotals = $diarrhoeaTotals = new \StdClass;
+        $supervisionLegacyData = $distributions = [];
+        $facilities = [];
     	if (!$request->county) {
     		$county = County::where('cto_id', '!=', null)->inRandomOrder()->first();
     		$request->county = $county->county;
+            $request->county_id = $county->cto_id;
     	}
-        $supervisionLegacyData = \DB::select("SELECT * FROM supervision_legacy_data_view WHERE county = '{$request->county}'");
+        // $supervisionLegacyData = \DB::select("SELECT * FROM supervision_legacy_data_view WHERE county = '{$request->county}'");
         // dd($supervisionLegacyData);
         $distributions = $this->getFacilityDistribution($request->county);
+        // dd($distributions);die;
         // $facilities = Facility::where('county', $request->county)->count();
-        $facilities = Supervision::select('fname')->distinct()->where('county', $request->county)->count();
-        $pneumoniaTotals = $this->getCountyPneumoniaTotals($request->county);
-        $diarrhoeaTotals = $this->getCountyDiarrhoeaTotals($request->county);
-        $supervisionLegacyData = \DB::select("SELECT * FROM supervision_legacy_data_view WHERE county = '{$request->county}'");
-        // $pneumoniaTotals = ['assessment' => '', 'TOTAL_CASES_AFTER_DIF' => 0];
-        // $diarrhoeaTotals = ['TOTAL_CASES_AFTER_DIFF' => 0];
+        // $facilities = Supervision::select('fname')->distinct()->where('county', $request->county)->count();
+        $facilities = Supervision::select('fname')->distinct()->where('cname', $request->county_id)->count();
+        // $pneumoniaTotals = $this->getCountyPneumoniaTotals($request->county);
+        // dd($pneumoniaTotals);
+        // $diarrhoeaTotals = $this->getCountyDiarrhoeaTotals($request->county);
+        // $supervisionLegacyData = \DB::select("SELECT * FROM supervision_legacy_data_view WHERE county = '{$request->county}'");
+        $pneumoniaTotals = ['assessment' => '', 'TOTAL_CASES_AFTER_DIF' => 0];
+        $diarrhoeaTotals = ['TOTAL_CASES_AFTER_DIFF' => 0];
         // echo "<pre>";print_r($distributions);die;
-    	return view('dashboard.county.breakdown')->with(['county' => $request->county, 'assessments' => $this->getAssessmentTypes($request->county), 'distributions' => $distributions, 'facilities'=> $facilities, 'pneumoniaTotals' => $pneumoniaTotals, 'diarrhoeaTotals' => $diarrhoeaTotals, 'legacy' => $supervisionLegacyData]);
+    	return view('dashboard.county.breakdown')->with(['county_id' => $request->county_id, 'county' => $request->county, 'assessments' => $this->getAssessmentTypes($request->county), 'distributions' => $distributions, 'facilities'=> $facilities, 'pneumoniaTotals' => $pneumoniaTotals, 'diarrhoeaTotals' => $diarrhoeaTotals, 'legacy' => $supervisionLegacyData]);
     }
 
     function getCountyPneumoniaTotals($county){

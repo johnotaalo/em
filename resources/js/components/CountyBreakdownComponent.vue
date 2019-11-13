@@ -65,7 +65,7 @@
 										<h4 class="header-pretitle">Cases Assessed</h4>
 										<div class="mb-3">
 											<h6 class = "header-pretitle">Pneumonia</h6>
-											<h3>{{ pneumoniatotals.TOTAL_CASES_AFTER_DIF.toLocaleString('en') }}</h3>
+											<h3>{{ pneumoniaTotals.cases_after_dif.toLocaleString('en') }}</h3>
 										</div>
 										<div class="mb-3">
 											<h6 class = "header-pretitle">Diarrhoea</h6>
@@ -91,7 +91,7 @@
 									<center><h2>Treatment</h2></center>
 									<div class="row">
 										<div class="col-lg-6">
-											<donut-treatment-donut title = "Pneumonia" :gdata="this.data.pneumoniaTreat[this.selectedAssessment]" :labels = "pneumonia.treatmentLabels" :colors="pneumonia.colors"></donut-treatment-donut>
+											<donut-treatment-donut title = "Pneumonia" :gdata="pneumoniaDonutData" :labels = "pneumonia.treatmentLabels" :colors="pneumonia.colors"></donut-treatment-donut>
 											<!-- <highcharts :options="gaugeExample"></highcharts> -->
 										</div>
 										<div class="col-lg-6">
@@ -290,6 +290,7 @@
 	
 	export default {
 		props: {
+			id: { type: null, default: null },
 			county: { type: null, default: null },
 			assessments: { type: null, default: null },
 			facilitydistribution: { type: null, default: null },
@@ -389,6 +390,7 @@
 				facilityChart: {},
 				xfacilityChart: {},
 				data: {
+					all: [],
 					pneumoniaClass: [],
 					pneumoniaLocClass: [],
 					pneumoniaTreat: {},
@@ -410,16 +412,23 @@
 		created(){
 			this.getCounties()
 			this.getSubCounties()
-			this.getPneumoniaClassificationData()
-			this.getPneumoniaTreatmentData()
-			this.getPneumoniaLocClassificationData()
-			this.getPneumoniaLocTreatmentData()
-			this.getDiarrhoeaSubcountyClassificationData()
-			this.getDiarrhoeaTreatmentData()
-			this.getDiarrhoeaSubcountyLocClassificationData()
-			this.getDiarrhoeaLocTreatmentData()
+			this.getData()
+			// this.getPneumoniaClassificationData()
+			// this.getPneumoniaTreatmentData()
+			// this.getPneumoniaLocClassificationData()
+			// this.getPneumoniaLocTreatmentData()
+			// this.getDiarrhoeaSubcountyClassificationData()
+			// this.getDiarrhoeaTreatmentData()
+			// this.getDiarrhoeaSubcountyLocClassificationData()
+			// this.getDiarrhoeaLocTreatmentData()
 		},
 		methods: {
+			getData(){
+				axios.get(`/api/data/county/breakdown/${this.id}`)
+				.then(res => {
+					this.data.all = res.data
+				})
+			},
 			getCounties(){
 				axios.get('/api/data/counties')
 				.then(res => {
@@ -967,6 +976,37 @@
 			}
 		},
 		computed: {
+			pneumoniaTotals(){
+				var data = this.data.all[this.selectedAssessment]
+				console.log(data)
+
+				var total_cases_after_dif = _.sumBy(data, 'total_cases_after_dif');
+				var total_classified = _.sumBy(data, 'total_classified')
+
+				return {
+					'total_classified':	total_classified,
+					'cases_after_dif':	total_cases_after_dif
+				}
+			},
+
+			pneumoniaDonutData(){
+				var data = this.data.all[this.selectedAssessment]
+
+				var cleanedData = _.map(data, (o) => {
+					return {
+						'AMOXDT' : o.AMOXDT,
+						'AMOX_SYRUP' : o.AMOX_SYRUP,
+						'OXYGEN' : o.OXYGEN,
+						'CTX' : o.CTX,
+						'INJECTABLES' : o.INJECTABLES,
+						'OTHER' : o.ANTI_OTHER,
+						'NOTX' : (o.treatment_diff > 0) ? o.treatment_diff + o.NOTX : o.NOTX
+					}
+				})
+
+				return cleanedData
+			},
+
 			facilityDistributionChart() {
 				var data = [];
 				var facilityCount = 0;
@@ -1036,7 +1076,11 @@
 				};
 			},
 			pneumoniaCountyClassification(){
-				return _.round((this.pneumoniatotals.TOTAL_CLASSIFIED / this.pneumoniatotals.TOTAL_CASES_AFTER_DIF) * 100)
+				var data = this.data.all[this.selectedAssessment]
+
+				var total_cases_after_dif = _.sumBy(data, 'total_cases_after_dif')
+				var total_classified = _.sumBy(data, 'total_classified')
+				return _.round((total_classified / total_cases_after_dif) * 100)
 			},
 			diarrhoeaCountyClassification(){
 				return _.round((this.diarrhoeatotals.TOTAL_CLASSIFIED / this.diarrhoeatotals.TOTAL_CASES_AFTER_DIFF) * 100)
@@ -1181,115 +1225,115 @@
 				    series: seriesData
 				}
 			},
-			pneumoniaSubCountyClassifications(){
-				// Order by the third bar classified
-				var cat = Object.keys(this.data.pneumoniaClass);
-				// console.log(cat)
-				var categoryData = this.data.pneumoniaClass[this.selectedAssessment]
-				// console.log(categoryData)
-				var categories = _.uniq(_.map(this.pneumoniaSubCounties, (o) => { return o.sub_county }))
-				categories.sort()
-				// console.log(categories)
-				var seriesData = []
-				var resData = []
+			//  {
+			// 	// Order by the third bar classified
+			// 	var cat = Object.keys(this.data.pneumoniaClass);
+			// 	// console.log(cat)
+			// 	var categoryData = this.data.pneumoniaClass[this.selectedAssessment]
+			// 	// console.log(categoryData)
+			// 	var categories = _.uniq(_.map(this.pneumoniaSubCounties, (o) => { return o.sub_county }))
+			// 	categories.sort()
+			// 	// console.log(categories)
+			// 	var seriesData = []
+			// 	var resData = []
 
-				// var cat = this.categories
-				// cat.splice(3, 2)
-				// console.log(this.data.pneumoniaClass)
+			// 	// var cat = this.categories
+			// 	// cat.splice(3, 2)
+			// 	// console.log(this.data.pneumoniaClass)
 				
-				// _.forOwn(cat, (category) => {
-				var obj = {};
-				var notClassifiedObj = {};
+			// 	// _.forOwn(cat, (category) => {
+			// 	var obj = {};
+			// 	var notClassifiedObj = {};
 
-				obj.name = "Classified"
-				notClassifiedObj.name = "Not Classified";
+			// 	obj.name = "Classified"
+			// 	notClassifiedObj.name = "Not Classified";
 
-				obj.data = []
-				notClassifiedObj.data = []
+			// 	obj.data = []
+			// 	notClassifiedObj.data = []
 
-				obj.color = this.pneumoniaColor
-				notClassifiedObj.color = this.notclassifiedColor.color
-				notClassifiedObj.borderColor = "red"
+			// 	obj.color = this.pneumoniaColor
+			// 	notClassifiedObj.color = this.notclassifiedColor.color
+			// 	notClassifiedObj.borderColor = "red"
 
-				_.forOwn(categories, (subcounty, k) => {
-					if(k != 0){
-						if(typeof categoryData[subcounty] == "undefined"){
-							obj.data.push(0)
-							notClassifiedObj.data.push(0)
-						}else{
-							obj.data.push(categoryData[subcounty]['classified'])
-							notClassifiedObj.data.push(categoryData[subcounty]['notClassified'])
-						}
-					}
-				})
+			// 	_.forOwn(categories, (subcounty, k) => {
+			// 		if(k != 0){
+			// 			if(typeof categoryData[subcounty] == "undefined"){
+			// 				obj.data.push(0)
+			// 				notClassifiedObj.data.push(0)
+			// 			}else{
+			// 				obj.data.push(categoryData[subcounty]['classified'])
+			// 				notClassifiedObj.data.push(categoryData[subcounty]['notClassified'])
+			// 			}
+			// 		}
+			// 	})
 
-				var data = obj.data;
-				var noData = notClassifiedObj.data;
+			// 	var data = obj.data;
+			// 	var noData = notClassifiedObj.data;
 
-				var average = _.round(_.mean(data), 1)
-				var noAverage = _.round(_.mean(noData), 1)
+			// 	var average = _.round(_.mean(data), 1)
+			// 	var noAverage = _.round(_.mean(noData), 1)
 
-				obj.data.unshift(average)
-				notClassifiedObj.data.unshift(noAverage)
+			// 	obj.data.unshift(average)
+			// 	notClassifiedObj.data.unshift(noAverage)
 
-				seriesData.push(notClassifiedObj)
-				seriesData.push(obj)
+			// 	seriesData.push(notClassifiedObj)
+			// 	seriesData.push(obj)
 				
-				// })
+			// 	// })
 
-				return {
+			// 	return {
 
-				    chart: {
-				        type: 'column'
-				    },
+			// 	    chart: {
+			// 	        type: 'column'
+			// 	    },
 
-				    title: {
-				        text: 'Pneumonia Case Classification'
-				    },
+			// 	    title: {
+			// 	        text: 'Pneumonia Case Classification'
+			// 	    },
 
-				    xAxis: {
-				        categories: categories
-				    },
+			// 	    xAxis: {
+			// 	        categories: categories
+			// 	    },
 
-				    yAxis: {
+			// 	    yAxis: {
 				       
-				        allowDecimals: false,
-				        min: 0,
-				        title: {
-				            text: null
-				        },
-				        gridLineWidth: 0,
-						minorGridLineWidth: 0,
-						labels:
-						{
-							enabled: false
-						}
-				    },
+			// 	        allowDecimals: false,
+			// 	        min: 0,
+			// 	        title: {
+			// 	            text: null
+			// 	        },
+			// 	        gridLineWidth: 0,
+			// 			minorGridLineWidth: 0,
+			// 			labels:
+			// 			{
+			// 				enabled: false
+			// 			}
+			// 	    },
 
-				    tooltip: {
-				        formatter: function () {
-				            return '<b>' + this.x + '</b><br/>' +
-				                this.series.name + ': ' + this.y + '<br/>'
-				        }
-				    },
+			// 	    tooltip: {
+			// 	        formatter: function () {
+			// 	            return '<b>' + this.x + '</b><br/>' +
+			// 	                this.series.name + ': ' + this.y + '<br/>'
+			// 	        }
+			// 	    },
 
-				    plotOptions: {
-				        column: {
-				            stacking: 'percent',
-				            dataLabels: {
-								enabled: true,
-								color: "#000",
-								borderColor: "#000",
-								format: "{point.percentage:.0f}%"
-							},
-							pointPadding: 0.2,
-            				borderWidth: 2
-				        }
-				    },
+			// 	    plotOptions: {
+			// 	        column: {
+			// 	            stacking: 'percent',
+			// 	            dataLabels: {
+			// 					enabled: true,
+			// 					color: "#000",
+			// 					borderColor: "#000",
+			// 					format: "{point.percentage:.0f}%"
+			// 				},
+			// 				pointPadding: 0.2,
+   //          				borderWidth: 2
+			// 	        }
+			// 	    },
 
-				    series: seriesData
-				}
-			},
+			// 	    series: seriesData
+			// 	}
+			// },
 			diarrhoeaFacilityClassification(){
 				var categories = ["<b>" + _.upperCase(this.diarrhoea.selectedSubcounty) + " SUB COUNTY" + "</b>",];
 				categories = categories.concat(this.data.facilityTypesX)
