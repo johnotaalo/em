@@ -41,9 +41,44 @@ class DataController extends Controller
     }
 
     function pullCalculatedData(){
-      $pneumoniaClassificationData = \DB::select("SELECT * FROM pneumonia_facility_classification c JOIN pneumonia_facility_treatment_data t ON t.id = c.id");
-      // dd($pneumoniaClassificationData);
 
+      $diarrhoeaData = \DB::select('SELECT * FROM diarrhoea_case_tx_aggreagate');
+      $diarrhoeaInsertData = collect($diarrhoeaData)->map(function($data){
+        $c = \App\County::where('county', $data->county)->first();
+        if (!is_null($c)) {
+          $county = $c->cto_id;
+        }else{
+          $county = $data->cname;
+        }
+        
+        $sub_county = \App\Subcounty::where("subcounty_name", $data->sub_county)->first();
+        $subcounty_id = ($sub_county) ? $sub_county->cto_id : 0;
+        if($subcounty_id == 0){
+          $subcounty_id = \App\Facility::where('SURVEY_CTO_ID', $data->fname)->first()->SUB_COUNTY_ID;
+        }
+
+        return [
+          'cname'           =>  $county,
+          'scname'          =>  $subcounty_id,
+          'fname'           =>  (int)$data->fname,
+          'assessment'      =>  $data->assessment,
+          'assessment_type' =>  $data->assessment_type,
+          'NO_CLASS_CASES'  =>  $data->NO_CLASS_CASES,
+          'classified'      =>  $data->classified,
+          'total_cases'     =>  $data->total_cases,
+          'ANTIBIOTICS'     =>  $data->ANTIBIOTICS,
+          'IV'              =>  $data->IV,
+          'NOTX'            =>  $data->NOTX,
+          'COP'             =>  $data->COP,
+          'ZINC'            =>  $data->ZINC,
+          'ORS'             =>  $data->ORS,
+          'OTHER'           =>  $data->OTHER,
+          'TOTAL_TX'        =>  $data->TOTAL_TX,
+          'DIFFERENCE'      =>  $data->DIFFERENCE     
+        ];
+      })->toArray();
+
+      $pneumoniaClassificationData = \DB::select("SELECT * FROM pneumonia_facility_classification c JOIN pneumonia_facility_treatment_data t ON t.id = c.id");
       $pneuClassInsertData = collect($pneumoniaClassificationData)->map(function($data){
         $county = \App\County::where('county', $data->county)->first()->cto_id;
         $sub_county = \App\Subcounty::where("subcounty_name", $data->sub_county)->first();
@@ -85,7 +120,10 @@ class DataController extends Controller
       // dd($pneuClassInsertData);
 
       \App\PneumoniaCalculatedValue::query()->truncate();
+      \App\DiarrhoeaCalculatedValue::query()->truncate();
+
       \App\PneumoniaCalculatedValue::insert($pneuClassInsertData);
+      \App\DiarrhoeaCalculatedValue::insert($diarrhoeaInsertData);
       // dd($pneuClassInsertData);
     }
 }

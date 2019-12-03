@@ -17,14 +17,21 @@ class SupervisionController extends Controller
     }
 
     function getCountyBreakdownData(Request $request){
-        $data = \App\PneumoniaCalculatedValue::where('cname', $request->county_id)->get();
+        $data = \App\PneumoniaCalculatedValue::select('*', \DB::raw('(CASE WHEN treatment_diff > 0 THEN treatment_diff + NOTX ELSE NOTX END) AS NOTX_DIFF'))->where('cname', $request->county_id)->with('county', 'facility', 'subcounty')->get();
         $cleanedData = [];
 
         foreach ($data as $d) {
             $cleanedData[$d->assessment][] = $d;
         }
 
-        return $cleanedData;
+        $diarrhoeaData = \App\DiarrhoeaCalculatedValue::select('*', \DB::raw('(CASE WHEN DIFFERENCE > 0 THEN classified + NO_CLASS_CASES + DIFFERENCE ELSE classified + NO_CLASS_CASES END) AS TOTAL_CASES_AFTER_DIFF'), \DB::raw('IF (DIFFERENCE < 0, NOTX - DIFFERENCE, NOTX) AS NOTX_CALC'))->where('cname', $request->county_id)->with('county', 'facility', 'subcounty')->get();
+        $diarrhoeaCleanedData = [];
+
+        foreach ($diarrhoeaData as $d) {
+            $diarrhoeaCleanedData[$d->assessment][] = $d;
+        }
+
+        return ['pneumonia' => $cleanedData, 'diarrhoea' => $diarrhoeaCleanedData];
     }
 
     function getClassificationData(){
@@ -116,6 +123,16 @@ FROM
     	$data = \DB::table('supervision_data')->distinct('fname')->count('fname');
 
     	return $data;
+    }
+
+    function getAssessmentsCount(){
+//         $data = \DB::select("SELECT assessment, count(county) as count FROM (
+// SELECT DISTINCT county, assessment FROM `supervision_data_with_assessment`) x
+// GROUP BY assessment");
+
+        $data = \DB::table('supervision_data_with_assessment')->select(\DB::raw('DISTINCT assessment, county'))->get();
+
+        return $data;
     }
 
     function getFacilitiesBreakdown(){

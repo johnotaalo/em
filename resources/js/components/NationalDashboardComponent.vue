@@ -2,35 +2,13 @@
 	<div>
 		<div class="col">
 			<div class="col-md">
-				<small style="font-size: .7rem">This page shows data for at least 3 facility assessments.</small>
+				<center><small style="font-size: .7rem">This page shows data for at least 3 facility assessments.</small></center>
 			</div>
 		</div>
 		<div class="row">
-			<!-- <div class="col-md-1">
-				
-			</div> -->
-			<div class="col-md-4">
+			<div class="col-3">
 				<div class="row">
-					<div class="col">
-						<div class="card">
-							<div class="card-header">
-								<h4 class="card-header-title">
-								COUNTY COVERAGE
-								</h4>
-								<small class="text-muted">Click on a county to view analytics</small>
-							</div>
-							<div class="card-body">
-								<center><small style="font-size: .7rem"><span v-for="(breakdown, key) in facilityBreakdown" :key="key">{{ breakdown.type | pluralize(breakdown.count) }} {{ breakdown.count }} | </span></small></center>
-								<loading :active.sync="mapLoading" :color="loaderColor" :can-cancel="false" :is-full-page="false"></loading>
-								<highmaps :options="mapData" style="height: 400px;"></highmaps>
-							</div>
-							
-						</div>
-					</div>
-				</div>
-
-				<div class="row">
-					<div class="col">
+					<div class="col-md-6">
 						<div class="card">
 							<div class="card-body">
 								<div class="row align-items-center">
@@ -55,7 +33,7 @@
 						</div>
 					</div>
 
-					<div class="col">
+					<div class="col-md-6">
 						<div class="card">
 							<div class="card-body">
 								<div class="row align-items-center">
@@ -79,47 +57,25 @@
 							</div>
 						</div>
 					</div>
-				</div>
-				
+				</div>		
 
-				
-						
-				<!-- <div class="card">
+				<div class="card">
 					<div class="card-body">
 						<div class="row align-items-center">
 							<div class="col">
-
-								<h6 class="card-title text-uppercase text-muted mb-2">
-									Facilities Breakdown
-								</h6>
-
-								<span class="h2 mb-0">
-									{{ facilities }}
-								</span>
-							</div>
-							<div class="col-auto">
-
-								<span class="h2 fe fe-grid text-muted mb-0"></span>
-
+								<table class="table table-bordered">
+									<tr v-for="(value, key) in assessmentCountNumber">
+										<th>{{key}}</th>
+										<td>{{ value.length }}</td>
+									</tr>
+								</table>
 							</div>
 						</div>
 
-						<div class="row">
-							<div class="col">
-								<b-list-group>
-									<b-list-group-item v-for="(breakdown, key) in facilityBreakdown" class="d-flex justify-content-between align-items-center" :key="key">
-										{{ breakdown.type | pluralize(breakdown.count) }}
-										<b-badge variant="primary" pill>{{ breakdown.count }}</b-badge>
-									</b-list-group-item>
-								</b-list-group>
-							</div>
-							
-						</div>
 					</div>
-				</div> -->
-				
+				</div>
 			</div>
-			<div class="col-md-8">
+			<div class="col">
 				<div class="row">		
 					<div class="col-md-6">
 						<div class="card">
@@ -131,41 +87,10 @@
 							</div>
 							<div class="card-body">
 								<loading :active.sync="classificationLoading" :color="loaderColor" :can-cancel="false" :is-full-page="false"></loading>
-								<highcharts :options="pneumoniaClassificationOptions" style="height: 300px;"></highcharts>
+								<highcharts :options="pneumoniaClassificationOptions" style="height: 50vh;"></highcharts>
 							</div>
 						</div>
-						<div class="row" style="margin-bottom: 10px;">
-							<div class="col-md-6">
-								<div class="card">
-									<div class="card-header">
-										<h5 class="card-header-title">
-										DIARRHOEA CLASSIFICATION
-
-										<span class="badge badge-soft-warning mt-n1 float-right" style="flex: 0"><span v-if="variance.classification.diarrhoea > 0">+</span>{{ variance.classification.diarrhoea }}%</span>
-										</h5>
-									</div>
-									<div class="card-body">
-										<loading :active.sync="classificationLoading" :color="loaderColor" :can-cancel="false" :is-full-page="false"></loading>
-										<highcharts :options="diarrhoeaClassificationOptions" style = "height: 200px;"></highcharts>	
-									</div>
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="card">
-									<div class="card-header">
-										<h5 class="card-header-title">
-										DIARRHOEA TREATMENT
-										<span class="badge badge-soft-warning mt-n1 float-right" style="flex: 0">+0%</span>
-										</h5>
-									</div>
-									<div class="card-body">
-										<loading :active.sync="diarrhoeaTreatmentLoading" :color="loaderColor" :can-cancel="false" :is-full-page="false"></loading>
-										<highcharts :options="diarrhoeaTreatmentOptions" style = "height: 200px;"></highcharts>
-									</div>
-									
-								</div>
-							</div>
-						</div>
+						
 					</div>
 					<div class="col-md-6">
 						<div class="card">
@@ -177,8 +102,40 @@
 							</div>
 							<div class="card-body">
 								<loading :active.sync="pneumoniaTreatmentLoading" :color="loaderColor" :can-cancel="false" :is-full-page="false"></loading>
-								<highcharts :options="pneumoniaTreatmentOptions" style="height: 600px;"></highcharts>
+								<highcharts :options="pneumoniaTreatmentOptions" style="height: 50vh;"></highcharts>
 							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row" style="margin-bottom: 10px;">
+					<div class="col-md-6">
+						<div class="card">
+							<div class="card-header">
+								<h5 class="card-header-title">
+								DIARRHOEA CLASSIFICATION
+
+								<span class="badge badge-soft-warning mt-n1 float-right" style="flex: 0"><span v-if="variance.classification.diarrhoea > 0">+</span>{{ variance.classification.diarrhoea }}%</span>
+								</h5>
+							</div>
+							<div class="card-body">
+								<loading :active.sync="classificationLoading" :color="loaderColor" :can-cancel="false" :is-full-page="false"></loading>
+								<highcharts :options="diarrhoeaClassificationOptions" style = "height: 50vh;"></highcharts>	
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="card">
+							<div class="card-header">
+								<h5 class="card-header-title">
+								DIARRHOEA TREATMENT
+								<span class="badge badge-soft-warning mt-n1 float-right" style="flex: 0">+0%</span>
+								</h5>
+							</div>
+							<div class="card-body">
+								<loading :active.sync="diarrhoeaTreatmentLoading" :color="loaderColor" :can-cancel="false" :is-full-page="false"></loading>
+								<highcharts :options="diarrhoeaTreatmentOptions" style = "height: 50vh;"></highcharts>
+							</div>
+							
 						</div>
 					</div>
 				</div>
@@ -213,6 +170,7 @@ import json from '../../../public/counties.json'
 				baselineColor: "#BDBDBD",
 				facilities: 0,
 				counties: 0,
+				assessmentsCount: [],
 				facilityBreakdown: {},
 				countyFacilities: {},
 				classificationData: {
@@ -278,6 +236,12 @@ import json from '../../../public/counties.json'
 				var data = response.data;
 				this.treatmentData.diarrhoea = data;
 			});
+
+			axios.get('/api/data/count/assessments')
+			.then((res) => {
+				var data = res.data
+				this.assessmentsCount = data
+			})
 
 			axios.get('/api/data/count/facilities')
 			.then((response) => {
@@ -378,6 +342,19 @@ import json from '../../../public/counties.json'
 		            }
 		          }
 		        }
+			},
+			assessmentCountNumber: function(){
+				var assessmentArray = {};
+
+				_.forOwn(this.assessmentsCount, (v, k) => {
+					if(typeof assessmentArray[v.assessment] === 'undefined'){
+						assessmentArray[v.assessment] = [];
+					}
+					assessmentArray[v.assessment].push(v.county)
+				})
+
+				// console.log(assessmentArray)
+				return assessmentArray;
 			},
 			pneumoniaClassificationOptions: function(){
 				var em = this;

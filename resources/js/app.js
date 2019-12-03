@@ -14,6 +14,7 @@ import Vue from 'vue'
 import vSelect from 'vue-select'
 import VueLoading from 'vue-loading-overlay';
 import VuePluralize from 'vue-pluralize'
+import Vuelidate from 'vuelidate'
 
 // load these modules as your need
 import { genComponent } from 'vue-highcharts';
@@ -58,6 +59,8 @@ Vue.use(ServerTable, {}, false, 'bootstrap4', 'default');
 Vue.use(VueSwal)
 Vue.use(VueLoading)
 Vue.use(VuePluralize)
+Vue.use(require('vue-moment'));
+Vue.use(Vuelidate)
 
 
 loadStock(Highcharts);
@@ -80,12 +83,26 @@ Vue.component('temporary-data-component', require('./components/TemporaryDataCom
 Vue.component('directory-component', require('./components/DirectoryComponent.vue').default);
 Vue.component('facility-component', require('./components/FacilityComponent.vue').default);
 Vue.component('county-breakdown-component', require('./components/CountyBreakdownComponent.vue').default);
+Vue.component('users', require('./components/users/Users.vue').default);
+Vue.component('user-add', require('./components/users/UserAdd.vue').default);
+Vue.component('country-overview', require('./components/CountryOverview.vue').default)
 Vue.component('loading', VueLoading)
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
+
+Vue.filter('formatUserType', function(value){
+	switch(value){
+		case 'admin':
+			return 'Administrator'
+		case 'chai-admin':
+			return 'CHAI Administrator'
+		default:
+			return 'Unknown'
+	}
+})
 
 const app = new Vue({
     el: '#app',

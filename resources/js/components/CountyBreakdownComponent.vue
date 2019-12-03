@@ -69,7 +69,7 @@
 										</div>
 										<div class="mb-3">
 											<h6 class = "header-pretitle">Diarrhoea</h6>
-											<h3>{{ diarrhoeatotals.TOTAL_CASES_AFTER_DIFF.toLocaleString('en') }}</h3>
+											<h3>{{ diarrhoeaTotals.cases_after_dif.toLocaleString('en') }}</h3>
 										</div>
 									</div>
 								</div>
@@ -92,11 +92,9 @@
 									<div class="row">
 										<div class="col-lg-6">
 											<donut-treatment-donut title = "Pneumonia" :gdata="pneumoniaDonutData" :labels = "pneumonia.treatmentLabels" :colors="pneumonia.colors"></donut-treatment-donut>
-											<!-- <highcharts :options="gaugeExample"></highcharts> -->
 										</div>
 										<div class="col-lg-6">
-											<donut-treatment-donut title = "Diarrhoea" :gdata="this.data.diarrhoeaTreat[this.selectedAssessment]" :labels = "diarrhoea.treatmentLabels" :colors="diarrhoea.colors"></donut-treatment-donut>
-											<!-- <highcharts :options="gaugeExample"></highcharts> -->
+											<donut-treatment-donut title = "Diarrhoea" :gdata="diarrhoeaDonutData" :labels = "diarrhoea.treatmentLabels" :colors="diarrhoea.colors"></donut-treatment-donut>
 										</div>
 									</div>
 									
@@ -122,14 +120,8 @@
 											<highcharts :options="pneumoniaSubCountyClassifications" style = "height: 300px;"></highcharts>
 											<hr>
 											<center><h2 class="mt-6">Prescription Pattern</h2></center>
-											<!-- <div>
-												<highcharts :options="pneumoniaSubCountyTreatmentBaseline" style = "height: 400px;"></highcharts>
-
-												<highcharts :options="pneumoniaSubCountyTreatmentSupervision1" style = "height: 400px;"></highcharts>
-
-												<highcharts :options="pneumoniaSubCountyTreatmentSupervision2" style = "height: 400px;"></highcharts>
-											</div> -->
-											<graph-component v-for="(treatmentData, assessment) in data.pneumoniaTreat" :key="assessment" :title = "assessment" :data = "treatmentData" :county="county" :treatmentLabels = "pneumoniaTreatmentLabels" :subcounties="subcounties"></graph-component>
+											<graph-component :title = "selectedAssessment" :data = "subcountyPneumoniaTreatment" :county="county" :treatmentLabels = "pneumoniaTreatmentLabels" :subcounties="subcounties"></graph-component>
+											<!-- <graph-component v-for="(treatmentData, assessment) in data.pneumoniaTreat" :key="assessment" :title = "assessment" :data = "treatmentData" :county="county" :treatmentLabels = "pneumoniaTreatmentLabels" :subcounties="subcounties"></graph-component> -->
 											
 										</div>
 										<div class="col-5">
@@ -138,18 +130,10 @@
 											<hr>
 											<center><h2 class="mt-6">Prescription Pattern</h2></center>
 											<div>
-												<loc-graph-component v-for="(treatmentData, assessment) in data.pneumoniaLocTreat" :key="assessment" :title = "assessment" :data = "treatmentData" :county="county" :treatmentLabels = "pneumoniaTreatmentLabels"></loc-graph-component>
-												<!-- <highcharts :options="pneumoniaLoCPPBaseline" style = "height: 400px;"></highcharts>
-
-												<highcharts :options="pneumoniaLoCPPSupervision1" style = "height: 400px;"></highcharts> -->
-
-												<!-- <highcharts :options="pneumoniaLoCPPSupervision2" style = "height: 400px;"></highcharts> -->
+												<loc-graph-component :title = "selectedAssessment" :data = "subcountyLOCPneumoniaTreatment" :county="county" :treatmentLabels = "pneumoniaTreatmentLabels"></loc-graph-component>
+												<!-- <loc-graph-component v-for="(treatmentData, assessment) in data.pneumoniaLocTreat" :key="assessment" :title = "assessment" :data = "treatmentData" :county="county" :treatmentLabels = "pneumoniaTreatmentLabels"></loc-graph-component> -->
 											</div>
-											<!-- <highcharts :options="pneumoniaSubCountyClassifications" style = "height: 400px;"></highcharts> -->
 										</div>
-									<!-- <div class="col">
-										<highcharts :options="pneumoniaClassificationTrend" style = "height: 400px;"></highcharts>
-									</div> -->
 									</div>
 							 	</b-tab>
 							 	<b-tab>
@@ -178,12 +162,12 @@
 													<highcharts :options="facilityChart" style = "height: 400px;"></highcharts>
 
 													<center><h2 class="mt-6">Prescription Pattern</h2></center>
-													<facility-graph-component v-for="(treatmentData, assessment) in data.facilityTreatmentData" :key="assessment" :title = "assessment" :data = "treatmentData" :subcounty="pneumonia.selectedSubcounty" :treatmentLabels = "pneumoniaTreatmentLabels"></facility-graph-component>
+													<facility-graph-component :title = "selectedAssessment" :data = "data.facilityTreatmentData" :subcounty="pneumonia.selectedSubcounty" :treatmentLabels = "pneumoniaTreatmentLabels"></facility-graph-component>
 												</div>
 												<div class="col-5">
-													<highcharts :options="pneumoniaFacilityClassification" style = "height: 400px;"></highcharts>
+													<highcharts :options="pneumoniaLOCChart" style = "height: 400px;"></highcharts>
 													<center><h2 class="mt-6">Prescription Pattern</h2></center>
-													<facility-sub-county-component v-for="(treatmentData, assessment) in data.facilityLocData" :key="assessment" :title = "assessment" :data = "treatmentData" :county="county" :subcounties="subcounties" :subcounty="pneumonia.selectedSubcounty"></facility-sub-county-component>
+													<facility-sub-county-component :title = "selectedAssessment" :data = "data.facilityLocData" :county="county" :subcounties="subcounties" :subcounty="pneumonia.selectedSubcounty"></facility-sub-county-component>
 												</div>
 											</div>
 											
@@ -388,9 +372,13 @@
 					pneumoniaFacilityTypes: []
 				},
 				facilityChart: {},
+				pneumoniaLOCChart: {},
 				xfacilityChart: {},
 				data: {
-					all: [],
+					all: {
+						pneumonia: [],
+						diarrhoea: []
+					},
 					pneumoniaClass: [],
 					pneumoniaLocClass: [],
 					pneumoniaTreat: {},
@@ -652,187 +640,259 @@
 				})
 			},
 			getPneumoniaFacilityTreatmentData(subcounty){
-				axios.get('/api/data/pneumonia/treatment/facilities/' + subcounty)
-				.then(res => {
-					this.data.facilityTreatmentData = res.data
-				})
+				// axios.get('/api/data/pneumonia/treatment/facilities/' + subcounty)
+				// .then(res => {
+				// 	this.data.facilityTreatmentData = res.data
+				// })
+				var facilityTreatmentData = _.without(_.map(this.pageData, (data) => {
+					if (data.facility.SUB_COUNTY === subcounty) {
+						return {
+							facility_name: data.facility.FACILITY_NAME,
+							'AMOXDT': data.AMOXDT,
+							'AMOX_SYRUP' : data.AMOX_SYRUP,
+							'OXYGEN' : data.OXYGEN,
+							'CTX' : data.CTX,
+							'INJECTABLES' : data.INJECTABLES,
+							'OTHER' : data.ANTI_OTHER,
+							'NOTX' : data.NOTX_DIFF
+						}
+					}
+				}), undefined)
+
+				return facilityTreatmentData
 			},
 			getFacilityClassificationData(subcounty){
-				axios.get('/api/data/pneumonia/classification/locfacility/' + subcounty)
-				.then(res => {
-					var pneumoniaLocClassData = {}
-					var facility_type = []
-					_.forOwn(res.data, data =>{
-						if(typeof pneumoniaLocClassData[data.assessment] == "undefined"){
-							pneumoniaLocClassData[data.assessment] = {};
-						}
+				var facilityClassificationData = _.without(_.map(this.pageData, (data) => {
+					if (data.facility.SUB_COUNTY === subcounty) {
+						return data
+					}
+				}), undefined)
 
-						var ftype = (data.FACILITY_TYPE == null) ? "Unknown" : data.FACILITY_TYPE
-						if(typeof pneumoniaLocClassData[data.assessment][ftype] == "undefined"){
-							pneumoniaLocClassData[data.assessment][ftype] = {};
-						}
-						pneumoniaLocClassData[data.assessment][ftype]['classified'] = data.TOTAL_CLASSIFIED
-						pneumoniaLocClassData[data.assessment][ftype]['notClassified'] = data.TOTAL_CASES_AFTER_DIF - data.TOTAL_CLASSIFIED
-						
+				var cleanedLOCData = _(facilityClassificationData)
+				.groupBy('facility.FACILITY_TYPE')
+				.map((facilityData, facilityType) => ({
+					// console.log(facilityData)
+					facilityType: facilityType,
+					classified: _.sumBy(facilityData, 'total_classified'),
+					not_classified: _.sumBy(facilityData, 'total_cases_after_dif') - _.sumBy(facilityData, 'total_classified')
+				})).value()
 
-						facility_type.push(ftype)
-					})
-					// console.log(pneumoniaClassData)
-					// console.log(pneumoniaLocClassData)
-					this.data.pneumoniaFacilityTreat = pneumoniaLocClassData
-					facility_type = _.uniq(facility_type)
-					this.data.xfacilityTypes = facility_type
-					// this.data.pneumoniaFacilityTreat = res.data
+				var categories = [`<b>${_.upperCase( subcounty )} Sub County</b>`]
+				var seriesData = []
+				var resData = [];
+				var obj = {};
+				var notClassifiedObj = {};
+
+				obj.name = "Classified"
+				obj.data = [0]
+
+				notClassifiedObj.name = "Not Classified"
+				notClassifiedObj.data = [0]
+
+				obj.color = this.pneumoniaColor
+				notClassifiedObj.color = this.notclassifiedColor.color
+				notClassifiedObj.borderColor = "red"
+
+				_.forOwn(cleanedLOCData, (loc) => {
+					categories.push(loc.facilityType)
+					obj.data.push(loc.classified)
+					notClassifiedObj.data.push(loc.not_classified)
 				})
+
+				var data = obj.data;
+				var noData = notClassifiedObj.data;
+
+				var average = _.round(_.mean(data), 1)
+				var noAverage = _.round(_.mean(noData), 1)
+
+				obj.data[0] = average
+				notClassifiedObj.data[0] = noAverage
+
+				seriesData.push(notClassifiedObj)
+				seriesData.push(obj)
+
+				return {
+				    chart: {
+				        type: 'column'
+				    },
+				    title: {
+				        text: 'Pneumonia Case Classification by Level of Care'
+				    },
+				    xAxis: {
+				        categories: categories,
+				        crosshair: true
+				    },
+				    yAxis: {
+				        min: 0,
+				        title: {
+				            text: null
+				        },allowDecimals: false,
+				        min: 0,
+				        gridLineWidth: 0,
+						minorGridLineWidth: 0,
+						labels:
+						{
+							enabled: false
+						}
+				    },
+				    tooltip: {
+				        headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+				        pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+				            '<td style="padding:0"><b>{point.y}</b></td></tr>',
+				        footerFormat: '</table>',
+				        shared: true,
+				        useHTML: true
+				    },
+				    plotOptions: {
+				        column: {
+				        	stacking: 'percent',
+				            pointPadding: 0.2,
+				            borderWidth: 2,
+				        	dataLabels: {
+								enabled: true,
+								color: "#000",
+								borderColor: "#000",
+								format: "{point.percentage:.0f}%"
+							},
+				        }
+				    },
+				    series: seriesData
+				}
 			},
 			getFacilityLocTreatementData(subcounty){
-				axios.get('/api/data/pneumonia/treatment/facilitydata/loc/' + subcounty)
-				.then(res => {
-					this.data.facilityLocData = res.data
-				})
+				var facilityClassificationData = _.without(_.map(this.pageData, (data) => {
+					if (data.facility.SUB_COUNTY === subcounty) {
+						return data
+					}
+				}), undefined)
+
+				var cleanedLOCData = _(facilityClassificationData)
+				.groupBy('facility.FACILITY_TYPE')
+				.map((facilityData, facilityType) => ({
+					FACILITY_TYPE: facilityType,
+					'AMOXDT': _.sumBy(facilityData, 'AMOXDT'),
+					'AMOX_SYRUP': _.sumBy(facilityData, 'AMOX_SYRUP'),
+					'OXYGEN' : _.sumBy(facilityData, 'OXYGEN'),
+					'CTX' : _.sumBy(facilityData, 'CTX'),
+					'INJECTABLES' : _.sumBy(facilityData, 'INJECTABLES'),
+					'OTHER' : _.sumBy(facilityData, 'ANTI_OTHER'),
+					'NOTX' : _.sumBy(facilityData, 'NOTX_DIFF')
+				})).value()
+
+				return cleanedLOCData
 			}
 		},
 		watch: {
 			'pneumonia.selectedSubcounty': function(newVal, oldVal){
-				axios.get("/api/data/pneumonia/classification/facility/" + newVal)
-				.then(res => {
-					var categories = []
-					var seriesData = []
-					var resData = []
-					var cat = _.uniq(_.map(res.data, (o) => { return o.assessment }))
-
-					var categories = _.map(res.data, (o) => {
-						return o.facility_name
-					})
-
-					this.facilityNo = categories.length
-					categories.sort()
-					categories.unshift("<b>" + _.upperCase(newVal + " Sub County") +" </b>")
-
-					_.forOwn(res.data, (value) => {
-						if(typeof resData[value.assessment] === 'undefined'){
-							resData[value.assessment]= []
+				var facilityClassificationData = _.without(_.map(this.pageData, (data) => {
+					if (data.facility.SUB_COUNTY === newVal) {
+						return {
+							facility: data.facility.FACILITY_NAME,
+							classified: data.total_classified,
+							notclassified: data.total_cases_after_dif - data.total_classified
 						}
-
-						if(typeof resData[value.assessment][value.facility_name] === 'undefined'){
-							resData[value.assessment][value.facility_name]= []
-						}
-
-						resData[value.assessment][value.facility_name]['classified'] = value.TOTAL_CLASSIFIED
-						resData[value.assessment][value.facility_name]['notClassified'] = value.TOTAL_CASES_AFTER_DIF - value.TOTAL_CLASSIFIED
-					})
-
-					// console.log(resData)
-
-					// _.forOwn(cat, (category) => {
-						// console.log(category)
-						var obj = {};
-						var notClassifiedObj = {};
-
-						obj.name = "Classified"
-						notClassifiedObj.name = "Not Classified";
-
-						obj.data = []
-						notClassifiedObj.data = []
-
-						obj.color = this.pneumoniaColor
-						notClassifiedObj.color = this.notclassifiedColor.color
-						notClassifiedObj.borderColor = "red"
-
-						var categoryData = resData[this.selectedAssessment]
-
-						_.forOwn(categories, (facility, k) => {
-							// console.log(facility)
-							if(k != 0){
-								var data = 0
-								var noData = 100;
-								if (typeof categoryData[facility] != "undefined") {
-									data = categoryData[facility]['classified']
-									noData = categoryData[facility]['notClassified']
-								}
-								obj.data.push(data)
-								notClassifiedObj.data.push(noData)
-							}
-						})
-
-						var data = obj.data;
-						var noData = notClassifiedObj.data;
-
-						var average = _.round(_.mean(data), 1)
-						var noAverage = _.round(_.mean(noData), 1)
-
-						obj.data.unshift(average)
-						notClassifiedObj.data.unshift(noAverage)
-
-						seriesData.push(notClassifiedObj)
-						seriesData.push(obj)
-					// })
-
-					this.facilityChart = {
-
-					    chart: {
-					        type: this.pneumonia.selectedChart
-					    },
-
-					    title: {
-					        text: ' Pneumonia Case Classification'
-					    },
-
-					    subtitle: {
-					    	title: newVal
-					    },
-
-					    xAxis: {
-					        categories: categories
-					    },
-
-					    yAxis: {
-					       
-					        allowDecimals: false,
-					        min: 0,
-					        title: {
-					            text: null
-					        },
-					        gridLineWidth: 0,
-							minorGridLineWidth: 0,
-							labels:
-							{
-								enabled: false
-							}
-					    },
-
-					    tooltip: {
-					        formatter: function () {
-					            return '<b>' + this.x + '</b><br/>' +
-					                this.series.name + ': ' + this.y + '<br/>'
-					        }
-					    },
-
-					    plotOptions: {
-					        column: {
-					            stacking: 'percent',
-					            dataLabels: {
-									enabled: true,
-									color: "#000",
-									borderColor: "#000",
-									format: "{point.percentage:.0f}%"
-								},
-								pointPadding: 0.2,
-	            				borderWidth: 2
-					        }
-					    },
-
-					    series: seriesData
 					}
-				})
-				.catch(error =>{
-					console.error(error)
-					alert("There was an error");
+				}), undefined)
+
+				var categories = [`<b>${_.upperCase( newVal )} Sub County</b>`]
+				var seriesData = []
+				var resData = [];
+				var obj = {};
+				var notClassifiedObj = {};
+
+				obj.name = "Classified"
+				obj.data = [0]
+
+				notClassifiedObj.name = "Not Classified"
+				notClassifiedObj.data = [0]
+
+				obj.color = this.pneumoniaColor
+				notClassifiedObj.color = this.notclassifiedColor.color
+				notClassifiedObj.borderColor = "red"
+
+				_.forOwn(facilityClassificationData, (o) => {
+					categories.push(o.facility)
+					obj.data.push(o.classified)
+					notClassifiedObj.data.push(o.notclassified)
 				})
 
-				this.getPneumoniaFacilityTreatmentData(newVal)
-				this.getFacilityClassificationData(newVal)
-				this.getFacilityLocTreatementData(newVal)
+				var data = obj.data;
+				var noData = notClassifiedObj.data;
+
+				var average = _.round(_.mean(data), 1)
+				var noAverage = _.round(_.mean(noData), 1)
+
+				obj.data[0] = average
+				notClassifiedObj.data[0] = noAverage
+
+				seriesData.push(notClassifiedObj)
+				seriesData.push(obj)
+
+				this.facilityChart = {
+
+				    chart: {
+				        type: this.pneumonia.selectedChart
+				    },
+
+				    title: {
+				        text: ' Pneumonia Case Classification'
+				    },
+
+				    subtitle: {
+				    	title: newVal
+				    },
+
+				    xAxis: {
+				        categories: categories
+				    },
+
+				    yAxis: {
+				       
+				        allowDecimals: false,
+				        min: 0,
+				        title: {
+				            text: null
+				        },
+				        gridLineWidth: 0,
+						minorGridLineWidth: 0,
+						labels:
+						{
+							enabled: false
+						}
+				    },
+
+				    tooltip: {
+				        formatter: function () {
+				            return '<b>' + this.x + '</b><br/>' +
+				                this.series.name + ': ' + this.y + '<br/>'
+				        }
+				    },
+
+				    plotOptions: {
+				        column: {
+				            stacking: 'percent',
+				            dataLabels: {
+								enabled: true,
+								color: "#000",
+								borderColor: "#000",
+								format: "{point.percentage:.0f}%"
+							},
+							pointPadding: 0.2,
+            				borderWidth: 2
+				        }
+				    },
+
+				    series: seriesData
+				}
+				// })
+				// .catch(error =>{
+				// 	console.error(error)
+				// 	alert("There was an error");
+				// })
+
+				this.data.facilityTreatmentData = this.getPneumoniaFacilityTreatmentData(newVal)
+				this.pneumoniaLOCChart = this.getFacilityClassificationData(newVal)
+				this.data.facilityLocData = this.getFacilityLocTreatementData(newVal)
 			},
 			'diarrhoea.selectedSubcounty': function(newVal, oldVal){
 				axios.get("/api/data/diarrhoea/classification/facility/" + newVal)
@@ -976,9 +1036,14 @@
 			}
 		},
 		computed: {
+			pageData() {
+				return this.data.all.pneumonia[this.selectedAssessment]
+			},
+			diarrhoeaPageData(){
+				return this.data.all.diarrhoea[this.selectedAssessment]
+			},
 			pneumoniaTotals(){
-				var data = this.data.all[this.selectedAssessment]
-				console.log(data)
+				var data = this.data.all.pneumonia[this.selectedAssessment]
 
 				var total_cases_after_dif = _.sumBy(data, 'total_cases_after_dif');
 				var total_classified = _.sumBy(data, 'total_classified')
@@ -989,8 +1054,80 @@
 				}
 			},
 
+			diarrhoeaTotals(){
+				var data = this.diarrhoeaPageData
+
+				var total_classified = _.sumBy(data, 'classified')
+				var total_cases_after_dif = _.sumBy(data, 'TOTAL_CASES_AFTER_DIFF')
+
+				return {
+					'total_classified':	total_classified,
+					'cases_after_dif':	total_cases_after_dif
+				}
+			},
+
+			subcountyPneumoniaTreatment(){
+				var cleanedSubcountyData = _(this.pageData)
+				.groupBy('facility.SUB_COUNTY')
+				.map((facilityData, subcounty) => ({
+					// console.log(facilityData)
+					sub_county: subcounty,
+					'AMOXDT': _.sumBy(facilityData, 'AMOXDT'),
+					'AMOX_SYRUP' : _.sumBy(facilityData, 'AMOX_SYRUP'),
+					'OXYGEN' : _.sumBy(facilityData, 'OXYGEN'),
+					'CTX' : _.sumBy(facilityData, 'CTX'),
+					'INJECTABLES' : _.sumBy(facilityData, 'INJECTABLES'),
+					'OTHER' : _.sumBy(facilityData, 'ANTI_OTHER'),
+					'NOTX' : _.sumBy(facilityData, 'NOTX_DIFF')
+				})).value()
+
+				cleanedSubcountyData =_.sortBy(cleanedSubcountyData, ['subcounty', 'ASC'])
+
+				return cleanedSubcountyData
+			},
+
+			facilityPneumoniaTreatment(){
+				var cleanedSubcountyData = _(this.pageData)
+				.groupBy('facility.SUB_COUNTY')
+				.map((facilityData, subcounty) => ({
+					// console.log(facilityData)
+					sub_county: subcounty,
+					'AMOXDT': _.sumBy(facilityData, 'AMOXDT'),
+					'AMOX_SYRUP' : _.sumBy(facilityData, 'AMOX_SYRUP'),
+					'OXYGEN' : _.sumBy(facilityData, 'OXYGEN'),
+					'CTX' : _.sumBy(facilityData, 'CTX'),
+					'INJECTABLES' : _.sumBy(facilityData, 'INJECTABLES'),
+					'OTHER' : _.sumBy(facilityData, 'ANTI_OTHER'),
+					'NOTX' : _.sumBy(facilityData, 'NOTX_DIFF')
+				})).value()
+
+				cleanedSubcountyData =_.sortBy(cleanedSubcountyData, ['subcounty', 'ASC'])
+
+				return cleanedSubcountyData
+			},
+
+			subcountyLOCPneumoniaTreatment(){
+				var cleanedSubcountyData = _(this.pageData)
+				.groupBy('facility.FACILITY_TYPE')
+				.map((facilityData, facility_type) => ({
+					// console.log(facilityData)
+					FACILITY_TYPE: facility_type,
+					'AMOXDT': _.sumBy(facilityData, 'AMOXDT'),
+					'AMOX_SYRUP' : _.sumBy(facilityData, 'AMOX_SYRUP'),
+					'OXYGEN' : _.sumBy(facilityData, 'OXYGEN'),
+					'CTX' : _.sumBy(facilityData, 'CTX'),
+					'INJECTABLES' : _.sumBy(facilityData, 'INJECTABLES'),
+					'OTHER' : _.sumBy(facilityData, 'ANTI_OTHER'),
+					'NOTX' : _.sumBy(facilityData, 'NOTX_DIFF')
+				})).value()
+
+				cleanedSubcountyData =_.sortBy(cleanedSubcountyData, ['subcounty', 'ASC'])
+
+				return cleanedSubcountyData
+			},
+
 			pneumoniaDonutData(){
-				var data = this.data.all[this.selectedAssessment]
+				var data = this.data.all.pneumonia[this.selectedAssessment]
 
 				var cleanedData = _.map(data, (o) => {
 					return {
@@ -1000,7 +1137,25 @@
 						'CTX' : o.CTX,
 						'INJECTABLES' : o.INJECTABLES,
 						'OTHER' : o.ANTI_OTHER,
-						'NOTX' : (o.treatment_diff > 0) ? o.treatment_diff + o.NOTX : o.NOTX
+						'NOTX' : o.NOTX_DIFF
+					}
+				})
+
+				return cleanedData
+			},
+
+			diarrhoeaDonutData(){
+				var data = this.diarrhoeaPageData
+
+				var cleanedData = _.map(data, (o) => {
+					return {
+						NOTX: o.NOTX_CALC,
+						COP: o.COP,
+						ZINC: o.ZINC,
+						ORS: o.ORS,
+						ANTIBIOTICS: o.ANTIBIOTICS,
+						IV: o.IV,
+						OTHER: o.OTHER,
 					}
 				})
 
@@ -1076,14 +1231,14 @@
 				};
 			},
 			pneumoniaCountyClassification(){
-				var data = this.data.all[this.selectedAssessment]
+				var data = this.data.all.pneumonia[this.selectedAssessment]
 
 				var total_cases_after_dif = _.sumBy(data, 'total_cases_after_dif')
 				var total_classified = _.sumBy(data, 'total_classified')
 				return _.round((total_classified / total_cases_after_dif) * 100)
 			},
 			diarrhoeaCountyClassification(){
-				return _.round((this.diarrhoeatotals.TOTAL_CLASSIFIED / this.diarrhoeatotals.TOTAL_CASES_AFTER_DIFF) * 100)
+				return _.round((this.diarrhoeaTotals.total_classified / this.diarrhoeaTotals.cases_after_dif) * 100)
 			},
 			assessmentOptions(){
 				var options = [];
@@ -1225,115 +1380,107 @@
 				    series: seriesData
 				}
 			},
-			//  {
-			// 	// Order by the third bar classified
-			// 	var cat = Object.keys(this.data.pneumoniaClass);
-			// 	// console.log(cat)
-			// 	var categoryData = this.data.pneumoniaClass[this.selectedAssessment]
-			// 	// console.log(categoryData)
-			// 	var categories = _.uniq(_.map(this.pneumoniaSubCounties, (o) => { return o.sub_county }))
-			// 	categories.sort()
-			// 	// console.log(categories)
-			// 	var seriesData = []
-			// 	var resData = []
+			pneumoniaSubCountyClassifications(){
+				var cleanedSubcountyData = _(this.pageData)
+				.groupBy('facility.SUB_COUNTY')
+				.map((facilityData, subcounty) => ({
+					// console.log(facilityData)
+					subcounty: subcounty,
+					classified: _.sumBy(facilityData, 'total_classified'),
+					not_classified: _.sumBy(facilityData, 'total_cases_after_dif') - _.sumBy(facilityData, 'total_classified')
+				})).value()
 
-			// 	// var cat = this.categories
-			// 	// cat.splice(3, 2)
-			// 	// console.log(this.data.pneumoniaClass)
+				cleanedSubcountyData =_.sortBy(cleanedSubcountyData, ['subcounty', 'ASC'])
+
+
+				var seriesData = []
+				var resData = []
+
+				var categories = [`<b>${_.upperCase( this.county )} COUNTY</b>`];
+				var obj = {};
+				var notClassifiedObj = {};
+				obj.name = "Classified"
+				notClassifiedObj.name = "Not Classified";
+				obj.data = [0]
+				notClassifiedObj.data = [0]
+				obj.color = this.pneumoniaColor
+				notClassifiedObj.color = this.notclassifiedColor.color
+				notClassifiedObj.borderColor = "red"
+				// _.forOwn(categories, (subcounty, k) => {
+				// 	if(k != 0){
+				// 		if(typeof categoryData[subcounty] == "undefined"){
+				// 			obj.data.push(0)
+				// 			notClassifiedObj.data.push(0)
+				// 		}else{
+				// 			obj.data.push(categoryData[subcounty]['classified'])
+				// 			notClassifiedObj.data.push(categoryData[subcounty]['notClassified'])
+				// 		}
+				// 	}
+				// })
+
+				_.forOwn(cleanedSubcountyData, (data, k) => {
+					var key = k + 1;
+					categories.push(data.subcounty)
+					obj.data.push(data.classified);
+					notClassifiedObj.data.push(data.not_classified);
+				})
+
+				var data = obj.data;
+				var noData = notClassifiedObj.data;
+				var average = _.round(_.mean(data), 1)
+				var noAverage = _.round(_.mean(noData), 1)
+				obj.data[0] = average
+				notClassifiedObj.data[0] = noAverage
+				seriesData.push(notClassifiedObj)
+				seriesData.push(obj)
 				
-			// 	// _.forOwn(cat, (category) => {
-			// 	var obj = {};
-			// 	var notClassifiedObj = {};
-
-			// 	obj.name = "Classified"
-			// 	notClassifiedObj.name = "Not Classified";
-
-			// 	obj.data = []
-			// 	notClassifiedObj.data = []
-
-			// 	obj.color = this.pneumoniaColor
-			// 	notClassifiedObj.color = this.notclassifiedColor.color
-			// 	notClassifiedObj.borderColor = "red"
-
-			// 	_.forOwn(categories, (subcounty, k) => {
-			// 		if(k != 0){
-			// 			if(typeof categoryData[subcounty] == "undefined"){
-			// 				obj.data.push(0)
-			// 				notClassifiedObj.data.push(0)
-			// 			}else{
-			// 				obj.data.push(categoryData[subcounty]['classified'])
-			// 				notClassifiedObj.data.push(categoryData[subcounty]['notClassified'])
-			// 			}
-			// 		}
-			// 	})
-
-			// 	var data = obj.data;
-			// 	var noData = notClassifiedObj.data;
-
-			// 	var average = _.round(_.mean(data), 1)
-			// 	var noAverage = _.round(_.mean(noData), 1)
-
-			// 	obj.data.unshift(average)
-			// 	notClassifiedObj.data.unshift(noAverage)
-
-			// 	seriesData.push(notClassifiedObj)
-			// 	seriesData.push(obj)
-				
-			// 	// })
-
-			// 	return {
-
-			// 	    chart: {
-			// 	        type: 'column'
-			// 	    },
-
-			// 	    title: {
-			// 	        text: 'Pneumonia Case Classification'
-			// 	    },
-
-			// 	    xAxis: {
-			// 	        categories: categories
-			// 	    },
-
-			// 	    yAxis: {
+				// })
+				return {
+				    chart: {
+				        type: 'column'
+				    },
+				    title: {
+				        text: 'Pneumonia Case Classification'
+				    },
+				    xAxis: {
+				        categories: categories
+				    },
+				    yAxis: {
 				       
-			// 	        allowDecimals: false,
-			// 	        min: 0,
-			// 	        title: {
-			// 	            text: null
-			// 	        },
-			// 	        gridLineWidth: 0,
-			// 			minorGridLineWidth: 0,
-			// 			labels:
-			// 			{
-			// 				enabled: false
-			// 			}
-			// 	    },
-
-			// 	    tooltip: {
-			// 	        formatter: function () {
-			// 	            return '<b>' + this.x + '</b><br/>' +
-			// 	                this.series.name + ': ' + this.y + '<br/>'
-			// 	        }
-			// 	    },
-
-			// 	    plotOptions: {
-			// 	        column: {
-			// 	            stacking: 'percent',
-			// 	            dataLabels: {
-			// 					enabled: true,
-			// 					color: "#000",
-			// 					borderColor: "#000",
-			// 					format: "{point.percentage:.0f}%"
-			// 				},
-			// 				pointPadding: 0.2,
-   //          				borderWidth: 2
-			// 	        }
-			// 	    },
-
-			// 	    series: seriesData
-			// 	}
-			// },
+				        allowDecimals: false,
+				        min: 0,
+				        title: {
+				            text: null
+				        },
+				        gridLineWidth: 0,
+						minorGridLineWidth: 0,
+						labels:
+						{
+							enabled: false
+						}
+				    },
+				    tooltip: {
+				        formatter: function () {
+				            return '<b>' + this.x + '</b><br/>' +
+				                this.series.name + ': ' + this.y + '<br/>'
+				        }
+				    },
+				    plotOptions: {
+				        column: {
+				            stacking: 'percent',
+				            dataLabels: {
+								enabled: true,
+								color: "#000",
+								borderColor: "#000",
+								format: "{point.percentage:.0f}%"
+							},
+							pointPadding: 0.2,
+            				borderWidth: 2
+				        }
+				    },
+				    series: seriesData
+				}
+			},
 			diarrhoeaFacilityClassification(){
 				var categories = ["<b>" + _.upperCase(this.diarrhoea.selectedSubcounty) + " SUB COUNTY" + "</b>",];
 				categories = categories.concat(this.data.facilityTypesX)
@@ -1808,34 +1955,37 @@
 			},
 			pneumoniaLoCTreatmentBaseline(){
 				var categories = ["<b>" + _.upperCase(this.county) + " COUNTY" + "</b>",];
-				categories = categories.concat(this.data.facilityTypes)
+
+				var cleanedSubcountyData = _(this.pageData)
+				.groupBy('facility.FACILITY_TYPE')
+				.map((facilityData, facilityType) => ({
+					facilityType: facilityType,
+					classified: _.sumBy(facilityData, 'total_classified'),
+					not_classified: _.sumBy(facilityData, 'total_cases_after_dif') - _.sumBy(facilityData, 'total_classified')
+				})).value()
+
+				cleanedSubcountyData = _.sortBy(cleanedSubcountyData, [ 'facilityType', 'ASC' ])
 				var seriesData = [];
-				var cat = Object.keys(this.data.pneumoniaLocClass)
-				var categoryData = this.data.pneumoniaLocClass[this.selectedAssessment]
-				// _.forOwn(cat, (category) => {
-					var obj = {};
-					var notClassifiedObj = {};
+				var obj = {};
+				var notClassifiedObj = {};
 
-					obj.name = "Classified"
-					notClassifiedObj.name = "Not Classified";
+				obj.name = "Classified"
+				notClassifiedObj.name = "Not Classified";
 
-					obj.data = []
-					notClassifiedObj.data = []
+				obj.data = [0]
+				notClassifiedObj.data = [0]
 
-					obj.color = this.pneumoniaColor
-					notClassifiedObj.color = this.notclassifiedColor.color
-					notClassifiedObj.borderColor = "red"
-					_.forOwn(categories, (ftype, k) => {
-						if(k != 0){
-							if(typeof categoryData[ftype] == "undefined"){
-								obj.data.push(0)
-								notClassifiedObj.data.push(0)
-							}else{
-								obj.data.push(categoryData[ftype]['classified'])
-								notClassifiedObj.data.push(categoryData[ftype]['notClassified'])
-							}
-						}
-					})
+				obj.color = this.pneumoniaColor
+				notClassifiedObj.color = this.notclassifiedColor.color
+				notClassifiedObj.borderColor = "red"
+
+				_.forOwn(cleanedSubcountyData, (data) => {
+					categories.push(data.facilityType)
+
+					obj.data.push(data.classified)
+					notClassifiedObj.data.push(data.not_classified)
+				})
+				
 
 					var data = obj.data;
 					var noData = notClassifiedObj.data;
@@ -1843,19 +1993,12 @@
 					var average = _.round(_.mean(data), 1)
 					var noAverage = _.round(_.mean(noData), 1)
 
-					obj.data.unshift(average)
-					notClassifiedObj.data.unshift(noAverage)
+					obj.data[0] = average
+					notClassifiedObj.data[0] = noAverage
 
 					seriesData.push(notClassifiedObj)
 					seriesData.push(obj)
-				// })
-
-				// console.log(seriesData)
-				
-				_.forOwn(this.data.pneumoniaLocClass, (value, key) =>{
-					// categories.push(key)
-					// seriesData.push(value)
-				})
+			
 					
 				return {
 				    chart: {

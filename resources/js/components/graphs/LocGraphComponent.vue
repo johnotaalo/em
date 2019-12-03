@@ -74,7 +74,7 @@
 					seriesData.push(obj)
 				})
 
-				console.log(seriesData)
+				// console.log(seriesData)
 
 				return {
 					chart: {

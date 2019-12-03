@@ -27,3 +27,11 @@ Route::get('data/facilities', 'Dashboard\DataController@facilitiesPage')->name('
 Route::get('data/pull', 'Dashboard\DataController@pullCalculatedData');
 
 Route::get('directory', 'Dashboard\DataController@directory')->name('directory');
+
+Route::get('country', 'Dashboard\HomeController@countryOverview')->name('country-overview');
+Route::get('overview/county', 'Dashboard\HomeController@countyOverview')->name('county-overview');
+
+Route::prefix('user-management')->group(function(){
+	Route::get('/', 'Dashboard\UserManagement@index')->name('user-management');
+	Route::get('/add', 'Dashboard\UserManagement@add')->name('user-management-add');
+});

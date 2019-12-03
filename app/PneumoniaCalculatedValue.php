@@ -22,4 +22,16 @@ class PneumoniaCalculatedValue extends Model
 		'total_cases_after_dif',
 		'total_tx_after_dif'
     ];
+
+    function county(){
+    	return $this->belongsTo(\App\County::class, 'cname', 'cto_id');
+    }
+
+    function facility(){
+    	return $this->belongsTo(\App\Facility::class, 'fname', 'SURVEY_CTO_ID');
+    }
+
+    function subcounty(){
+    	return $this->belongsTo(\App\Subcounty::class, 'scname', 'cto_id');
+    }
 }
