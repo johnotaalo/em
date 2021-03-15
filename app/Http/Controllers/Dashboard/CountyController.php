@@ -19,6 +19,7 @@ class CountyController extends Controller
         // $facilities = $supervisionLegacyData = [];
         // $pneumoniaTotals = $diarrhoeaTotals = new \StdClass;
         // dd(\App\Jobs\RecalculateValues::dispatch());
+        // dd($request->county);
         try{
             $supervisionLegacyData = $distributions = [];
             $facilities = [];
@@ -29,7 +30,9 @@ class CountyController extends Controller
         	}else{
                 $c = $request->county;
                 if (!is_numeric($c)) {
-                    $county = County::where('county', 'LIKE', $request->county)->first();
+                    \DB::enableQueryLog(); // Enable query log
+                    $county = County::where('county', 'LIKE', addslashes($request->county))->first();
+                    // dd(\DB::getQueryLog()); 
                 }else{
                     $county = County::where('cto_id', $request->county)->first();
                 }
@@ -51,11 +54,14 @@ class CountyController extends Controller
             $pneumoniaTotals = ['assessment' => '', 'TOTAL_CASES_AFTER_DIF' => 0];
             $diarrhoeaTotals = ['TOTAL_CASES_AFTER_DIFF' => 0];
             // echo "<pre>";print_r($distributions);die;
+            $error = 0;
             if(count($distributions) == 0){
-                return view('dashboard.county.breakdown')->with(['error' => true, 'message' => "There is no data here"]);
+                $error = 1;
+                // return view('dashboard.county.breakdown')->with(['error' => true, 'message' => "There is no data here"]);
             }
-        	return view('dashboard.county.breakdown')->with(['county_id' => $request->county_id, 'county' => $request->county, 'assessments' => \App\DiarrhoeaCalculatedValue::distinct()->where('cname', $request->county_id)->get(['assessment']), 'distributions' => $distributions, 'facilities'=> $facilities, 'pneumoniaTotals' => $pneumoniaTotals, 'diarrhoeaTotals' => $diarrhoeaTotals, 'legacy' => $supervisionLegacyData]);
+        	return view('dashboard.county.breakdown')->with(['county_id' => $request->county_id, 'county' => $request->county, 'assessments' => \App\DiarrhoeaCalculatedValue::distinct()->where('cname', $request->county_id)->get(['assessment_type_step']), 'distributions' => $distributions, 'facilities'=> $facilities, 'pneumoniaTotals' => $pneumoniaTotals, 'diarrhoeaTotals' => $diarrhoeaTotals, 'legacy' => $supervisionLegacyData, 'error'  =>  $error]);
         }catch(\Exception $ex){
+            \Log::error($ex->getMessage());
             return view('dashboard.county.breakdown')->with(['error' => true, 'message' => $ex->getMessage()]);
         }
     }
@@ -114,6 +120,7 @@ class CountyController extends Controller
     function getFacilityDistribution($county){
         // $sql = 'SELECT FACILITY_TYPE, count(SURVEY_CTO_ID) AS facilities FROM `facilities` WHERE county = "'.$county.'" GROUP BY FACILITY_TYPE';
         // die($sql);
+        $county = addslashes($county);
 
         $sql = "SELECT f.FACILITY_TYPE, COUNT(x.facility_code) AS facilities FROM (SELECT DISTINCT(fname) as facility_code FROM supervision_data WHERE county = '{$county}') x JOIN facilities f ON f.SURVEY_CTO_ID = x.facility_code GROUP BY f.FACILITY_TYPE";
 

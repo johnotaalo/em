@@ -11,11 +11,13 @@ class SupervisionDataImport implements ToModel, WithHeadingRow
     protected $upload_id;
     protected $assessment_type_id;
     protected $period;
+    protected $step;
 
-    public function __construct($upload_id, $assessment_type_id, $period){
+    public function __construct($upload_id, $assessment_type_id, $period, $step){
         $this->upload_id = $upload_id;
         $this->assessment_type_id = $assessment_type_id;
         $this->period = $period;
+        $this->step = $step;
     }
     /**
     * @param array $row
@@ -134,7 +136,8 @@ class SupervisionDataImport implements ToModel, WithHeadingRow
             'mobile' => $row["mobile"],
             'upload_id'             =>  $this->upload_id,
             'period'                =>  $this->period,
-            'assessment_type_id'    =>  $this->assessment_type_id
+            'assessment_type_id'    =>  $this->assessment_type_id,
+            'step'                  =>  $this->step,
         ];
         
         foreach ($row as $key => $value) {

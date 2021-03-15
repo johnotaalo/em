@@ -58,8 +58,6 @@
 					seriesData.push(obj)
 				})
 
-				console.log(seriesData)
-
 				return {
 					chart: {
 				        type: 'column'

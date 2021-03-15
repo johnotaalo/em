@@ -52,6 +52,8 @@
 					obj.data = []
 					if (id == "NOTX") {
 						obj.borderColor = "red"
+					}else{
+						obj.borderColor = this.pneumoniaTreatmentColors[id]
 					}
 					obj.color = this.pneumoniaTreatmentColors[id]
 					_.forOwn(categories, (category, key) => {

@@ -25,7 +25,6 @@
 		},
 		computed: {
 			graphOptions(){
-				// console.log(this.data)
 				var categories = _.map(this.data, (o) => { return o.facility_name })
 				var seriesData = []
 				categories.sort()
@@ -37,6 +36,8 @@
 					obj.data = []
 					if (id == "NOTX") {
 						obj.borderColor = "red"
+					}else{
+						obj.borderColor = this.treatmentColors[id]
 					}
 					obj.color = this.treatmentColors[id]
 					_.forOwn(categories, (category, key) => {

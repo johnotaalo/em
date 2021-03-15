@@ -57,42 +57,35 @@
 				</div>		
 
 				<div class="card">
-					<div class="card-body">
-						<div class="row align-items-center">
-							<div class="col">
-								<table class="table table-bordered">
-									<tr v-for="(value, key) in assessmentCountNumber">
-										<th>{{key}}</th>
-										<td>{{ value.length }}</td>
-									</tr>
-								</table>
-							</div>
-						</div>
-
-					</div>
-				</div>
-
-				<div class="card">
-					<div class="card-body" style="height: 600px;overflow-x: scroll;">
-						<div class="row align-items-center">
-							<div class="col">
-								<table class="table table-bordered">
-									<thead>
-										<th>County</th>
-										<th>Facilities</th>
-									</thead>
-									<tbody>
-										<tr v-for="(value, key) in countyData">
-											<td>{{ value[1] }}</td>
-											<td><a class="btn btn-link" :href="'/dashboard/county/breakdown/' + value[1]">{{ value[2] }}</a></td>
-										</tr>
-									</tbody>
-									
-								</table>
-							</div>
+					<div class="row align-items-center">
+						<div class="col">
+							<table class="table table-bordered table-sm card-table">
+								<tr v-for="(value, key) in assessmentCountNumber">
+									<th>{{key}}</th>
+									<td>{{ value.length }}</td>
+								</tr>
+							</table>
 						</div>
 					</div>
 				</div>
+				
+				<div class="card" style="height: 600px;overflow-x: scroll;">
+					<perfect-scrollbar>
+						<table class="table table-bordered table-sm card-table">
+							<thead>
+								<th>County</th>
+								<th>Facilities</th>
+							</thead>
+							<tbody>
+								<tr v-for="(value, key) in countyData">
+									<td>{{ value[1] }}</td>
+									<td><a class="btn btn-link" :href="'/dashboard/county/breakdown/' + value[1]">{{ value[2] }}</a></td>
+								</tr>
+							</tbody>
+						</table>
+					</perfect-scrollbar>
+				</div>
+
 			</div>
 			<div class="col-md">
 				<!-- <div class="row">		
@@ -415,10 +408,14 @@ import json from '../../../public/counties.json'
 				var assessmentArray = {};
 
 				_.forOwn(this.assessmentsCount, (v, k) => {
-					if(typeof assessmentArray[v.assessment] === 'undefined'){
-						assessmentArray[v.assessment] = [];
+					if (v.assessment_type_step === "Baseline (Legacy)") {
+						v.assessment_type_step = "Baseline";
 					}
-					assessmentArray[v.assessment].push(v.county)
+
+					if(typeof assessmentArray[v.assessment_type_step] === 'undefined'){
+						assessmentArray[v.assessment_type_step] = [];
+					}
+					assessmentArray[v.assessment_type_step].push(v.county)
 				})
 
 				// console.log(assessmentArray)

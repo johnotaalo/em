@@ -14,6 +14,7 @@
 			title: { type: null, default: null },
 			data: { type: null, default: null },
 			county: { type: null, default: null },
+			subcounties: { type: null, default: null },
 			treatmentLabels: { type: null, default: null },
 			treatmentColors: { type: null, default: null }
 		},
@@ -25,7 +26,7 @@
 		computed: {
 			graphOptions(){
 				// console.log(this.data)
-				var categories = _.map(this.data, (o) => { return o.sub_county })
+				var categories = _.map(this.data, (o) => { return o.subcounty })
 				var seriesData = []
 				categories.sort()
 				categories.unshift("<b>" + _.upperCase(this.county + " County") +" </b>")
@@ -36,12 +37,14 @@
 					obj.data = []
 					if (id == "NOTX") {
 						obj.borderColor = "red"
+					}else{
+						obj.borderColor = this.treatmentColors[id]
 					}
 					obj.color = this.treatmentColors[id]
 					_.forOwn(categories, (category, key) => {
 						if(key != 0){
 							var scData = _.map(this.data, function(o){
-								if (o.sub_county == category) { return o}
+								if (o.subcounty == category) { return o}
 							})
 
 							scData = _.without(scData, undefined)

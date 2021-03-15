@@ -24,8 +24,8 @@
 		},
 		computed: {
 			graphOptions(){
-				// console.log(this.data)
-				var categories = _.map(this.data, (o) => { return o.FACILITY_TYPE })
+				console.log(this.data)
+				var categories = _.map(this.data, (o) => { return o.facility_type })
 				var seriesData = []
 				categories.sort()
 				categories.unshift("<b>" + _.upperCase(this.subcounty + " SubCounty") +" </b>")
@@ -41,7 +41,7 @@
 					_.forOwn(categories, (category, key) => {
 						if(key != 0){
 							var scData = _.map(this.data, function(o){
-								if (o.FACILITY_TYPE == category) { return o}
+								if (o.facility_type == category) { return o}
 							})
 
 							scData = _.without(scData, undefined)

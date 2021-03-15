@@ -17,6 +17,10 @@ class AddStepToSupervisionData extends Migration
             $table->integer("step")->nullable();
         });
 
+        Schema::table('supervision_data_upload_tmps', function (Blueprint $table) {
+            $table->integer("step")->nullable();
+        });
+
         Schema::table('pneumonia_calculated_values', function(Blueprint $table){
             $table->string("assessment_type_step")->nullable();
         });
@@ -34,6 +38,10 @@ class AddStepToSupervisionData extends Migration
     public function down()
     {
         Schema::table('supervision_data', function (Blueprint $table) {
+            $table->dropColumn(['step']);
+        });
+
+        Schema::table('supervision_data_upload_tmps', function (Blueprint $table) {
             $table->dropColumn(['step']);
         });
 

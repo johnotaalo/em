@@ -112,7 +112,8 @@ class SupervisionDataUploadTmp extends Model
 		'd_noclass_no',
 		'upload_id',
 		'assessment_type_id',
-		'period'
+		'period',
+		'step'
     ];
 
     protected $columns = [
@@ -222,7 +223,8 @@ class SupervisionDataUploadTmp extends Model
 		'assessment_type_id',
 		'period',
 		'created_at',
-		'updated_at'];
+		'updated_at',
+		'step'];
 
     public function getSubmissionDateAttr($value){
     	return Carbon::parse($value)->format('Y-m-d');

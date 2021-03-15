@@ -21,7 +21,7 @@ class SupervisionController extends Controller
         $pneumoniaCleanedData = [];
 
         foreach ($pneumoniaData as $d) {
-            $pneumoniaCleanedData[$d->assessment][] = $d;
+            $pneumoniaCleanedData[$d->assessment_type_step][] = $d;
         }
 
         $diarrhoeaData = \App\DiarrhoeaCalculatedValue::select('*', \DB::raw('(ZINC + ORS) AS ZINC_ORS'), \DB::raw('(CASE WHEN DIFFERENCE > 0 THEN classified + NO_CLASS_CASES + DIFFERENCE ELSE classified + NO_CLASS_CASES END) AS TOTAL_CASES_AFTER_DIFF'), \DB::raw('IF (DIFFERENCE < 0, NOTX - DIFFERENCE, NOTX) AS NOTX_CALC'))->with('county', 'facility', 'subcounty')->get();
@@ -29,7 +29,7 @@ class SupervisionController extends Controller
         $diarrhoeaCleanedData = [];
 
         foreach ($diarrhoeaData as $d) {
-            $ass = $d->assessment;
+            $ass = $d->assessment_type_step;
             if ($d->assessment == "Baseline (Legacy)") {
                 $ass = "Baseline";
             }
@@ -44,14 +44,14 @@ class SupervisionController extends Controller
         $cleanedData = [];
 
         foreach ($data as $d) {
-            $cleanedData[$d->assessment][] = $d;
+            $cleanedData[$d->assessment_type_step][] = $d;
         }
 
         $diarrhoeaData = \App\DiarrhoeaCalculatedValue::select('*', \DB::raw('(CASE WHEN DIFFERENCE > 0 THEN classified + NO_CLASS_CASES + DIFFERENCE ELSE classified + NO_CLASS_CASES END) AS TOTAL_CASES_AFTER_DIFF'), \DB::raw('IF (DIFFERENCE < 0, NOTX - DIFFERENCE, NOTX) AS NOTX_CALC'))->where('cname', $request->county_id)->with('county', 'facility', 'subcounty')->get();
         $diarrhoeaCleanedData = [];
 
         foreach ($diarrhoeaData as $d) {
-            $diarrhoeaCleanedData[$d->assessment][] = $d;
+            $diarrhoeaCleanedData[$d->assessment_type_step][] = $d;
         }
 
         return ['pneumonia' => $cleanedData, 'diarrhoea' => $diarrhoeaCleanedData];
@@ -153,7 +153,9 @@ FROM
 // SELECT DISTINCT county, assessment FROM `supervision_data_with_assessment`) x
 // GROUP BY assessment");
 
-        $data = \DB::table('supervision_data_with_assessment')->select(\DB::raw('DISTINCT assessment, county'))->get();
+        $data = \App\DiarrhoeaCalculatedValue::select(\DB::raw('DISTINCT assessment_type_step, cname'))->get();
+
+        // $data = \DB::table('supervision_data_with_assessment')->select(\DB::raw('DISTINCT assessment, county'))->get();
 
         return $data;
     }
@@ -199,6 +201,7 @@ FROM
 
     function uploadCSV(Request $request){
         // echo "<pre>";print_r($request->input());die;
+        \Log::debug("Input data: " . json_encode($request->input()));
         
         $counties = "";
         $countyList = [];
@@ -221,7 +224,7 @@ FROM
         $period = $request->input('duration')['month'] . " " . $request->input('duration')['year'];
 
         if(!$is_legacy){
-            Excel::import(new SupervisionDataImport($upload->id, $request->input('assessmentType'), $period), $path);
+            Excel::import(new SupervisionDataImport($upload->id, $request->input('assessmentType'), $period, $request->input('assessmentStep')), $path);
         }else{
             Excel::import(new SupervisionLegacyImport($upload->id, $request->input('assessmentType'), $period), $path);
         }

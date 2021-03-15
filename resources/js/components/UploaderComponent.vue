@@ -9,6 +9,9 @@
 							<b-form-select v-model="form.assessmentType" name="assessmentType" :options="assessmentTypes"></b-form-select>
 						</b-form-group>
 					</div>
+					<b-form-group label="Assessment Cycle" v-if="form.assessmentType == 3">
+						<b-form-select v-model = "form.assessmentStep" name="assessmentStep" :options="assessmentSteps"></b-form-select>
+					</b-form-group>
 					<div class="form-group">
 						<b-form-group label="Pick the number of counties that the data belongs to">
 							<b-form-radio v-model="uploadType" name="no-counties" value="single">Single County</b-form-radio>
@@ -104,10 +107,18 @@ export default {
 			fullPage: true,
 			counties: [],
 			assessmentTypes: [],
+			assessmentSteps: [
+				{ value: 1, text: "Cycle 1" },
+				{ value: 2, text: "Cycle 2" },
+				{ value: 3, text: "Cycle 3" },
+				{ value: 4, text: "Cycle 4" },
+				{ value: 5, text: "Cycle 5" }
+			],
 			uploadType: "multiple",
 			months: ["January", "February", "March", 'April', "May", "June", "July", "August", "September", "October", "November", "December"],
 			form: new Form({
 				assessmentType: "",
+				assessmentStep: "",
 				county: "",
 				duration: {
 					month: "",
@@ -212,6 +223,13 @@ export default {
 		},
 		multiselect: function(){
 			return ( this.uploadType == "single" ) ? false : true;
+		}
+	},
+	watch: {
+		'form.assessmentType': function(newVal, oldVal){
+			if (newVal !== 3) {
+				this.form.assessmentStep = ""
+			}
 		}
 	}
 }

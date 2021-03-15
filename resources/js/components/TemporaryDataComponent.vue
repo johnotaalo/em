@@ -24,10 +24,10 @@
 			
 		</div>
 		<div class="card">
-			<div class="card-body">
-				<v-client-table v-if="!islegacy" small :data="filteredData" :columns="columns" :options="options"></v-client-table>
+			<!-- <div class="card-body"> -->
+				<v-client-table class = "table-sm table-card" v-if="!islegacy" small :data="filteredData" :columns="columns" :options="options"></v-client-table>
 				<v-client-table v-if="islegacy" small :data="filteredData" :columns="legacyColumns" :options="options"></v-client-table>
-			</div>
+			<!-- </div> -->
 		</div>
 
 		<loading :active.sync="isLoading" color="#2196F3" :can-cancel="false" :is-full-page="true"></loading>

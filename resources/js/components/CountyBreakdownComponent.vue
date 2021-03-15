@@ -3,46 +3,44 @@
 		<div class="row">
 			<div class="col">
 				<div class="float-left">
-					<h2 class="text-primary text-uppercase text-center display-4">{{ county }} County</h2>
+					
 				</div>
 			</div>
+		</div>
 
-			<div class="col">
-				
+		<div class="row">
+			<div class="col-md">
+				<h4>
+					<span class="text-uppercase text-center display-3">{{ county }} County</span><br/>
+					<span class="text-muted">{{ selectedAssessment }}</span>
+				</h4>
 			</div>
-
-			<div class="col">
-				<div class="float-right">
-					<!-- <label>Select a County</label> -->
-			 		<b-form-select v-model="selectedCounty" :options="counties" :change="openNewCounty">
+			<div class="col-md">
+				<div class="">
+					<label>Select a County</label>
+			 		<b-form-select v-model="selectedCounty" :options="counties" :change="openNewCounty" size="sm">
 			 			<template slot="first">
 							<option :value="null" disabled>Select County</option>
 						</template>
 			 		</b-form-select>
 			 	</div>
 			</div>
-		</div>
 
-		<b-card>
-			<div class="row">
-				<div class="col">
-					<b-form-group label="Assessments">
-						<b-form-radio-group
-						id="radio-group-1"
-						v-model="selectedAssessment"
-						:options="assessmentOptions"
-						name="radio-options"
-						></b-form-radio-group>
-					</b-form-group>
-				</div>
-
-				<div class="col">
-					<h1 class="float-right">{{ selectedAssessment }}</h1>
-				</div>
+			<div class="col-md">
+				<b-form-group>
+					<label>Select an Assessment ({{ assessmentOptions.length }} Available)</label>
+					<b-select
+					id="radio-group-1"
+					v-model="selectedAssessment"
+					:options="assessmentOptions"
+					name="radio-options"
+					size="sm"
+					></b-select>
+				</b-form-group>
 			</div>
-		</b-card>
+		</div>
 		
-		<div class="row">
+		<div class="row" v-if="!error">
 			<div class="col">
 				<b-card no-body>
 					<b-tabs pills card>
@@ -227,14 +225,16 @@
 											<highcharts :options="diarrhoeaSubCountyClassifications" style = "height: 400px;"></highcharts>
 
 											<h4><center>Prescription Pattern</center></h4>
-											<diarrhoea-subcounty-treatment v-for="(treatmentData, assessment) in data.diarrhoeaTreat" :key="assessment" :title = "assessment" :data = "treatmentData" :county="county" :treatmentLabels = "diarrhoea.treatmentLabels" :treatmentColors="diarrhoea.colors"></diarrhoea-subcounty-treatment>
+											<diarrhoea-subcounty-treatment :data="subcountyDiarrhoeaTreatment" :title = "selectedAssessment" :county="county" :treatmentLabels = "diarrhoea.treatmentLabels" :subcounties="subcounties" :treatmentColors="diarrhoea.colors"></diarrhoea-subcounty-treatment>
 										</div>
 
 										<div class="col-5">
 											<highcharts :options="diarrhoeaLoCTreatment" style = "height: 400px;"></highcharts>
 
 											<h4><center>Prescription Pattern</center></h4>
-											<diarrhoea-loc-treatments v-for="(treatmentData, assessment) in data.diarrhoeaLocTreat" :key="assessment" :title = "assessment" :data = "treatmentData" :county="county" :treatmentLabels = "diarrhoea.treatmentLabels" :treatmentColors="diarrhoea.colors"></diarrhoea-loc-treatments>
+											<!-- <diarrhoea-loc-treatments v-for="(treatmentData, assessment) in data.diarrhoeaLocTreat" :key="assessment" :title = "assessment" :data = "treatmentData" :county="county" :treatmentLabels = "diarrhoea.treatmentLabels" :treatmentColors="diarrhoea.colors"></diarrhoea-loc-treatments> -->
+
+											<diarrhoea-loc-treatments :data="subcountyLOCDiarrhoeaTreatment" :title = "selectedAssessment" :county="county" :treatmentLabels = "diarrhoea.treatmentLabels" :subcounties="subcounties" :treatmentColors="diarrhoea.colors"></diarrhoea-loc-treatments>
 										</div>
 									</div>
 								</b-tab>
@@ -263,12 +263,12 @@
 													<highcharts :options="xfacilityChart" style = "height: 400px;"></highcharts>
 
 													<center><h2 class="mt-6">Prescription Pattern</h2></center>
-													<diarrhoea-facility-prescription-pattern v-for="(treatmentData, assessment) in diarrhoea.facilityTreatmentData" :key="assessment" :title = "assessment" :data = "treatmentData" :subcounty="diarrhoea.selectedSubcounty" :treatmentLabels = "diarrhoea.treatmentLabels" :treatmentColors="diarrhoea.colors"></diarrhoea-facility-prescription-pattern>
+													<diarrhoea-facility-prescription-pattern :title = "selectedAssessment" :data = "diarrhoea.facilityTreatmentData" :subcounty="diarrhoea.selectedSubcounty" :treatmentLabels = "diarrhoea.treatmentLabels" :treatmentColors="diarrhoea.colors"></diarrhoea-facility-prescription-pattern>
 												</div>
 												<div class="col-5">
-													<highcharts :options="diarrhoeaFacilityClassification" style = "height: 400px;"></highcharts>
+													<highcharts :options="diarrhoea.diarrhoeaLocClass" style = "height: 400px;"></highcharts>
 													<center><h2 class="mt-6">Prescription Pattern</h2></center>
-													<diarrhoea-loc-prescription-pattern v-for="(treatmentData, assessment) in diarrhoea.locTreatmentData" :key="assessment" :title = "assessment" :data = "treatmentData" :county="county" :subcounties="subcounties" :subcounty="diarrhoea.selectedSubcounty" :treatmentLabels = "diarrhoea.treatmentLabels" :treatmentColors="diarrhoea.colors"></diarrhoea-loc-prescription-pattern>
+													<diarrhoea-loc-prescription-pattern :title = "selectedAssessment" :data = "diarrhoea.locTreatmentData" :county="county" :subcounties="subcounties" :subcounty="diarrhoea.selectedSubcounty" :treatmentLabels = "diarrhoea.treatmentLabels" :treatmentColors="diarrhoea.colors"></diarrhoea-loc-prescription-pattern>
 												</div>
 											</div>
 											
@@ -281,6 +281,9 @@
 					</b-tabs>
 				</b-card>
 			</div>
+		</div>
+		<div v-else>
+			<no-data-component></no-data-component>
 		</div>
 		<!--  -->
 	</div>
@@ -300,6 +303,8 @@
 	import DiarrhoeaFacilityPrescriptionPattern from  './graphs/DiarrhoeaFacilityPrescriptionPattern'
 	import DiarrhoeaLocPrescriptionPattern from './graphs/DiarrhoeaLocPrescriptionPattern'
 
+	import NoDataComponent from './common/NoDataComponent'
+
 	exportingInit(Highcharts)
 	
 	export default {
@@ -311,9 +316,10 @@
 			facilities: { type: null, default: null },
 			diarrhoeatotals: { type: null, default: null },
 			pneumoniatotals: { type: null, default: null },
-			legacydata: { type: null, default: null }
+			legacydata: { type: null, default: null },
+			error: { type: null, default: null }
 		},
-		components: { GraphComponent, LocGraphComponent, FacilityGraphComponent, FacilitySubCountyComponent, DiarrhoeaSubcountyTreatment, DiarrhoeaLocTreatments, DiarrhoeaFacilityPrescriptionPattern, DiarrhoeaLocPrescriptionPattern, GaugeComponent, DonutTreatmentDonut },
+		components: { NoDataComponent, GraphComponent, LocGraphComponent, FacilityGraphComponent, FacilitySubCountyComponent, DiarrhoeaSubcountyTreatment, DiarrhoeaLocTreatments, DiarrhoeaFacilityPrescriptionPattern, DiarrhoeaLocPrescriptionPattern, GaugeComponent, DonutTreatmentDonut },
 		data(){
 			return {
 				selectedAssessment: "",
@@ -372,7 +378,7 @@
 					selectedSubcounty: null,
 					facilityNo: 0,
 					facilityTreatmentData: [],
-					diarrhoeaLocClass: [],
+					diarrhoeaLocClass: {},
 					locTreatmentData: [],
 					treatmentLabels: {
 						NOTX: "No Treatment",
@@ -429,18 +435,122 @@
 		},
 		created(){
 			this.getCounties()
-			this.getSubCounties()
-			this.getData()
-			// this.getPneumoniaClassificationData()
-			// this.getPneumoniaTreatmentData()
-			// this.getPneumoniaLocClassificationData()
-			// this.getPneumoniaLocTreatmentData()
-			// this.getDiarrhoeaSubcountyClassificationData()
-			// this.getDiarrhoeaTreatmentData()
-			// this.getDiarrhoeaSubcountyLocClassificationData()
-			// this.getDiarrhoeaLocTreatmentData()
+			if(!this.error){
+				this.getSubCounties()
+				this.getData()
+			}
+		},
+		mounted(){
+
 		},
 		methods: {
+			getSubCountyFacilityData(subcounty, assessment){
+				let _this = this
+
+				var facilityClassificationData = _.without(_.map(this.diarrhoeaPageData, (data) => {
+					if (_.upperCase(data.facility.SUB_COUNTY) == _.upperCase(subcounty) && data.assessment_type_step == assessment) {
+						return {
+							facility: data.facility.FACILITY_NAME,
+							classified: data.classified,
+							notclassified: data.TOTAL_CASES_AFTER_DIFF - data.classified
+						}
+					}
+				}), undefined)
+
+				var categories = [`<b>${_.upperCase( subcounty )} Sub County</b>`]
+				var seriesData = []
+				var resData = [];
+				var obj = {};
+				var notClassifiedObj = {};
+
+				obj.name = "Classified"
+				obj.data = [0]
+
+				notClassifiedObj.name = "Not Classified"
+				notClassifiedObj.data = [0]
+
+				obj.color = this.diarrhoeaColor
+				obj.borderColor = this.diarrhoeaColor
+				notClassifiedObj.color = this.notclassifiedColor.color
+				notClassifiedObj.borderColor = "red"
+
+				_.forOwn(facilityClassificationData, (o) => {
+					categories.push(o.facility)
+					obj.data.push(o.classified)
+					notClassifiedObj.data.push(o.notclassified)
+				})
+
+				var data = obj.data;
+				var noData = notClassifiedObj.data;
+
+				var average = _.round(_.mean(data), 1)
+				var noAverage = _.round(_.mean(noData), 1)
+
+				obj.data[0] = average
+				notClassifiedObj.data[0] = noAverage
+
+				seriesData.push(notClassifiedObj)
+				seriesData.push(obj)
+
+				let facilityChart = {
+
+				    chart: {
+				        type: this.pneumonia.selectedChart
+				    },
+
+				    title: {
+				        text: ' Diarrhoea Case Classification'
+				    },
+
+				    subtitle: {
+				    	title: subcounty
+				    },
+
+				    xAxis: {
+				        categories: categories
+				    },
+
+				    yAxis: {
+				       
+				        allowDecimals: false,
+				        min: 0,
+				        title: {
+				            text: null
+				        },
+				        gridLineWidth: 0,
+						minorGridLineWidth: 0,
+						labels:
+						{
+							enabled: false
+						}
+				    },
+
+				    tooltip: {
+				        formatter: function () {
+				            return '<b>' + this.x + '</b><br/>' +
+				                this.series.name + ': ' + this.y + '<br/>'
+				        }
+				    },
+
+				    plotOptions: {
+				        column: {
+				            stacking: 'percent',
+				            dataLabels: {
+								enabled: true,
+								color: "#000",
+								borderColor: "#000",
+								format: "{point.percentage:.0f}%"
+							},
+							pointPadding: 0.2,
+            				borderWidth: 2
+				        }
+				    },
+
+				    series: seriesData
+				}
+
+				return facilityChart
+			},
 			getData(){
 				axios.get(`/api/data/county/breakdown/${this.id}`)
 				.then(res => {
@@ -454,6 +564,8 @@
 						value: o.county,
 						text: o.county
 					}))
+
+					this.selectedCounty = this.county
 				})
 			},
 			openNewCounty(){
@@ -511,7 +623,6 @@
 			getDiarrhoeaSubcountyLocClassificationData(){
 				axios.get('/api/data/diarrhoea/classification/loc/' + this.county)
 				.then(res => {
-					console.log(res.data)
 					var diarrhoeaLocClassData = {}
 					var facility_type = []
 					_.forOwn(res.data, data =>{
@@ -539,33 +650,121 @@
 				})
 			},
 
-			getDiarrhoeaFacilityLocClassificationData(subcounty){
-				axios.get('/api/data/diarrhoea/classification/facility/loc/' + subcounty)
-				.then(res => {
-					var diarrhoeaLocClassData = {}
-					var facility_type = []
-					_.forOwn(res.data, data =>{
-						if(typeof diarrhoeaLocClassData[data.assessment] == 'undefined'){
-							diarrhoeaLocClassData[data.assessment] = {}
+			getDiarrhoeaFacilityLocClassificationData(subcounty, assessment){
+				let _this = this
+
+				var facilityClassificationData = _.without(_.map(this.diarrhoeaPageData, (data) => {
+					if (_.upperCase(data.facility.SUB_COUNTY) == _.upperCase(subcounty) && data.assessment_type_step == assessment) {
+						return {
+							facility_type: data.facility.FACILITY_TYPE,
+							classified: data.classified,
+							notclassified: data.TOTAL_CASES_AFTER_DIFF - data.classified
 						}
+					}
+				}), undefined)
 
-						var ftype = (data.FACILITY_TYPE == null) ? "Unknown" : data.FACILITY_TYPE
-						if(typeof diarrhoeaLocClassData[data.assessment][ftype] == 'undefined'){
-							diarrhoeaLocClassData[data.assessment][ftype] = {}
-						}
-						diarrhoeaLocClassData[data.assessment][ftype]['classified'] = data.TOTAL_CLASSIFIED
-						diarrhoeaLocClassData[data.assessment][ftype]['notClassified'] = data.TOTAL_CASES_AFTER_DIFF - data.TOTAL_CLASSIFIED
+				var cleanedLOCData = _(facilityClassificationData)
+				.groupBy('facility_type')
+				.map((facilityData, facilityType) => ({
+					// console.log(facilityData)
+					facilityType: facilityType,
+					classified: _.sumBy(facilityData, 'classified'),
+					not_classified: _.sumBy(facilityData, 'notclassified')
+				})).value()
 
-						facility_type.push(ftype)
-					})
-					// console.log(diarrhoeaLocClassData)
+				var categories = [`<b>${_.upperCase( subcounty )} Sub County</b>`]
+				var seriesData = []
+				var resData = [];
+				var obj = {};
+				var notClassifiedObj = {};
 
-					this.diarrhoea.diarrhoeaLocClass = diarrhoeaLocClassData
-					// this.diarrhoeaLocFtypes = [{sub_county: "<b>" + _.upperCase(this.county + " County") +" </b>"}]
-					facility_type = _.uniq(facility_type)
-					this.data.facilityTypesX = facility_type
-					// console.log(this.subcounties)
+				obj.name = "Classified"
+				obj.data = [0]
+
+				notClassifiedObj.name = "Not Classified"
+				notClassifiedObj.data = [0]
+
+				obj.color = this.diarrhoeaColor
+				obj.borderColor = this.diarrhoeaColor
+				notClassifiedObj.color = this.notclassifiedColor.color
+				notClassifiedObj.borderColor = "red"
+
+				_.forOwn(cleanedLOCData, (o) => {
+					categories.push(o.facilityType)
+					obj.data.push(o.classified)
+					notClassifiedObj.data.push(o.not_classified)
 				})
+
+				var data = obj.data;
+				var noData = notClassifiedObj.data;
+
+				var average = _.round(_.mean(data), 1)
+				var noAverage = _.round(_.mean(noData), 1)
+
+				obj.data[0] = average
+				notClassifiedObj.data[0] = noAverage
+
+				seriesData.push(notClassifiedObj)
+				seriesData.push(obj)
+
+				let locChart = {
+
+				    chart: {
+				        type: this.pneumonia.selectedChart
+				    },
+
+				    title: {
+				        text: ' Diarrhoea Case Classification'
+				    },
+
+				    subtitle: {
+				    	title: subcounty
+				    },
+
+				    xAxis: {
+				        categories: categories
+				    },
+
+				    yAxis: {
+				       
+				        allowDecimals: false,
+				        min: 0,
+				        title: {
+				            text: null
+				        },
+				        gridLineWidth: 0,
+						minorGridLineWidth: 0,
+						labels:
+						{
+							enabled: false
+						}
+				    },
+
+				    tooltip: {
+				        formatter: function () {
+				            return '<b>' + this.x + '</b><br/>' +
+				                this.series.name + ': ' + this.y + '<br/>'
+				        }
+				    },
+
+				    plotOptions: {
+				        column: {
+				            stacking: 'percent',
+				            dataLabels: {
+								enabled: true,
+								color: "#000",
+								borderColor: "#000",
+								format: "{point.percentage:.0f}%"
+							},
+							pointPadding: 0.2,
+            				borderWidth: 2
+				        }
+				    },
+
+				    series: seriesData
+				}
+
+				return locChart
 			},
 			getDiarrhoeaLocTreatmentData(){
 				axios.get('/api/data/diarrhoea/treatment/loc/' + this.county)
@@ -655,25 +854,58 @@
 					this.data.diarrhoeaClass = res.data
 				})
 			},
+			getDiarrhoeaFacilityTreatmentData(subcounty, assessment){
+				var facilityTreatmentData = _.without(_.map(this.diarrhoeaPageData, (data) => {
+					if (_.upperCase(data.facility.SUB_COUNTY) == _.upperCase(subcounty) && data.assessment_type_step == assessment) {
+						return {
+							facility_name: data.facility.FACILITY_NAME,
+							'NOTX': data.NOTX_CALC,
+							'COP' : data.COP,
+							'ZINC' : data.ZINC,
+							'ORS' : data.ORS,
+							'ANTIBIOTICS' : data.ANTIBIOTICS,
+							'IV' : data.IV,
+							'OTHER' : data.OTHER
+						}
+					}
+				}), undefined)
 
-			getDiarrhoeaFacilityTreatmentData(subcounty){
-				axios.get('/api/data/diarrhoea/treatment/facilities/' + subcounty)
-				.then(res => {
-					this.diarrhoea.facilityTreatmentData = res.data
-				})
+				return facilityTreatmentData
 			},
 
-			getDiarrhoeaLocSubcountyTreatmentData(subcounty){
-				axios.get('/api/data/diarrhoea/treatment/scloc/' + subcounty)
-				.then(res => {
-					this.diarrhoea.locTreatmentData = res.data
-				})
+			getDiarrhoeaLocSubcountyTreatmentData(subcounty, assessment){
+				var facilityTreatmentData = _.without(_.map(this.diarrhoeaPageData, (data) => {
+					if (_.upperCase(data.facility.SUB_COUNTY) == _.upperCase(subcounty) && data.assessment_type_step == assessment) {
+						return {
+							facility_type: data.facility.FACILITY_TYPE,
+							'NOTX': data.NOTX_CALC,
+							'COP' : data.COP,
+							'ZINC' : data.ZINC,
+							'ORS' : data.ORS,
+							'ANTIBIOTICS' : data.ANTIBIOTICS,
+							'IV' : data.IV,
+							'OTHER' : data.OTHER
+						}
+					}
+				}), undefined)
+
+				var cleanedData = _(facilityTreatmentData)
+				.groupBy('facility_type')
+				.map((facilityData, facilityType) => ({
+					// console.log(facilityData)
+					facility_type: facilityType,
+					'NOTX': _.sumBy(facilityData, 'NOTX'),
+					'COP' : _.sumBy(facilityData, 'COP'),
+					'ZINC' : _.sumBy(facilityData, 'ZINC'),
+					'ORS' : _.sumBy(facilityData, 'ORS'),
+					'ANTIBIOTICS' : _.sumBy(facilityData, 'ANTIBIOTICS'),
+					'IV' : _.sumBy(facilityData, 'IV'),
+					'OTHER' : _.sumBy(facilityData, 'OTHER')
+				})).value();
+
+				return cleanedData
 			},
 			getPneumoniaFacilityTreatmentData(subcounty){
-				// axios.get('/api/data/pneumonia/treatment/facilities/' + subcounty)
-				// .then(res => {
-				// 	this.data.facilityTreatmentData = res.data
-				// })
 				var facilityTreatmentData = _.without(_.map(this.pageData, (data) => {
 					if (data.facility.SUB_COUNTY === subcounty) {
 						return {
@@ -813,6 +1045,12 @@
 			}
 		},
 		watch: {
+			'selectedAssessment': function(newVal, oldVal){
+				this.xfacilityChart = this.getSubCountyFacilityData(this.diarrhoea.selectedSubcounty, newVal)
+				this.diarrhoea.facilityTreatmentData = this.getDiarrhoeaFacilityTreatmentData(this.diarrhoea.selectedSubcounty, newVal);
+				this.diarrhoea.diarrhoeaLocClass = this.getDiarrhoeaFacilityLocClassificationData(this.diarrhoea.selectedSubcounty, newVal);
+				this.diarrhoea.locTreatmentData = this.getDiarrhoeaLocSubcountyTreatmentData(this.diarrhoea.selectedSubcounty, newVal)
+			},
 			'pneumonia.selectedSubcounty': function(newVal, oldVal){
 				var facilityClassificationData = _.without(_.map(this.pageData, (data) => {
 					if (data.facility.SUB_COUNTY === newVal) {
@@ -925,144 +1163,19 @@
 				this.data.facilityLocData = this.getFacilityLocTreatementData(newVal)
 			},
 			'diarrhoea.selectedSubcounty': function(newVal, oldVal){
-				axios.get("/api/data/diarrhoea/classification/facility/" + newVal)
-				.then(res => {
-					var categories = []
-					var seriesData = []
-					var resData = []
-					var cat = _.uniq(_.map(res.data, (o) => { return o.assessment }))
-
-					var categories = _.map(res.data, (o) => {
-						return o.facility_name
-					})
-
-					this.diarrhoea.facilityNo = categories.length
-					categories.sort()
-					categories.unshift("<b>" + _.upperCase(newVal + " Sub County") +" </b>")
-					_.forOwn(res.data, (value) => {
-						if(typeof resData[value.assessment] === 'undefined'){
-							resData[value.assessment]= []
-						}
-
-						if(typeof resData[value.assessment][value.facility_name] === 'undefined'){
-							resData[value.assessment][value.facility_name]= []
-						}
-						resData[value.assessment][value.facility_name]['classified'] = value.TOTAL_CLASSIFIED
-						resData[value.assessment][value.facility_name]['notClassified'] = value.TOTAL_CASES_AFTER_DIFF - value.TOTAL_CLASSIFIED
-					})
-
-					// console.log(resData)
-					var categoryData = resData[this.selectedAssessment]
-
-					// _.forOwn(cat, (category) => {
-						// console.log(category)
-						var obj = {};
-						var notClassifiedObj = {};
-
-						obj.name = "Classified"
-						notClassifiedObj.name = "Not Classified";
-
-						obj.data = []
-						notClassifiedObj.data = []
-
-						obj.color = this.diarrhoeaColor
-						notClassifiedObj.color = this.notclassifiedColor.color
-						notClassifiedObj.borderColor = "red"
-						_.forOwn(categories, (facility, k) => {
-							// console.log(facility)
-							if(k != 0){
-								var data = 0
-								var noData = 0;
-								if (typeof categoryData[facility] != "undefined") {
-									data = categoryData[facility]['classified']
-									noData = categoryData[facility]['notClassified']
-								}
-								obj.data.push(data)
-								notClassifiedObj.data.push(noData)
-							}
-						})
-
-						var data = obj.data;
-						var noData = notClassifiedObj.data;
-
-						var average = _.round(_.mean(data), 1)
-						var noAverage = _.round(_.mean(noData), 1)
-
-						obj.data.unshift(average)
-						notClassifiedObj.data.unshift(noAverage)
-
-						seriesData.push(notClassifiedObj)
-						seriesData.push(obj)
-					// })
-
-					this.xfacilityChart = {
-
-					    chart: {
-					        type: this.pneumonia.selectedChart
-					    },
-
-					    title: {
-					        text: ' Diarrhoea Case Classification'
-					    },
-
-					    subtitle: {
-					    	title: newVal
-					    },
-
-					    xAxis: {
-					        categories: categories
-					    },
-
-					    yAxis: {
-					       
-					        allowDecimals: false,
-					        min: 0,
-					        title: {
-					            text: null
-					        },
-					        gridLineWidth: 0,
-							minorGridLineWidth: 0,
-							labels:
-							{
-								enabled: false
-							}
-					    },
-
-					    tooltip: {
-					        formatter: function () {
-					            return '<b>' + this.x + '</b><br/>' +
-					                this.series.name + ': ' + this.y + '<br/>'
-					        }
-					    },
-
-					    plotOptions: {
-					        column: {
-					            stacking: 'percent',
-					            dataLabels: {
-									enabled: true,
-									color: "#000",
-									borderColor: "#000",
-									format: "{point.percentage:.0f}%"
-								},
-								pointPadding: 0.2,
-	            				borderWidth: 2
-					        }
-					    },
-
-					    series: seriesData
-					}
-				})
-				.catch(error =>{
-					console.error(error)
-					alert("There was an error");
-				})
-
-				this.getDiarrhoeaFacilityTreatmentData(newVal)
-				this.getDiarrhoeaFacilityLocClassificationData(newVal)
-				this.getDiarrhoeaLocSubcountyTreatmentData(newVal)
+				
+				this.xfacilityChart = this.getSubCountyFacilityData(newVal, this.selectedAssessment)
+				this.diarrhoea.facilityTreatmentData = this.getDiarrhoeaFacilityTreatmentData(newVal, this.selectedAssessment);
+				this.diarrhoea.diarrhoeaLocClass = this.getDiarrhoeaFacilityLocClassificationData(newVal, this.selectedAssessment)
+				this.diarrhoea.locTreatmentData = this.getDiarrhoeaLocSubcountyTreatmentData(newVal, this.selectedAssessment)
 			},
 			selectedCounty: function(county){
-				window.location.href = "/dashboard/county/breakdown/" + county
+				var _this = this
+				if (_this.county !== county) {
+					let url = "/dashboard/county/breakdown/" + county
+					window.location.href = url
+				}
+				
 			}
 		},
 		computed: {
@@ -1116,6 +1229,25 @@
 				return cleanedSubcountyData
 			},
 
+			subcountyDiarrhoeaTreatment(){
+				var cleanedSubcountyData = _(this.diarrhoeaPageData)
+				.groupBy('facility.SUB_COUNTY')
+				.map((facilityData, subcounty) => ({
+					subcounty: subcounty,
+					NOTX: _.sumBy(facilityData, 'NOTX_CALC'),
+					COP: _.sumBy(facilityData, 'COP'),
+					ZINC: _.sumBy(facilityData, 'ZINC'),
+					ORS: _.sumBy(facilityData, 'ORS'),
+					ANTIBIOTICS: _.sumBy(facilityData, 'ANTIBIOTICS'),
+					IV: _.sumBy(facilityData, 'IV'),
+					OTHER: _.sumBy(facilityData, 'OTHER'),
+				})).value()
+
+				cleanedSubcountyData = _.sortBy(cleanedSubcountyData, ['subcounty', 'ASC'])
+
+				return cleanedSubcountyData
+			},
+
 			facilityPneumoniaTreatment(){
 				var cleanedSubcountyData = _(this.pageData)
 				.groupBy('facility.SUB_COUNTY')
@@ -1149,6 +1281,26 @@
 					'INJECTABLES' : _.sumBy(facilityData, 'INJECTABLES'),
 					'OTHER' : _.sumBy(facilityData, 'ANTI_OTHER'),
 					'NOTX' : _.sumBy(facilityData, 'NOTX_DIFF')
+				})).value()
+
+				cleanedSubcountyData =_.sortBy(cleanedSubcountyData, ['subcounty', 'ASC'])
+
+				return cleanedSubcountyData
+			},
+
+			subcountyLOCDiarrhoeaTreatment(){
+				var cleanedSubcountyData = _(this.diarrhoeaPageData)
+				.groupBy('facility.FACILITY_TYPE')
+				.map((facilityData, facility_type) => ({
+					// console.log(facilityData)
+					FACILITY_TYPE: facility_type,
+					NOTX: _.sumBy(facilityData, 'NOTX_CALC'),
+					COP: _.sumBy(facilityData, 'COP'),
+					ZINC: _.sumBy(facilityData, 'ZINC'),
+					ORS: _.sumBy(facilityData, 'ORS'),
+					ANTIBIOTICS: _.sumBy(facilityData, 'ANTIBIOTICS'),
+					IV: _.sumBy(facilityData, 'IV'),
+					OTHER: _.sumBy(facilityData, 'OTHER'),
 				})).value()
 
 				cleanedSubcountyData =_.sortBy(cleanedSubcountyData, ['subcounty', 'ASC'])
@@ -1271,90 +1423,87 @@
 				return _.round((this.diarrhoeaTotals.total_classified / this.diarrhoeaTotals.cases_after_dif) * 100)
 			},
 			assessmentOptions(){
-				var options = [];
-				var legacyOptions = [];
-				var legacy_assessment_types = [];
-				var assessment_types = [];
+				let options = [];
+				let legacyOptions = [];
+				let legacy_assessment_types = [];
+				let assessment_types = [];
+				try{
 
-				options = _.map( this.assessments, (o) => {
-					return {
-						text: o.assessment,
-						value: o.assessment
-					}
-				})
-
-				if (this.legacydata.length >  0){
-					assessment_types = _.chain(this.legacydata).map('assessment_type').uniq().value()
-					legacyOptions = _.map(assessment_types, (o) => {
+					options = _.map( this.assessments, (o) => {
 						return {
-							text: o + " (Legacy)",
-							value: o + " (Legacy)"
+							text: o.assessment_type_step,
+							value: o.assessment_type_step
 						}
 					})
 
-					_.each(legacyOptions, (option) => {
-						options.unshift(option)
-					})
+					if (this.legacydata.length >  0){
+						assessment_types = _.chain(this.legacydata).map('assessment_type').uniq().value()
+						legacyOptions = _.map(assessment_types, (o) => {
+							return {
+								text: o + " (Legacy)",
+								value: o + " (Legacy)"
+							}
+						})
+
+						_.each(legacyOptions, (option) => {
+							options.unshift(option)
+						})
+					}
+
+					// console.log(options)
+
+					this.selectedAssessment = options[0].value
+
+					return options
+				}catch(err){
+					console.log(err)
 				}
 
-				// console.log(options)
-
-				this.selectedAssessment = options[0].value
-
-				return options
+				return options;
 			},
 			diarrhoeaSubCountyClassifications() {
-				// Order by the third bar classified
-				var cat = Object.keys(this.data.diarrhoeaClass);
-				var categoryData = this.data.diarrhoeaClass[this.selectedAssessment]
-				var categories = _.uniq(_.map(this.diarrhoeaSubCounties, (o) => { return o.sub_county }))
-				categories.sort()
-				// console.log(categories)
+				var categories = [`<b>${_.upperCase( this.county )} COUNTY</b>`];
+
 				var seriesData = []
 				var resData = []
 
-				// var cat = this.categories
-				// cat.splice(3, 2)
-				// console.log(this.data.pneumoniaClass)
-				
-				// _.forOwn(cat, (category) => {
-					var obj = {};
-					var notClassifiedObj = {};
+				var cleanedData = _(this.diarrhoeaPageData)
+				.groupBy('facility.SUB_COUNTY')
+				.map((facilityData, subcounty) => ({
+					subcounty: subcounty,
+					classified: _.sumBy(facilityData, 'classified'),
+					not_classified: _.sumBy(facilityData, 'TOTAL_CASES_AFTER_DIFF') - _.sumBy(facilityData, 'classified')
+				})).value()
 
-					obj.name = "Classified"
-					notClassifiedObj.name = "Not Classified";
+				cleanedData =_.sortBy(cleanedData, ['subcounty', 'ASC'])
 
-					obj.data = []
-					notClassifiedObj.data = []
+				var obj = {};
+				var notClassifiedObj = {};
+				obj.name = "Classified"
+				notClassifiedObj.name = "Not Classified";
+				obj.data = [0]
+				notClassifiedObj.data = [0]
+				obj.color = this.diarrhoeaColor
+				obj.borderColor = this.diarrhoeaColor
+				notClassifiedObj.color = this.notclassifiedColor.color
+				notClassifiedObj.borderColor = "red"
 
-					obj.color = this.diarrhoeaColor
-					notClassifiedObj.color = this.notclassifiedColor.color
-					notClassifiedObj.borderColor = "red"
+				_.forOwn(cleanedData, (data, k) => {
+					var key = k + 1;
+					categories.push(data.subcounty)
+					obj.data.push(data.classified);
+					notClassifiedObj.data.push(data.not_classified);
+				})
 
-					_.forOwn(categories, (subcounty, k) => {
-						if(k != 0){
-							if(typeof categoryData[subcounty] == "undefined"){
-								obj.data.push(0)
-								notClassifiedObj.data.push(0)
-							}else{
-								obj.data.push(categoryData[subcounty]['classified'])
-								notClassifiedObj.data.push(categoryData[subcounty]['notClassified'])
-							}
-						}
-						// obj.data.push(_.random(1, 20))
-					})
 
-					var data = obj.data;
-					var noData = notClassifiedObj.data;
-
-					var average = _.round(_.mean(data), 1)
-					var noAverage = _.round(_.mean(noData), 1)
-
-					obj.data.unshift(average)
-					notClassifiedObj.data.unshift(noAverage)
-
-					seriesData.push(notClassifiedObj)
-					seriesData.push(obj)
+				var data = obj.data;
+				var noData = notClassifiedObj.data;
+				var average = _.round(_.mean(data), 1)
+				var noAverage = _.round(_.mean(noData), 1)
+				obj.data[0] = average
+				notClassifiedObj.data[0] = noAverage
+				seriesData.push(notClassifiedObj)
+				seriesData.push(obj)
 				// })
 
 				return {
@@ -1517,10 +1666,6 @@
 				var seriesData = [];
 				var cat = Object.keys(this.diarrhoea.diarrhoeaLocClass)
 				var categoryData = this.diarrhoea.diarrhoeaLocClass[this.selectedAssessment]
-
-				// console.log(categoryData)
-				if(typeof categoryData !== "undefined"){
-				// _.forOwn(cat, (category) => {
 					var obj = {};
 					var notClassifiedObj = {};
 
@@ -1610,12 +1755,6 @@
 				    },
 
 				    series: seriesData
-				}
-				}
-				else{
-					return {
-
-					}
 				}
 			},
 			pneumoniaFacilityClassification(){
@@ -2080,49 +2219,46 @@
 			},
 			diarrhoeaLoCTreatment(){
 				var categories = ["<b>" + _.upperCase(this.county) + " COUNTY" + "</b>",];
-				categories = categories.concat(this.data.facilityTypesX)
-				var seriesData = [];
-				var cat = Object.keys(this.data.diarrhoeaLocClass)
-				var categoryData = this.data.diarrhoeaLocClass[this.selectedAssessment]
-				if(typeof categoryData != "undefined"){
+				var seriesData = []
+				var resData = []
+
+				var cleanedData = _(this.diarrhoeaPageData)
+				.groupBy('facility.FACILITY_TYPE')
+				.map((facilityData, facility_type) => ({
+					facility_type: facility_type,
+					classified: _.sumBy(facilityData, 'classified'),
+					not_classified: _.sumBy(facilityData, 'TOTAL_CASES_AFTER_DIFF') - _.sumBy(facilityData, 'classified')
+				})).value()
+
+				cleanedData =_.sortBy(cleanedData, ['subcounty', 'ASC'])
 				
-				// _.forOwn(cat, (category) => {
-					var obj = {};
-					var notClassifiedObj = {};
+				var obj = {};
+				var notClassifiedObj = {};
+				obj.name = "Classified"
+				notClassifiedObj.name = "Not Classified";
+				obj.data = [0]
+				notClassifiedObj.data = [0]
+				obj.color = this.diarrhoeaColor
+				obj.borderColor = this.diarrhoeaColor
+				notClassifiedObj.color = this.notclassifiedColor.color
+				notClassifiedObj.borderColor = "red"
 
-					obj.name = "Classified"
-					notClassifiedObj.name = "Not Classified";
+				_.forOwn(cleanedData, (data, k) => {
+					var key = k + 1;
+					categories.push(data.facility_type)
+					obj.data.push(data.classified);
+					notClassifiedObj.data.push(data.not_classified);
+				})
 
-					obj.data = []
-					notClassifiedObj.data = []
 
-					obj.color = this.diarrhoeaColor
-					notClassifiedObj.color = this.notclassifiedColor.color
-					notClassifiedObj.borderColor = "red"
-
-					_.forOwn(categories, (ftype, k) => {
-						if(k != 0){
-							if(typeof categoryData[ftype] === "undefined"){
-								obj.data.push(0)
-								notClassifiedObj.data.push(0)
-							}else{
-								obj.data.push(categoryData[ftype]['classified'])
-								notClassifiedObj.data.push(categoryData[ftype]['notClassified'])
-							}
-						}
-					})
-
-					var data = obj.data;
-					var noData = notClassifiedObj.data;
-
-					var average = _.round(_.mean(data), 1)
-					var noAverage = _.round(_.mean(noData), 1)
-
-					obj.data.unshift(average)
-					notClassifiedObj.data.unshift(noAverage)
-
-					seriesData.push(notClassifiedObj)
-					seriesData.push(obj)
+				var data = obj.data;
+				var noData = notClassifiedObj.data;
+				var average = _.round(_.mean(data), 1)
+				var noAverage = _.round(_.mean(noData), 1)
+				obj.data[0] = average
+				notClassifiedObj.data[0] = noAverage
+				seriesData.push(notClassifiedObj)
+				seriesData.push(obj)
 				// })
 
 				return {
@@ -2177,9 +2313,9 @@
 
 				    series: seriesData
 				}
-				}else{
-					return {}
-				}
+				// }else{
+				// 	return {}
+				// }
 			},
 			pneumoniaLoCPPBaseline(){
 				var categories = ["<b>" + _.upperCase(this.county) + " COUNTY" + "</b>",

@@ -52,6 +52,9 @@ import '../../public/fonts/feather/feather.min.css'
 import '../../public/css/theme.min.css'
 import 'vue-loading-overlay/dist/vue-loading.css'
 
+import PerfectScrollbar from 'vue2-perfect-scrollbar'
+import 'vue2-perfect-scrollbar/dist/vue2-perfect-scrollbar.css'
+
 Vue.use(HighchartsVue);
 Vue.use(BootstrapVue);
 Vue.use(ClientTable, {}, false, 'bootstrap4', 'default');
@@ -61,6 +64,8 @@ Vue.use(VueLoading)
 Vue.use(VuePluralize)
 Vue.use(require('vue-moment'));
 Vue.use(Vuelidate)
+
+Vue.use(PerfectScrollbar);
 
 
 loadStock(Highcharts);

@@ -29,7 +29,7 @@
 							<center>{{ data.label }}</center>
 						</template>
 
-						<template slot-scope="row" slot="facilities">
+						<template #cell(facilities)="row">
 							<b-link @click="row.toggleDetails">{{ row.item.facilities.length }}</b-link>
 						</template>
 
@@ -49,32 +49,32 @@
 							</b-card>
 						</template>
 
-						<template slot-scope="data" slot="sub_counties">
+						<template #cell(sub_counties)="data">
 							{{ $_.keys(countyListing[data.item.county]).length }}
 						</template>
 
-						<template slot-scope="data" slot="baseline">
+						<template #cell(baseline)="data">
 							<center>
 								<i v-if="assessmentInfo[data.item.county][1] > 0" class = "fe fe-check text-success"></i>
 								<i v-else class = "fe fe-x text-danger"></i>
 							</center>
 						</template>
 
-						<template slot-scope="data" slot="Mid-Term">
+						<template #cell(Mid-Term)="data">
 							<center>
 								<i v-if="assessmentInfo[data.item.county][2] > 0" class = "fe fe-check text-success"></i>
 								<i v-else class = "fe fe-x text-danger"></i>
 							</center>
 						</template>
 
-						<template slot-scope="data" slot="facility_supervisions">
+						<template #cell(facility_supervisions)="data">
 							<center>
 								<i v-if="assessmentInfo[data.item.county][3] > 0" class = "fe fe-check text-success"></i>
 								<i v-else class = "fe fe-x text-danger"></i>
 							</center>
 						</template>
 
-						<template slot-scope="data" slot="End-Line">
+						<template #cell(End-Line)="data">
 							<center>
 								<i v-if="assessmentInfo[data.item.county][4] > 0" class = "fe fe-check text-success"></i>
 								<i v-else class = "fe fe-x text-danger"></i>
@@ -108,29 +108,12 @@
 				.then(res => {
 					this.isBusy = false
 					this.items = res.data
-					// var counties = [];
-					// _.forOwn(this.items, (item) => {
-					// 	counties[item.county] = []
-					// 	console.log(item.county)
-					// 	_.forOwn(item.facilities, (facility) => {
-					// 		if (typeof counties[item.county][facility.SUB_COUNTY] == "undefined") {
-					// 			counties[item.county][facility.SUB_COUNTY] = [];
-					// 		}
-
-					// 		counties[item.county][facility.SUB_COUNTY].push(facility);
-					// 		console.log(counties)
-					// 	})
-					// })
-					// this.countyListing = counties
 				})
 				.catch(() => {
 					this.isBusy = false
 					alert("There was an error while running your request");
 				})
-			},
-			// assessmentInfo: function(type, county){
-
-			// }
+			}
 		},
 		computed: {
 			assessmentInfo: function(){
@@ -175,7 +158,6 @@
 						counties[item.county][facility.SUB_COUNTY].push(facility);
 					})
 				})
-				// console.log(counties)
 				return counties
 			}
 		}
