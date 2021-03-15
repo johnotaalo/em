@@ -20,7 +20,8 @@ class PneumoniaCalculatedValue extends Model
 		'abs_treatment_diff',
 		'no_clasification_incl_diff',
 		'total_cases_after_dif',
-		'total_tx_after_dif'
+		'total_tx_after_dif',
+		'assessment_type_step'
     ];
 
     function county(){

@@ -29,7 +29,9 @@ class RecalculateValues implements ShouldQueue
      */
     public function handle()
     {
+      \Log::debug("Job has been dispatched");
         try{
+          \Log::debug("Getting diarrhoea data");
             $diarrhoeaData = \DB::select('SELECT * FROM diarrhoea_case_tx_aggreagate');
             $diarrhoeaInsertData = collect($diarrhoeaData)->map(function($data){
                 $c = \App\County::where('county', $data->county)->first();
@@ -46,25 +48,29 @@ class RecalculateValues implements ShouldQueue
                 }
 
                 return [
-                  'cname'           =>  $county,
-                  'scname'          =>  $subcounty_id,
-                  'fname'           =>  (int)$data->fname,
-                  'assessment'      =>  $data->assessment,
-                  'assessment_type' =>  $data->assessment_type,
-                  'NO_CLASS_CASES'  =>  $data->NO_CLASS_CASES,
-                  'classified'      =>  $data->classified,
-                  'total_cases'     =>  $data->total_cases,
-                  'ANTIBIOTICS'     =>  $data->ANTIBIOTICS,
-                  'IV'              =>  $data->IV,
-                  'NOTX'            =>  $data->NOTX,
-                  'COP'             =>  $data->COP,
-                  'ZINC'            =>  $data->ZINC,
-                  'ORS'             =>  $data->ORS,
-                  'OTHER'           =>  $data->OTHER,
-                  'TOTAL_TX'        =>  $data->TOTAL_TX,
-                  'DIFFERENCE'      =>  $data->DIFFERENCE     
+                  'cname'                 =>  $county,
+                  'scname'                =>  $subcounty_id,
+                  'fname'                 =>  (int)$data->fname,
+                  'assessment'            =>  $data->assessment,
+                  'assessment_type'       =>  $data->assessment_type,
+                  'assessment_type_step'  =>  $data->assessment_step,
+                  'NO_CLASS_CASES'        =>  $data->NO_CLASS_CASES,
+                  'classified'            =>  $data->classified,
+                  'total_cases'           =>  $data->total_cases,
+                  'ANTIBIOTICS'           =>  $data->ANTIBIOTICS,
+                  'IV'                    =>  $data->IV,
+                  'NOTX'                  =>  $data->NOTX,
+                  'COP'                   =>  $data->COP,
+                  'ZINC'                  =>  $data->ZINC,
+                  'ORS'                   =>  $data->ORS,
+                  'OTHER'                 =>  $data->OTHER,
+                  'TOTAL_TX'              =>  $data->TOTAL_TX,
+                  'DIFFERENCE'            =>  $data->DIFFERENCE     
                 ];
               })->toArray();
+
+          \Log::debug("Diarrhoea data received");
+          \Log::debug("Getting pneumonia data");
 
           $pneumoniaClassificationData = \DB::select("SELECT * FROM pneumonia_facility_classification c JOIN pneumonia_facility_treatment_data t ON t.id = c.id");
           $pneuClassInsertData = collect($pneumoniaClassificationData)->map(function($data){
@@ -73,14 +79,17 @@ class RecalculateValues implements ShouldQueue
             // dd($sub_county);
             $subcounty_id = ($sub_county) ? $sub_county->cto_id : 0;
             if($subcounty_id == 0){
-              $subcounty_id = \App\Facility::where('SURVEY_CTO_ID', $data->fname)->first()->SUB_COUNTY_ID;
+              \Log::debug("Pneumonia Data: " . $data->fname);
+              $facility = \App\Facility::where('SURVEY_CTO_ID', $data->fname)->first();
+              $subcounty_id = ($facility) ? $facility->SUB_COUNTY_ID : 0;
             }
             return [
               'cname' => $county,
               'scname' => $subcounty_id,
               'fname' =>  (int)$data->fname,
               'assessment' => $data->assessment,
-              'assessment_type' => $data->assessment_type, 
+              'assessment_type' => $data->assessment_type,
+              'assessment_type_step'  =>  $data->assessment_step, 
               'total_classified' => $data->TOTAL_CLASSIFIED,
               'total_tx' => $data->TOTAL_TX,
               'total_tx_notx_ex' => $data->TOTAL_TX_NOTX_EX,
@@ -104,18 +113,24 @@ class RecalculateValues implements ShouldQueue
               'NOTX'  =>  $data->NOTX
             ];
           })->toArray();
+
+          \Log::debug("Pneumonia Data received");
     }
     catch (\Exception $ex){
+        \Log::error($ex->getMessage());
         die($ex->getMessage());
     }
 
     // dd($pneuClassInsertData);
 
+    \Log::debug("Truncating data from pneumonia and diarrhoea calculated values");
     \App\PneumoniaCalculatedValue::query()->truncate();
     \App\DiarrhoeaCalculatedValue::query()->truncate();
-
+    \Log::debug("Successfully truncated data");
+    \Log::debug("Inserting data");
     \App\PneumoniaCalculatedValue::insert($pneuClassInsertData);
     \App\DiarrhoeaCalculatedValue::insert($diarrhoeaInsertData);
+    \Log::debug("Successfully inserted data");
     // dd($pneuClassInsertData);
     }
 }
