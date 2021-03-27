@@ -109,7 +109,6 @@ class RecalculateValues implements ShouldQueue
               $subcounty_id = ($sub_county) ? $sub_county->cto_id : 0;
               // \Log::debug("{$data->id} Sub County ID: {$subcounty_id}");
               if($subcounty_id == 0){
-                // \Log::debug("Pneumonia Data: " . $data->fname);
                 $facility = \App\Facility::where('SURVEY_CTO_ID', $data->fname)->first();
                 $subcounty_id = ($facility) ? $facility->SUB_COUNTY_ID : 0;
               }
