@@ -122,7 +122,15 @@ class CountyController extends Controller
         // die($sql);
         $county = addslashes($county);
 
-        $sql = "SELECT f.FACILITY_TYPE, COUNT(x.facility_code) AS facilities FROM (SELECT DISTINCT(fname) as facility_code FROM supervision_data WHERE county = '{$county}') x JOIN facilities f ON f.SURVEY_CTO_ID = x.facility_code GROUP BY f.FACILITY_TYPE";
+        // $sql = "SELECT f.FACILITY_TYPE, COUNT(x.facility_code) AS facilities FROM (SELECT DISTINCT(fname) as facility_code FROM supervision_data WHERE county = '{$county}') x JOIN facilities f ON f.SURVEY_CTO_ID = x.facility_code GROUP BY f.FACILITY_TYPE";
+
+        $sql = "SELECT f.FACILITY_TYPE, COUNT(all_facilities.facility_code) AS facilities FROM
+                (SELECT DISTINCT (facility_code) AS `facility_code`, facility_name, county FROM `supervision_data_legacy`
+                UNION
+                SELECT DISTINCT (fname) AS `facility_code`, facility_name, county FROM supervision_data) all_facilities
+                JOIN facilities f ON f.SURVEY_CTO_ID = all_facilities.facility_code
+                WHERE all_facilities.county = '{$county}'
+                GROUP BY f.FACILITY_TYPE";
 
         return \DB::select($sql);
     }

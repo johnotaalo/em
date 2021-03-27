@@ -42,6 +42,7 @@ class RecalculateValues implements ShouldQueue
                 }
                 
                 $sub_county = \App\Subcounty::where("subcounty_name", $data->sub_county)->first();
+                // \Log::debug("Subcounty: " . json_encode($sub_county));
                 $subcounty_id = ($sub_county) ? $sub_county->cto_id : 0;
                 if($subcounty_id == 0){
                   $subcounty_id = \App\Facility::where('SURVEY_CTO_ID', $data->fname)->first()->SUB_COUNTY_ID;
@@ -72,46 +73,82 @@ class RecalculateValues implements ShouldQueue
           \Log::debug("Diarrhoea data received");
           \Log::debug("Getting pneumonia data");
 
-          $pneumoniaClassificationData = \DB::select("SELECT * FROM pneumonia_facility_classification c JOIN pneumonia_facility_treatment_data t ON t.id = c.id");
+          $pneumoniaClassificationData = \DB::select("SELECT c.id, c.county,
+            c.sub_county,
+            c.fname,
+            c.assessment,
+            c.assessment_type,
+            c.assessment_step,
+            c.TOTAL_CLASSIFIED,
+            c.TOTAL_TX,
+            c.TOTAL_TX_NOTX_EX,
+            c.NO_CLASSIFICATION,
+            c.TREATMENT_DIFF,
+            c.ABS_TREATMENT_DIFF,
+            c.NO_CLASSIFICATION_INCL_DIFF,
+            c.TOTAL_CASES_AFTER_DIF,
+            c.TOTAL_TX_AFTER_DIF,
+            t.AMOXDT,
+            t.AMOX_SYRUP,
+            t.OXYGEN,
+            t.CTX,
+            t.GENT,
+            t.BENZ,
+            t.BENZ_GENT,
+            t.INJECTABLES,
+            t.ANTIBIOTICS,
+            t.OTHER,
+            t.ANTI_OTHER,
+            t.NOTX FROM pneumonia_facility_classification c JOIN pneumonia_facility_treatment_data t ON t.id = c.id");
           $pneuClassInsertData = collect($pneumoniaClassificationData)->map(function($data){
-            $county = \App\County::where('county', $data->county)->first()->cto_id;
-            $sub_county = \App\Subcounty::where("subcounty_name", $data->sub_county)->first();
-            // dd($sub_county);
-            $subcounty_id = ($sub_county) ? $sub_county->cto_id : 0;
-            if($subcounty_id == 0){
-              \Log::debug("Pneumonia Data: " . $data->fname);
-              $facility = \App\Facility::where('SURVEY_CTO_ID', $data->fname)->first();
-              $subcounty_id = ($facility) ? $facility->SUB_COUNTY_ID : 0;
+            if($data->sub_county){
+              $county = \App\County::where('county', $data->county)->first()->cto_id;
+              $sub_county = \App\Subcounty::where("subcounty_name", $data->sub_county)->first();
+              // dd($sub_county);
+              // \Log::debug("PNEU Subcounty: " . json_encode($sub_county));
+              $subcounty_id = ($sub_county) ? $sub_county->cto_id : 0;
+              // \Log::debug("{$data->id} Sub County ID: {$subcounty_id}");
+              if($subcounty_id == 0){
+                // \Log::debug("Pneumonia Data: " . $data->fname);
+                $facility = \App\Facility::where('SURVEY_CTO_ID', $data->fname)->first();
+                $subcounty_id = ($facility) ? $facility->SUB_COUNTY_ID : 0;
+              }
+              return [
+                'cname' => $county,
+                'scname' => $subcounty_id,
+                'fname' =>  (int)$data->fname,
+                'assessment' => $data->assessment,
+                'assessment_type' => $data->assessment_type,
+                'assessment_type_step'  =>  $data->assessment_step, 
+                'total_classified' => $data->TOTAL_CLASSIFIED,
+                'total_tx' => $data->TOTAL_TX,
+                'total_tx_notx_ex' => $data->TOTAL_TX_NOTX_EX,
+                'no_classification' => $data->NO_CLASSIFICATION,
+                'treatment_diff' => $data->TREATMENT_DIFF,
+                'abs_treatment_diff' => $data->ABS_TREATMENT_DIFF,
+                'no_clasification_incl_diff' => $data->NO_CLASSIFICATION_INCL_DIFF,
+                'total_cases_after_dif' => $data->TOTAL_CASES_AFTER_DIF,
+                'total_tx_after_dif' => $data->TOTAL_TX_AFTER_DIF,
+                'AMOXDT'  =>  $data->AMOXDT,
+                'AMOX_SYRUP'  =>  $data->AMOX_SYRUP,
+                'OXYGEN'  =>  $data->OXYGEN,
+                'CTX' =>  $data->CTX,
+                'GENT'  =>  $data->GENT,
+                'BENZ'  =>  $data->BENZ,
+                'BENZ_GENT' =>  $data->BENZ_GENT,
+                'INJECTABLES' =>  $data->INJECTABLES,
+                'ANTIBIOTICS' =>  $data->ANTIBIOTICS,
+                'OTHER' =>  $data->OTHER,
+                'ANTI_OTHER'  =>  $data->ANTI_OTHER,
+                'NOTX'  =>  $data->NOTX
+              ];
+            }else{
+              \Log::debug("$data->id has no subcounty");
             }
-            return [
-              'cname' => $county,
-              'scname' => $subcounty_id,
-              'fname' =>  (int)$data->fname,
-              'assessment' => $data->assessment,
-              'assessment_type' => $data->assessment_type,
-              'assessment_type_step'  =>  $data->assessment_step, 
-              'total_classified' => $data->TOTAL_CLASSIFIED,
-              'total_tx' => $data->TOTAL_TX,
-              'total_tx_notx_ex' => $data->TOTAL_TX_NOTX_EX,
-              'no_classification' => $data->NO_CLASSIFICATION,
-              'treatment_diff' => $data->TREATMENT_DIFF,
-              'abs_treatment_diff' => $data->ABS_TREATMENT_DIFF,
-              'no_clasification_incl_diff' => $data->NO_CLASSIFICATION_INCL_DIFF,
-              'total_cases_after_dif' => $data->TOTAL_CASES_AFTER_DIF,
-              'total_tx_after_dif' => $data->TOTAL_TX_AFTER_DIF,
-              'AMOXDT'  =>  $data->AMOXDT,
-              'AMOX_SYRUP'  =>  $data->AMOX_SYRUP,
-              'OXYGEN'  =>  $data->OXYGEN,
-              'CTX' =>  $data->CTX,
-              'GENT'  =>  $data->GENT,
-              'BENZ'  =>  $data->BENZ,
-              'BENZ_GENT' =>  $data->BENZ_GENT,
-              'INJECTABLES' =>  $data->INJECTABLES,
-              'ANTIBIOTICS' =>  $data->ANTIBIOTICS,
-              'OTHER' =>  $data->OTHER,
-              'ANTI_OTHER'  =>  $data->ANTI_OTHER,
-              'NOTX'  =>  $data->NOTX
-            ];
+          });
+
+          $pneuClassInsertData = $pneuClassInsertData->filter(function($value){
+            return !is_null($value);
           })->toArray();
 
           \Log::debug("Pneumonia Data received");
@@ -122,13 +159,18 @@ class RecalculateValues implements ShouldQueue
     }
 
     // dd($pneuClassInsertData);
+    // \Log::debug(json_encode($pneuClassInsertData));
 
     \Log::debug("Truncating data from pneumonia and diarrhoea calculated values");
     \App\PneumoniaCalculatedValue::query()->truncate();
     \App\DiarrhoeaCalculatedValue::query()->truncate();
     \Log::debug("Successfully truncated data");
     \Log::debug("Inserting data");
-    \App\PneumoniaCalculatedValue::insert($pneuClassInsertData);
+
+    foreach (array_chunk($pneuClassInsertData, 1000) as $d) {
+      \App\PneumoniaCalculatedValue::insert($d);
+    }
+    
     \App\DiarrhoeaCalculatedValue::insert($diarrhoeaInsertData);
     \Log::debug("Successfully inserted data");
     // dd($pneuClassInsertData);

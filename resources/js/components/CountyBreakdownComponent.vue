@@ -1187,6 +1187,7 @@
 			},
 			pneumoniaTotals(){
 				var data = this.data.all.pneumonia[this.selectedAssessment]
+				console.log(data)
 
 				var total_cases_after_dif = _.sumBy(data, 'total_cases_after_dif');
 				var total_classified = _.sumBy(data, 'total_classified')
