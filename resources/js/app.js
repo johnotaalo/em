@@ -93,6 +93,7 @@ Vue.component('user-add', require('./components/users/UserAdd.vue').default);
 Vue.component('user-edit', require('./components/users/UserEdit.vue').default);
 Vue.component('country-overview', require('./components/CountryOverview.vue').default)
 Vue.component('no-data-component', require('./components/common/NoDataComponent').default);
+Vue.component('new-national-dashboard', require('./components/NewNationalDashboardComponent').default);
 Vue.component('loading', VueLoading)
 /**
  * Next, we will create a fresh Vue application instance and attach it to

@@ -101,8 +101,12 @@ class RecalculateValues implements ShouldQueue
             t.ANTI_OTHER,
             t.NOTX FROM pneumonia_facility_classification c JOIN pneumonia_facility_treatment_data t ON t.id = c.id");
           $pneuClassInsertData = collect($pneumoniaClassificationData)->map(function($data){
-            if($data->sub_county){
-              $county = \App\County::where('county', $data->county)->first()->cto_id;
+            if($data->county && $data->sub_county){
+              \Log::debug("Data ID: {$data->id}");
+              \Log::debug("===>County: {$data->county}");
+              \Log::debug("====>Subcounty: {$data->sub_county}");
+              \Log::debug("=====>Facility: {$data->fname}");
+              $county = \App\County::where('county', 'LIKE', $data->county)->first()->cto_id;
               $sub_county = \App\Subcounty::where("subcounty_name", $data->sub_county)->first();
               // dd($sub_county);
               // \Log::debug("PNEU Subcounty: " . json_encode($sub_county));

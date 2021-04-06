@@ -21,7 +21,10 @@ class SupervisionController extends Controller
         $pneumoniaCleanedData = [];
 
         foreach ($pneumoniaData as $d) {
-            $pneumoniaCleanedData[$d->assessment_type_step][] = $d;
+            if($d->assessment_type == "Baseline")
+                $pneumoniaCleanedData[$d->assessment_type][] = $d;
+            else
+                $pneumoniaCleanedData[$d->assessment_type_step][] = $d;
         }
 
         $diarrhoeaData = \App\DiarrhoeaCalculatedValue::select('*', \DB::raw('(ZINC + ORS) AS ZINC_ORS'), \DB::raw('(CASE WHEN DIFFERENCE > 0 THEN classified + NO_CLASS_CASES + DIFFERENCE ELSE classified + NO_CLASS_CASES END) AS TOTAL_CASES_AFTER_DIFF'), \DB::raw('IF (DIFFERENCE < 0, NOTX - DIFFERENCE, NOTX) AS NOTX_CALC'))->with('county', 'facility', 'subcounty')->get();
@@ -83,7 +86,6 @@ class SupervisionController extends Controller
         return $counties;
     }
 
-
     function getAssessmentTypes(){
         return \App\AssessmentType::all();
     }
@@ -110,12 +112,12 @@ FROM
         SUM( GENT ) AS GENT,
         ( SUM( BENZ ) + SUM( BENZ_GENT ) + SUM( GENT ) ) AS INJECTABLES,
         ( SUM( ANTI_OTHER ) ) AS OTHER,
-        c.NOTX 
+        c.NOTX
     FROM
         `pneumonia_treatment_data` t
-        JOIN ( SELECT county, SUM( NOTX_AFTER_DIF ) AS NOTX FROM pneumonia_tx_classification_agg_combined GROUP BY county ) c ON c.county = t.county 
+        JOIN ( SELECT county, SUM( NOTX_AFTER_DIF ) AS NOTX FROM pneumonia_tx_classification_agg_combined GROUP BY county ) c ON c.county = t.county
     GROUP BY
-    t.county 
+    t.county
     ) v";
     // echo $sql;die;
     $data = \DB::select($sql);
@@ -202,7 +204,7 @@ FROM
     function uploadCSV(Request $request){
         // echo "<pre>";print_r($request->input());die;
         \Log::debug("Input data: " . json_encode($request->input()));
-        
+
         $counties = "";
         $countyList = [];
         foreach ($request->input('county') as $key => $value) {
@@ -252,7 +254,7 @@ FROM
 
     function uploadData(Request $request){
         $legacyTmpData = \App\SupervisionDataLegacyTmp::count();
-        
+
         if($legacyTmpData > 0){
             $tempData = \App\SupervisionDataLegacyTmp::exclude(['created_at', 'updated_at', 'upload_id']);
         }else{
@@ -379,13 +381,13 @@ FROM
                 SUM( GENT ) AS GENT,
                 ( SUM( BENZ ) + SUM( BENZ_GENT ) + SUM( GENT ) ) AS INJECTABLES,
                 ( SUM( ANTI_OTHER ) ) AS OTHER,
-                c.NOTX 
+                c.NOTX
             FROM
                 `pneumonia_facility_treatment_data` t
                 JOIN ( SELECT sub_county, assessment, SUM( NOTX_AFTER_DIF ) AS NOTX FROM pneumonia_facility_tx_class_facility_agg GROUP BY sub_county ) c ON c.sub_county = t.sub_county
-                WHERE t.county = '{$request->county}' 
+                WHERE t.county = '{$request->county}'
             GROUP BY
-            t.sub_county 
+            t.sub_county
             ) v
                         GROUP BY sub_county, assessment";
             // echo $sql;die;
@@ -419,9 +421,9 @@ FROM
                     SUM(OTHER) AS OTHER,
                     sum(IF (DIFFERENCE < 0, NOTX - DIFFERENCE, NOTX)) AS NOTX
                 FROM
-                    `diarrhoea_case_tx_aggreagate` 
+                    `diarrhoea_case_tx_aggreagate`
                 WHERE
-                    county = '{$request->county}' 
+                    county = '{$request->county}'
                 GROUP BY
                     sub_county,
                     assessment";
@@ -461,13 +463,13 @@ FROM
         //         SUM( GENT ) AS GENT,
         //         ( SUM( BENZ ) + SUM( BENZ_GENT ) + SUM( GENT ) ) AS INJECTABLES,
         //         ( SUM( ANTI_OTHER ) ) AS OTHER,
-        //         c.NOTX 
+        //         c.NOTX
         //     FROM
         //         `pneumonia_facility_treatment_data` t
         //         JOIN ( SELECT sub_county, fname, facility_name, assessment, SUM( NOTX_AFTER_DIF ) AS NOTX FROM pneumonia_facility_tx_class_facility_agg GROUP BY sub_county ) c ON c.sub_county = t.sub_county
-        //         WHERE t.sub_county = '{$request->subcounty}' 
+        //         WHERE t.sub_county = '{$request->subcounty}'
         //     GROUP BY
-        //     t.fname 
+        //     t.fname
         //     ) v
         //                 GROUP BY fname, assessment";
 
@@ -542,32 +544,32 @@ FROM
     `supervision_data`.`sub_county` AS `sub county`,
     (
     CASE
-            
+
             WHEN ( `supervision_data`.`assessment_type_id` = 3 ) THEN
-            concat( `t`.`assessment_type`, ' ', CONVERT ( substring_index( `supervision_data`.`period`, ' ',- ( 1 ) ) USING utf8mb4 ) ) ELSE `t`.`assessment_type` 
-        END 
+            concat( `t`.`assessment_type`, ' ', CONVERT ( substring_index( `supervision_data`.`period`, ' ',- ( 1 ) ) USING utf8mb4 ) ) ELSE `t`.`assessment_type`
+        END
         ) AS `assessment`,
     (
-        ( ifnull( `supervision_data`.`sev_cases`, 0 ) + ifnull( `supervision_data`.`pneu_cases`, 0 ) ) + ifnull( `supervision_data`.`noc_cases`, 0 ) 
+        ( ifnull( `supervision_data`.`sev_cases`, 0 ) + ifnull( `supervision_data`.`pneu_cases`, 0 ) ) + ifnull( `supervision_data`.`noc_cases`, 0 )
     ) AS `PN_CLASSIFICATION`,
     `supervision_data`.`noclass_cases` AS `PN_NO_CLASSIFICATION`,
     (
         (
             (
-                ( ifnull( `supervision_data`.`d_shock_cases`, 0 ) + ifnull( `supervision_data`.`d_sev_cases`, 0 ) ) + ifnull( `supervision_data`.`d_some_cases`, 0 ) 
-            ) + ifnull( `supervision_data`.`d_nodehy_cases`, 0 ) 
-        ) + ifnull( `supervision_data`.`d_dys_cases`, 0 ) 
+                ( ifnull( `supervision_data`.`d_shock_cases`, 0 ) + ifnull( `supervision_data`.`d_sev_cases`, 0 ) ) + ifnull( `supervision_data`.`d_some_cases`, 0 )
+            ) + ifnull( `supervision_data`.`d_nodehy_cases`, 0 )
+        ) + ifnull( `supervision_data`.`d_dys_cases`, 0 )
     ) AS `DIA_CLASSIFICATION`,
-    `supervision_data`.`d_noclass_cases` AS `DIA_NO_CLASSIFICATION` 
+    `supervision_data`.`d_noclass_cases` AS `DIA_NO_CLASSIFICATION`
 FROM
     `supervision_data`
     JOIN assessment_types t ON t.id = supervision_data.assessment_type_id
     GROUP BY sub_county, (
     CASE
-            
+
             WHEN ( `supervision_data`.`assessment_type_id` = 3 ) THEN
-            concat( `t`.`assessment_type`, ' ', CONVERT ( substring_index( `supervision_data`.`period`, ' ',- ( 1 ) ) USING utf8mb4 ) ) ELSE `t`.`assessment_type` 
-        END 
+            concat( `t`.`assessment_type`, ' ', CONVERT ( substring_index( `supervision_data`.`period`, ' ',- ( 1 ) ) USING utf8mb4 ) ) ELSE `t`.`assessment_type`
+        END
         )";
 
         $classification = \DB::select($sql);
@@ -585,7 +587,7 @@ FROM
 
         // echo "<pre>";print_r($classification);die;
 
-        return $classification;   
+        return $classification;
     }
 
     function getFacilityPneumoniaTreatmentData(Request $request){
@@ -629,9 +631,9 @@ FROM
                     SUM(classified) AS TOTAL_CLASSIFIED,
                     SUM( NO_CLASS_CASES ) AS NO_CLASS_CASES,
                     SUM( classified + ( IF ( DIFFERENCE > 0, NO_CLASS_CASES + DIFFERENCE, NO_CLASS_CASES ) ) ) AS TOTAL_CASES_AFTER_DIFF,
-                    SUM( IF ( DIFFERENCE > 0, NOTX + DIFFERENCE, NOTX ) ) AS NOTX_AFTER_DIFF 
+                    SUM( IF ( DIFFERENCE > 0, NOTX + DIFFERENCE, NOTX ) ) AS NOTX_AFTER_DIFF
                 FROM
-                    `diarrhoea_case_tx_aggreagate` 
+                    `diarrhoea_case_tx_aggreagate`
                 WHERE
                     county = '{$request->county}'
                 GROUP BY
@@ -650,9 +652,9 @@ FROM
                     SUM(classified) AS TOTAL_CLASSIFIED,
                     SUM( NO_CLASS_CASES ) AS NO_CLASS_CASES,
                     SUM( classified + ( IF ( DIFFERENCE > 0, NO_CLASS_CASES + DIFFERENCE, NO_CLASS_CASES ) ) ) AS TOTAL_CASES_AFTER_DIFF,
-                    SUM( IF ( DIFFERENCE < 0, NOTX + abs( DIFFERENCE ), NOTX ) ) AS NOTX_AFTER_DIFF 
+                    SUM( IF ( DIFFERENCE < 0, NOTX + abs( DIFFERENCE ), NOTX ) ) AS NOTX_AFTER_DIFF
                 FROM
-                    `diarrhoea_case_tx_aggreagate` 
+                    `diarrhoea_case_tx_aggreagate`
                 WHERE
                     county = '{$request->county}'
                 GROUP BY
@@ -678,9 +680,9 @@ FROM
                     SUM(OTHER) AS OTHER,
                     sum(IF (DIFFERENCE < 0, NOTX - DIFFERENCE, NOTX)) AS NOTX
                 FROM
-                    `diarrhoea_case_tx_aggreagate` 
+                    `diarrhoea_case_tx_aggreagate`
                 WHERE
-                    county = '{$request->county}' 
+                    county = '{$request->county}'
                 GROUP BY
                     FACILITY_TYPE,
                     assessment";
@@ -702,9 +704,9 @@ FROM
                     SUM(classified) AS TOTAL_CLASSIFIED,
                     SUM( NO_CLASS_CASES ) AS NO_CLASS_CASES,
                     SUM( classified + ( IF ( DIFFERENCE > 0, NO_CLASS_CASES + DIFFERENCE, NO_CLASS_CASES ) ) ) AS TOTAL_CASES_AFTER_DIFF,
-                    SUM( IF ( DIFFERENCE < 0, NOTX + abs( DIFFERENCE ), NOTX ) ) AS NOTX_AFTER_DIFF 
+                    SUM( IF ( DIFFERENCE < 0, NOTX + abs( DIFFERENCE ), NOTX ) ) AS NOTX_AFTER_DIFF
                 FROM
-                    `diarrhoea_case_tx_aggreagate` 
+                    `diarrhoea_case_tx_aggreagate`
                 WHERE
                     sub_county = '{$request->subcounty}'
                 GROUP BY
@@ -730,9 +732,9 @@ FROM
                     SUM(OTHER) AS OTHER,
                     sum(IF (DIFFERENCE < 0, NOTX - DIFFERENCE, NOTX)) AS NOTX
                 FROM
-                    `diarrhoea_case_tx_aggreagate` 
+                    `diarrhoea_case_tx_aggreagate`
                 WHERE
-                    sub_county = '{$request->subcounty}' 
+                    sub_county = '{$request->subcounty}'
                 GROUP BY
                     facility_name,
                     assessment";
@@ -754,9 +756,9 @@ FROM
                     SUM(classified) AS TOTAL_CLASSIFIED,
                     SUM( NO_CLASS_CASES ) AS NO_CLASS_CASES,
                     SUM( classified + ( IF ( DIFFERENCE > 0, NO_CLASS_CASES + DIFFERENCE, NO_CLASS_CASES ) ) ) AS TOTAL_CASES_AFTER_DIFF,
-                    SUM( IF ( DIFFERENCE < 0, NOTX + abs( DIFFERENCE ), NOTX ) ) AS NOTX_AFTER_DIFF 
+                    SUM( IF ( DIFFERENCE < 0, NOTX + abs( DIFFERENCE ), NOTX ) ) AS NOTX_AFTER_DIFF
                 FROM
-                    `diarrhoea_case_tx_aggreagate` 
+                    `diarrhoea_case_tx_aggreagate`
                 WHERE
                     sub_county = '{$request->subcounty}'
                 GROUP BY
@@ -782,9 +784,9 @@ FROM
                     SUM(OTHER) AS OTHER,
                     sum(IF (DIFFERENCE < 0, NOTX - DIFFERENCE, NOTX)) AS NOTX
                 FROM
-                    `diarrhoea_case_tx_aggreagate` 
+                    `diarrhoea_case_tx_aggreagate`
                 WHERE
-                    sub_county = '{$request->subcounty}' 
+                    sub_county = '{$request->subcounty}'
                 GROUP BY
                     FACILITY_TYPE,
                     assessment";

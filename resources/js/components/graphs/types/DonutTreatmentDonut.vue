@@ -14,8 +14,10 @@
 			labels: { type: null, default: null },
 			colors: { type: null, default: null }
 		},
-		data: {
-			
+		data(){
+			return{
+
+            }
 		},
 		computed: {
 			graphOptions() {
@@ -33,7 +35,7 @@
 					})
 
 					obj.y = sortedData
-					
+
 					seriesData.push(obj)
 				})
 

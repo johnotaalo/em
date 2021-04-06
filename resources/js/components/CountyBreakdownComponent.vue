@@ -3,7 +3,7 @@
 		<div class="row">
 			<div class="col">
 				<div class="float-left">
-					
+
 				</div>
 			</div>
 		</div>
@@ -39,7 +39,7 @@
 				</b-form-group>
 			</div>
 		</div>
-		
+
 		<div class="row" v-if="!error">
 			<div class="col">
 				<b-card no-body>
@@ -104,7 +104,7 @@
 								<div class="col-md-5">
 									<highcharts :options="facilityDistributionChart" style="height: 500px;"></highcharts>
 								</div>
-								
+
 
 								<div class="col-md-6">
 									<center><h2>Classification</h2></center>
@@ -125,7 +125,7 @@
 											<donut-treatment-donut title = "Diarrhoea" :gdata="diarrhoeaDonutData" :labels = "diarrhoea.treatmentLabels" :colors="diarrhoea.colors"></donut-treatment-donut>
 										</div>
 									</div>
-									
+
 								</div>
 							</div>
 						</b-tab>
@@ -150,7 +150,7 @@
 											<center><h2 class="mt-6">Prescription Pattern</h2></center>
 											<graph-component :title = "selectedAssessment" :data = "subcountyPneumoniaTreatment" :county="county" :treatmentLabels = "pneumoniaTreatmentLabels" :subcounties="subcounties"></graph-component>
 											<!-- <graph-component v-for="(treatmentData, assessment) in data.pneumoniaTreat" :key="assessment" :title = "assessment" :data = "treatmentData" :county="county" :treatmentLabels = "pneumoniaTreatmentLabels" :subcounties="subcounties"></graph-component> -->
-											
+
 										</div>
 										<div class="col-5">
 											<!-- <h1><center>BY LEVEL OF CARE</center></h1> -->
@@ -198,14 +198,14 @@
 													<facility-sub-county-component :title = "selectedAssessment" :data = "data.facilityLocData" :county="county" :subcounties="subcounties" :subcounty="pneumonia.selectedSubcounty"></facility-sub-county-component>
 												</div>
 											</div>
-											
+
 										</div>
 									</div>
 							 	</b-tab>
 							 </b-tabs>
-							
 
-							
+
+
 						</b-tab>
 						<b-tab>
 							<template slot="title">
@@ -271,12 +271,12 @@
 													<diarrhoea-loc-prescription-pattern :title = "selectedAssessment" :data = "diarrhoea.locTreatmentData" :county="county" :subcounties="subcounties" :subcounty="diarrhoea.selectedSubcounty" :treatmentLabels = "diarrhoea.treatmentLabels" :treatmentColors="diarrhoea.colors"></diarrhoea-loc-prescription-pattern>
 												</div>
 											</div>
-											
+
 										</div>
 									</div>
 								</b-tab>
 							</b-tabs>
-							
+
 						</b-tab>
 					</b-tabs>
 				</b-card>
@@ -306,7 +306,7 @@
 	import NoDataComponent from './common/NoDataComponent'
 
 	exportingInit(Highcharts)
-	
+
 	export default {
 		props: {
 			id: { type: null, default: null },
@@ -426,7 +426,6 @@
 					facilityTreatmentData: [],
 					pneumoniaFacilityTreat: [],
 					facilityLocData: [],
-					diarrhoeaClass: [],
 					diarrhoeaTreat: [],
 					diarrhoeaLocClass: [],
 					diarrhoeaLocTreat: []
@@ -448,7 +447,7 @@
 				let _this = this
 
 				var facilityClassificationData = _.without(_.map(this.diarrhoeaPageData, (data) => {
-					if (_.upperCase(data.facility.SUB_COUNTY) == _.upperCase(subcounty) && data.assessment_type_step == assessment) {
+					if (_.upperCase(data.facility.SUB_COUNTY) === _.upperCase(subcounty) && data.assessment_type_step === assessment) {
 						return {
 							facility: data.facility.FACILITY_NAME,
 							classified: data.classified,
@@ -511,7 +510,7 @@
 				    },
 
 				    yAxis: {
-				       
+
 				        allowDecimals: false,
 				        min: 0,
 				        title: {
@@ -586,7 +585,7 @@
 				})
 			},
 			getFacilities(){
-				
+
 			},
 
 			getDiarrhoeaSubcountyClassificationData(){
@@ -602,7 +601,7 @@
 							diarrhoeaClassData[data.assessment][data.sub_county] = {}
 						}
 
-						diarrhoeaClassData[data.assessment][data.sub_county]['classified'] = data.TOTAL_CLASSIFIED; 
+						diarrhoeaClassData[data.assessment][data.sub_county]['classified'] = data.TOTAL_CLASSIFIED;
 						diarrhoeaClassData[data.assessment][data.sub_county]['notClassified'] = data.TOTAL_CASES_AFTER_DIFF - data.TOTAL_CLASSIFIED
 					})
 					// console.log(pneumoniaClassData)
@@ -614,7 +613,7 @@
 						if(!_.some(this.diarrhoeaSubCounties, sc)){
 							this.diarrhoeaSubCounties.push(sc)
 						}
-						
+
 					})
 					// console.log(this.subcounties)
 				})
@@ -726,7 +725,7 @@
 				    },
 
 				    yAxis: {
-				       
+
 				        allowDecimals: false,
 				        min: 0,
 				        title: {
@@ -809,7 +808,7 @@
 						if(!_.some(this.pneumoniaSubCounties, sc)){
 							this.pneumoniaSubCounties.push(sc)
 						}
-						
+
 					})
 					// console.log(this.subcounties)
 				})
@@ -1115,7 +1114,7 @@
 				    },
 
 				    yAxis: {
-				       
+
 				        allowDecimals: false,
 				        min: 0,
 				        title: {
@@ -1163,7 +1162,7 @@
 				this.data.facilityLocData = this.getFacilityLocTreatementData(newVal)
 			},
 			'diarrhoea.selectedSubcounty': function(newVal, oldVal){
-				
+
 				this.xfacilityChart = this.getSubCountyFacilityData(newVal, this.selectedAssessment)
 				this.diarrhoea.facilityTreatmentData = this.getDiarrhoeaFacilityTreatmentData(newVal, this.selectedAssessment);
 				this.diarrhoea.diarrhoeaLocClass = this.getDiarrhoeaFacilityLocClassificationData(newVal, this.selectedAssessment)
@@ -1175,7 +1174,7 @@
 					let url = "/dashboard/county/breakdown/" + county
 					window.location.href = url
 				}
-				
+
 			}
 		},
 		computed: {
@@ -1187,7 +1186,6 @@
 			},
 			pneumoniaTotals(){
 				var data = this.data.all.pneumonia[this.selectedAssessment]
-				console.log(data)
 
 				var total_cases_after_dif = _.sumBy(data, 'total_cases_after_dif');
 				var total_classified = _.sumBy(data, 'total_classified')
@@ -1514,7 +1512,7 @@
 				    },
 
 				    title: {
-				        text: 'Diarrhoea Case Classification' 
+				        text: 'Diarrhoea Case Classification'
 				    },
 
 				    xAxis: {
@@ -1522,7 +1520,7 @@
 				    },
 
 				    yAxis: {
-				       
+
 				        allowDecimals: false,
 				        min: 0,
 				        title: {
@@ -1613,7 +1611,7 @@
 				notClassifiedObj.data[0] = noAverage
 				seriesData.push(notClassifiedObj)
 				seriesData.push(obj)
-				
+
 				// })
 				return {
 				    chart: {
@@ -1626,7 +1624,7 @@
 				        categories: categories
 				    },
 				    yAxis: {
-				       
+
 				        allowDecimals: false,
 				        min: 0,
 				        title: {
@@ -1720,7 +1718,7 @@
 				    },
 
 				    yAxis: {
-				       
+
 				        allowDecimals: false,
 				        min: 0,
 				        title: {
@@ -1802,7 +1800,7 @@
 					seriesData.push(notClassifiedObj)
 					seriesData.push(obj)
 				// })
-					
+
 				return {
 				    chart: {
 				        type: 'column'
@@ -1925,8 +1923,8 @@
 				// 	})
 				// 	seriesData.push(obj)
 				// })
-				
-				
+
+
 				return {
 					chart: {
 				        type: 'column'
@@ -1998,12 +1996,12 @@
 						}else{
 							obj.data.push(0)
 						}
-						
+
 					})
 					seriesData.push(obj)
 				})
-				
-				
+
+
 				return {
 					chart: {
 				        type: 'column'
@@ -2071,8 +2069,8 @@
 					})
 					seriesData.push(obj)
 				})
-				
-				
+
+
 				return {
 					chart: {
 				        type: 'column'
@@ -2155,7 +2153,7 @@
 					obj.data.push(data.classified)
 					notClassifiedObj.data.push(data.not_classified)
 				})
-				
+
 
 					var data = obj.data;
 					var noData = notClassifiedObj.data;
@@ -2168,8 +2166,8 @@
 
 					seriesData.push(notClassifiedObj)
 					seriesData.push(obj)
-			
-					
+
+
 				return {
 				    chart: {
 				        type: 'column'
@@ -2232,7 +2230,7 @@
 				})).value()
 
 				cleanedData =_.sortBy(cleanedData, ['subcounty', 'ASC'])
-				
+
 				var obj = {};
 				var notClassifiedObj = {};
 				obj.name = "Classified"
@@ -2277,7 +2275,7 @@
 				    },
 
 				    yAxis: {
-				       
+
 				        allowDecimals: false,
 				        min: 0,
 				        title: {
@@ -2336,8 +2334,8 @@
 					})
 					seriesData.push(obj)
 				})
-				
-				
+
+
 				return {
 					chart: {
 				        type: 'column'
@@ -2402,14 +2400,14 @@
 				})
 
 				// console.log(specData)
-				
+
 
 				categories.unshift("<b>" + _.upperCase(this.county + " County") +" </b>")
 				var seriesData = []
-				
+
 				var stacks = ["baseline", "supervision1", "supervision2"]
 
-				
+
 
 				_.forOwn(this.pneumoniaTreatmentLabels, (treatment, key) => {
 					var obj = {}
@@ -2424,8 +2422,8 @@
 					})
 					seriesData.push(obj)
 				})
-				
-				
+
+
 				return {
 					chart: {
 				        type: 'column'
@@ -2494,8 +2492,8 @@
 					})
 					seriesData.push(obj)
 				})
-				
-				
+
+
 				return {
 					chart: {
 				        type: 'column'
