@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="d1a20898-e408-4314-8e4f-c78559f6a25a" name="Default Changelist" comment="" />
+    <list default="true" id="d1a20898-e408-4314-8e4f-c78559f6a25a" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/NewNationalDashboardComponent.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/NewNationalDashboardComponent.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/graphs/snapshot/DiseaseAreaGauge.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/graphs/snapshot/DiseaseAreaGauge.vue" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ComposerSettings" synchronizationState="SYNCHRONIZE">
+  <component name="ComposerSettings" doNotAsk="true" synchronizationState="SYNCHRONIZE">
     <pharConfigPath>$PROJECT_DIR$/composer.json</pharConfigPath>
     <execution />
   </component>
@@ -176,7 +181,8 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1617709881922</updated>
-      <workItem from="1617709888545" duration="21833000" />
+      <workItem from="1617709888545" duration="22826000" />
+      <workItem from="1617775865012" duration="3187000" />
     </task>
     <servers />
   </component>

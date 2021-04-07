@@ -94,6 +94,10 @@ export default {
             counties: [],
             nationalData: {
                 all: {}
+            },
+            columnColors: {
+                'Baseline': '#F7A35C',
+                'Facility Supervision': '#FF7599'
             }
         }
     },
@@ -138,13 +142,17 @@ export default {
                         supervisiondata[supervision] = []
                     }
                     _.each(supervisionData, data => {
-                        supervisiondata[supervision].push({
-                            id: data.facility.SURVEY_CTO_ID,
-                            facility: data.facility.FACILITY_NAME,
-                            type: data.facility.FACILITY_TYPE,
-                            county_id: data.county.id,
-                            county: data.county.county
-                        })
+                        if(data.facility != null) {
+                            supervisiondata[supervision].push({
+                                id: data.facility.SURVEY_CTO_ID,
+                                facility: data.facility.FACILITY_NAME,
+                                type: data.facility.FACILITY_TYPE,
+                                county_id: data.county.id,
+                                county: data.county.county
+                            })
+                        }else{
+                            console.log(data.fname)
+                        }
                     })
                 })
             })
@@ -202,9 +210,9 @@ export default {
                 let obj = {}
                 obj.name = supervision
                 obj.data = []
+                obj.color = (this.columnColors[supervision])
 
-                let total_cases_after_dif = _.sumBy(supervisionData, 'total_cases_after_dif');
-                // let total_classified = _.sumBy(supervisionData, 'total_classified')
+                let total_cases_after_dif = _.sumBy(supervisionData, 'total_cases_after_dif')
 
                 obj.data.push(total_cases_after_dif)
 
@@ -237,6 +245,7 @@ export default {
                 let obj = {}
                 obj.name = supervision
                 obj.data = []
+                obj.color = (this.columnColors[supervision])
 
                 let total_cases_after_dif = _.sumBy(supervisionData, 'TOTAL_CASES_AFTER_DIFF');
                 // let total_classified = _.sumBy(supervisionData, 'total_classified')

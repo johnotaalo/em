@@ -1,5 +1,6 @@
 <template>
     <div>
+        <h3 class="text-center">{{ this.assessment }}</h3>
         <highcharts :options="graphOptions"></highcharts>
     </div>
 </template>
@@ -46,9 +47,7 @@ export default {
                     height: '150px'
                 },
 
-                title: {
-                    text: this.assessment
-                },
+                title: null,
 
                 pane: {
                     startAngle: -90,
