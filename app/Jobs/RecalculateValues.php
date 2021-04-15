@@ -173,8 +173,12 @@ class RecalculateValues implements ShouldQueue
     foreach (array_chunk($pneuClassInsertData, 1000) as $d) {
       \App\PneumoniaCalculatedValue::insert($d);
     }
+
+    foreach (array_chunk($diarrhoeaInsertData, 1000) as $d) {
+      \App\DiarrhoeaCalculatedValue::insert($d);
+    }
     
-    \App\DiarrhoeaCalculatedValue::insert($diarrhoeaInsertData);
+    
     \Log::debug("Successfully inserted data");
     // dd($pneuClassInsertData);
     }
