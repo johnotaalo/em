@@ -16,6 +16,17 @@
                     </div>
                 </b-card>
 
+                <h3>County Assessment Breakdown</h3>
+                <div class="card mb-0" style="padding-top: 15px;">
+                    <div class="row" style="text-align: center;">
+                        <div class="col-md" v-for="(counties, supervision) in supervisionCounties" :key="supervision">
+                            <h5>{{ supervision }}</h5>
+                            <h1>{{ counties.length }}</h1>
+                        </div>
+                    </div>
+                </div>
+                <hr/>
+
                 <h3>Facilities</h3>
                 <div class="card mb-0" style="padding-top: 15px;">
                     <div class="row" style="text-align: center;">
@@ -148,6 +159,34 @@ export default {
                                 facility: data.facility.FACILITY_NAME,
                                 type: data.facility.FACILITY_TYPE,
                                 county_id: data.county.id,
+                                county: data.county.county
+                            })
+                        }else{
+                            console.log(data.cname)
+                        }
+                    })
+                })
+            })
+
+            _.each(supervisiondata, (data, supervision) => {
+                supervisiondata[supervision] = _.uniqBy(data, 'id')
+            })
+
+            return supervisiondata
+        },
+        supervisionCounties: function(){
+            let supervisiondata = {};
+
+            _.each( this.pageData, (diseaseData, disease) => {
+                _.each(diseaseData, (supervisionData, supervision) => {
+                    if( typeof supervisiondata[supervision] === "undefined" ){
+                        supervisiondata[supervision] = []
+
+                    }
+                    _.each(supervisionData, data => {
+                        if(data.county != null) {
+                            supervisiondata[supervision].push({
+                                id: data.county.id,
                                 county: data.county.county
                             })
                         }else{

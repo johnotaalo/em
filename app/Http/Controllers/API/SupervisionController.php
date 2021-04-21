@@ -17,7 +17,7 @@ class SupervisionController extends Controller
     }
 
     function getNationalData(){
-        $pneumoniaData = \App\PneumoniaCalculatedValue::select('*', \DB::raw('(CASE WHEN treatment_diff > 0 THEN treatment_diff + NOTX ELSE NOTX END) AS NOTX_DIFF'))->with('county', 'facility', 'subcounty')->get();
+        $pneumoniaData = \App\PneumoniaCalculatedValue::select('*', \DB::raw('(CASE WHEN treatment_diff > 0 THEN treatment_diff + NOTX ELSE NOTX END) AS NOTX_DIFF'))->with('county', 'facility', 'subcounty')->orderBy('assessment_type_step', 'ASC')->get();
         $pneumoniaCleanedData = [];
 
         foreach ($pneumoniaData as $d) {
@@ -27,7 +27,7 @@ class SupervisionController extends Controller
                 $pneumoniaCleanedData[$d->assessment_type_step][] = $d;
         }
 
-        $diarrhoeaData = \App\DiarrhoeaCalculatedValue::select('*', \DB::raw('(ZINC + ORS) AS ZINC_ORS'), \DB::raw('(CASE WHEN DIFFERENCE > 0 THEN classified + NO_CLASS_CASES + DIFFERENCE ELSE classified + NO_CLASS_CASES END) AS TOTAL_CASES_AFTER_DIFF'), \DB::raw('IF (DIFFERENCE < 0, NOTX - DIFFERENCE, NOTX) AS NOTX_CALC'))->with('county', 'facility', 'subcounty')->get();
+        $diarrhoeaData = \App\DiarrhoeaCalculatedValue::select('*', \DB::raw('(ZINC + ORS) AS ZINC_ORS'), \DB::raw('(CASE WHEN DIFFERENCE > 0 THEN classified + NO_CLASS_CASES + DIFFERENCE ELSE classified + NO_CLASS_CASES END) AS TOTAL_CASES_AFTER_DIFF'), \DB::raw('IF (DIFFERENCE < 0, NOTX - DIFFERENCE, NOTX) AS NOTX_CALC'))->orderBy('assessment_type_step', 'ASC')->with('county', 'facility', 'subcounty')->get();
 
         $diarrhoeaCleanedData = [];
 
