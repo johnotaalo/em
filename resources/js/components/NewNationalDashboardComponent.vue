@@ -108,7 +108,8 @@ export default {
             },
             columnColors: {
                 'Baseline': '#F7A35C',
-                'Facility Supervision': '#FF7599'
+                'Facility Supervision 1': '#8085E9',
+                'Facility Supervision 2': '#F15C80'
             }
         }
     },
