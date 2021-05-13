@@ -36,10 +36,6 @@ class DataController extends Controller
     	return view('dashboard.data.uploadpage');
     }
 
-    function facilitiesPage(){
-      return view('dashboard.data.facilities');
-    }
-
     function pullCalculatedData(){
 
       $diarrhoeaData = \DB::select('SELECT * FROM diarrhoea_case_tx_aggreagate');

@@ -47,6 +47,7 @@ Route::prefix('data')->group(function(){
 	Route::get('upload/{warning}', 'API\SupervisionController@uploadData');
 
 	Route::get('counties', 'API\SupervisionController@getCounties');
+	Route::get('counties-and-subcounties', 'API\SupervisionController@getCountiesSubcounties');
 	Route::get('assessmentTypes', 'API\SupervisionController@getAssessmentTypes');
 
 	Route::get('county-facilities-supervisions', 'API\SupervisionController@getCountiesFacilitySupervision');
@@ -78,4 +79,10 @@ Route::prefix('data')->group(function(){
 
 	Route::get('county/breakdown/{county_id}', 'API\SupervisionController@getCountyBreakdownData');
 	Route::get('national', 'API\SupervisionController@getNationalData');
+
+	Route::get('facility-listing', 'API\FacilityController@search');
+
+	Route::get('facility-types', 'Api\FacilityController@getFacilityTypes');	
 });
+
+Route::post('facilities/add', 'API\FacilityController@store');

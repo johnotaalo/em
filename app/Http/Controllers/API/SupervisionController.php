@@ -86,6 +86,12 @@ class SupervisionController extends Controller
         return $counties;
     }
 
+    function getCountiesSubcounties(){
+        $counties = \App\County::with('subcounties')->orderBy('county', 'ASC')->get();
+
+        return $counties;
+    }
+
     function getAssessmentTypes(){
         return \App\AssessmentType::all();
     }

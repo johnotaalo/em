@@ -26,6 +26,11 @@
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
+    <script type="text/javascript">
+        window.Laravel = {
+            baseUrl: "<?php echo URL::to('/');; ?>"
+        };
+    </script>
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}" defer></script>
 

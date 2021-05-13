@@ -94,6 +94,9 @@ Vue.component('user-edit', require('./components/users/UserEdit.vue').default);
 Vue.component('country-overview', require('./components/CountryOverview.vue').default)
 Vue.component('no-data-component', require('./components/common/NoDataComponent').default);
 Vue.component('new-national-dashboard', require('./components/NewNationalDashboardComponent').default);
+Vue.component('facility-listing', require('./components/facilityListing/FacilityListing').default);
+Vue.component('facility-index', require('./components/facilityListing/FacilityIndex').default);
+Vue.component('facility-add', require('./components/facilityListing/FacilityAdd').default);
 Vue.component('loading', VueLoading)
 /**
  * Next, we will create a fresh Vue application instance and attach it to

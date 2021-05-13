@@ -23,7 +23,10 @@ Route::get('data/upload', 'Dashboard\DataController@uploadPage')->name('upload-p
 Route::get('data/upload/cancel', 'Dashboard\DataController@cancelUpload')->name('upload-page');
 Route::get('data/counties', 'Dashboard\DataController@countyPage')->name('county-page');
 
-Route::get('data/facilities', 'Dashboard\DataController@facilitiesPage')->name('facilities');
+Route::prefix('data/facilities')->group(function(){
+	Route::get('/', 'Dashboard\FacilityController@facilitiesPage')->name('facilities');
+	Route::get('/add', 'Dashboard\FacilityController@add')->name('add-facility');
+});
 Route::get('data/pull', 'Dashboard\DataController@pullCalculatedData');
 
 Route::get('directory', 'Dashboard\DataController@directory')->name('directory');
