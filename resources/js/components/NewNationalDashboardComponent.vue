@@ -55,24 +55,63 @@
                     </div>
                 </div>
 
-                <h3>Classification</h3>
-                <b-card>
-                    <div class="row" v-for="(supervisiondata, disease) in pageData" :key="disease">
-                        <div class="col-md-12">
-                            <p style="text-transform: capitalize"><b>{{ disease }}</b></p>
-                            <div class="row">
-                                <div class="col-md" v-for="(assessmentData, assessment) in supervisiondata" :key="assessment">
-                                    <disease-area-gauge type="classification"  :disease-area="disease" :assessment="assessment" :assessment-data="assessmentData"></disease-area-gauge>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h4 class="card-header-title">
+                                    Classification
+                                </h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row" v-for="(supervisiondata, disease) in pageData" :key="disease">
+                            <div class="col-md-12">
+                                <p style="text-transform: capitalize"><b>{{ disease }}</b></p>
+                                <div class="row">
+                                    <div class="col-md" v-for="(assessmentData, assessment) in supervisiondata" :key="assessment">
+                                        <disease-area-gauge type="classification"  :disease-area="disease" :assessment="assessment" :assessment-data="assessmentData"></disease-area-gauge>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </b-card>
+
+                    <table class="table table-sm table-bordered table-nowrap card-table">
+                        <thead>
+                            <th style="width: 37%"></th>
+                            <th v-for="(assessment) in pageAssessments" :key="assessment" style="width: 21%;">
+                                <center>{{ assessment }}</center>
+                            </th>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(supervisiondata, disease) in pageData" :key="disease">
+                                <th style="text-transform: capitalize;">{{ disease }}</th>
+                                <td v-for="(assessmentData, assessment) in supervisiondata" :key="assessment">
+                                    <center>
+                                        <b-link>
+                                            {{ calculateClassificationPercentage(disease, assessmentData) }}%
+                                        </b-link>
+                                    </center>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
                 <hr/>
 
-                <h3>Treatment</h3>
-                <b-card>
-                    <div class="row" v-for="(supervisiondata, disease) in pageData">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h4 class="card-header-title">
+                                    Treatment
+                                </h4>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- <div class="row" v-for="(supervisiondata, disease) in pageData">
                         <div class="col-md-12">
                             <p style="text-transform: capitalize"><b>{{ disease }}</b></p>
                             <div class="row">
@@ -81,8 +120,28 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </b-card>
+                    </div> -->
+                    <table class="table table-sm table-bordered card-table">
+                        <thead>
+                            <th style="width: 37%"></th>
+                            <th v-for="(assessment) in pageAssessments" :key="assessment" style="width: 21%;">
+                                <center>{{ assessment }}</center>
+                            </th>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(supervisiondata, disease) in pageData" :key="disease">
+                                <th style="text-transform: capitalize;">{{ disease }}</th>
+                                <td v-for="(assessmentData, assessment) in supervisiondata" :key="assessment">
+                                    <center>
+                                        <b-link>
+                                            {{ calculateTreatmentPercentage(disease, assessment, assessmentData) }}%
+                                        </b-link>
+                                    </center>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -142,6 +201,43 @@ export default {
         },
         clearSelectedCounty: function(){
             this.filters.selectedCounty = ""
+        },
+        calculateClassificationPercentage(disease, assessmentData){
+            if (disease === "pneumonia") {
+                return _.round((_.sumBy(assessmentData, 'total_classified')) / (_.sumBy(assessmentData, 'total_cases_after_dif')) * 100)
+            }
+
+            return _.round((_.sumBy(assessmentData, 'classified')) / (_.sumBy(assessmentData, 'TOTAL_CASES_AFTER_DIFF')) * 100)
+        },
+        calculateTreatmentPercentage(disease, assessment, assessmentData){
+            let total_recommended_treatment = 0
+            let total_treatment = 0
+            let gdata = 0
+
+            if (disease === "pneumonia") {
+                if (assessment === "Baseline") {
+                    total_recommended_treatment = _.sumBy(assessmentData, 'AMOX_SYRUP')
+                }else{
+                    total_recommended_treatment = _.sumBy(assessmentData, 'AMOXDT')
+                }
+
+                let totalsArray = _.map(assessmentData, (data) => {
+                   return data.AMOXDT + data.AMOX_SYRUP + data.CTX + data.INJECTABLES + data.NOTX + data.OTHER + data.OXYGEN
+                })
+
+                total_treatment = _.sum(totalsArray)
+            } else {
+                total_recommended_treatment = _.sumBy(assessmentData, 'COP')
+                let totalsArray = _.map(assessmentData, (data) => {
+                    return data.ANTIBIOTICS + data.COP + data.IV + data.NOTX + data.ORS + data.OTHER + data.ZINC
+                })
+
+                total_treatment = _.sum(totalsArray)
+            }
+
+            gdata = _.round((total_recommended_treatment / total_treatment) * 100)
+
+            return gdata
         }
     },
     computed: {
@@ -312,6 +408,16 @@ export default {
                 },
                 series: seriesData,
             }
+        },
+        pageAssessments: function(){
+            let diarrhoeaData = this.pageData.diarrhoea
+            let assessments = [];
+
+            _.forOwn(diarrhoeaData, (supervisionData, supervision) => {
+                assessments.push(supervision)
+            })
+
+            return assessments
         }
     }
 }
