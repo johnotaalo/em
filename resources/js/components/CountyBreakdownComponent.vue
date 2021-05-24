@@ -341,7 +341,8 @@
 				pneumoniaSubCounties: [],
 				diarrhoeaSubCounties: [],
 				diarrhoeaSubCountiesX: [],
-				pneumoniaTreatmentLabels: {NOTX: "No Treatment",
+				pneumoniaTreatmentLabels: {
+				    NOTX: "No Treatment",
 					AMOXDT: "Amox DT",
 					AMOX_SYRUP: "Amox Syrup",
 					CTX: "CTX",

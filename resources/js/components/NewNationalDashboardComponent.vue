@@ -133,7 +133,7 @@
                                 <th style="text-transform: capitalize;">{{ disease }}</th>
                                 <td v-for="(assessmentData, assessment) in supervisiondata" :key="assessment">
                                     <center>
-                                        <b-link>
+                                        <b-link v-b-modal.gaugeModal @click="modal.assessment = assessment; modal.disease = disease;">
                                             {{ calculateTreatmentPercentage(disease, assessment, assessmentData) }}%
                                         </b-link>
                                     </center>
@@ -144,20 +144,37 @@
                 </div>
             </div>
         </div>
+
+        <dashboard-modal ref="dashboardModal" :assessment="modal.assessment" :disease="modal.disease" :data="dashboardModalData"></dashboard-modal>
+        <!-- <modal ref="chartModal">
+            <template v-slot:header>
+                <h1>Modal title</h1>
+            </template>
+
+            <template v-slot:body>
+                <p>Graph comes here</p>
+            </template>
+        </modal> -->
     </div>
 </template>
 
 <script>
 import FacilityTypeDonut from "./graphs/snapshot/FacilityTypeDonut"
 import DiseaseAreaGauge from "./graphs/snapshot/DiseaseAreaGauge";
+// import Modal from "./common/Modal"
+import DashboardModal from "./graphs/snapshot/DashboardModal";
 
 export default {
     name: "NewNationalDashboardComponent",
-    components: { FacilityTypeDonut, DiseaseAreaGauge },
+    components: { FacilityTypeDonut, DiseaseAreaGauge, DashboardModal },
     data(){
         return {
             dataLoading: false,
             loaderColor: "#2196F3",
+            modal: {
+                disease: "",
+                assessment: ""
+            },
             filters: {
                 selectedCounty: ""
             },
@@ -338,6 +355,14 @@ export default {
                 return cleanedPageData
             }
         },
+        dashboardModalData: function(){
+            if(this.modal.disease){
+                let filteredData = this.pageData[this.modal.disease][this.modal.assessment]
+                return filteredData
+            }
+
+            return []
+        },
         pneumoniaCasesAssessed: function(){
             let pneumoniaData = this.pageData.pneumonia
             let seriesData = []
@@ -423,6 +448,8 @@ export default {
 }
 </script>
 
-<style scoped>
-
+<style lang="scss">
+    .overflow-hidden {
+        overflow: hidden
+    }
 </style>
