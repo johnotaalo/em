@@ -97,6 +97,8 @@ Vue.component('new-national-dashboard', require('./components/NewNationalDashboa
 Vue.component('facility-listing', require('./components/facilityListing/FacilityListing').default);
 Vue.component('facility-index', require('./components/facilityListing/FacilityIndex').default);
 Vue.component('facility-add', require('./components/facilityListing/FacilityAdd').default);
+Vue.component('facility-edit', require('./components/facilityListing/FacilityEdit').default)
+Vue.component('temporary-facilities', require('./components/facilityListing/TemporaryFacilities').default);
 Vue.component('loading', VueLoading)
 /**
  * Next, we will create a fresh Vue application instance and attach it to

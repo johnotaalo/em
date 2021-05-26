@@ -26,6 +26,8 @@ Route::get('data/counties', 'Dashboard\DataController@countyPage')->name('county
 Route::prefix('data/facilities')->group(function(){
 	Route::get('/', 'Dashboard\FacilityController@facilitiesPage')->name('facilities');
 	Route::get('/add', 'Dashboard\FacilityController@add')->name('add-facility');
+    Route::get('/edit/{id}', 'Dashboard\FacilityController@edit')->name('edit-facility');
+	Route::get('/uploads/temporary', 'Dashboard\FacilityController@temporaryFacilityList')->name('temporary-facility-list');
 });
 Route::get('data/pull', 'Dashboard\DataController@pullCalculatedData');
 

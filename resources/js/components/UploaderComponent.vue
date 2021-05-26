@@ -29,7 +29,7 @@
 						<v-select v-model="form.county" :multiple="multiselect" label="text" :options="selectCounties"></v-select>
 					</div>
 
-					<div class="form-group"> 
+					<div class="form-group">
 						<label class="control-label">Select the period <span class="text-danger" v-if="form.assessmentType == 3">when the budget was approved</span></label>
 						<div class="row">
 							<div class="col-sm">
@@ -137,7 +137,7 @@ export default {
 			this.$refs.dropzone.processQueue();
 		},
 		downloadTemplate: function(format){
-			if(format == "current"){
+			if(format === "current"){
 				window.location.href = "/templates/supervision_data_template.csv"
 			}
 			else{

@@ -2,6 +2,12 @@
 	<div>
 		<div class="card">
 			<div class="card-body">
+                <b-alert :show="showAlert" variant="danger" dismissible>
+                    <p>There are some errors with your request</p>
+                    <ul>
+                        <li v-for="(error, key, index) in form.errors.errors">{{ error }}</li>
+                    </ul>
+                </b-alert>
 				<b-form>
 					<b-form-group label="Facility Name">
 						<b-input v-model="form.facility_name"></b-input>
@@ -48,6 +54,7 @@
 		data(){
 			return {
 				countyList: "",
+                showAlert: false,
 				facilityTypeList: [],
 				statusList: [
 					{value: 1, text: "Active"},
@@ -85,12 +92,15 @@
 				});
 			},
 			submitData: function(){
-				this.form.post('/api/facilities/add')
+				this.form.post('/api/facilities')
 				.then(res => {
-					$swal('Success', "Successfully added facility", "success")
+					alert('Successfully added facility to listing')
+                    window.location = "/data/facilities"
 				})
 				.catch(error => {
 					alert(error.message)
+                    this.form.errors = error
+                    this.showAlert = true
 				})
 			}
 		},

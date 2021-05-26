@@ -81,8 +81,20 @@ Route::prefix('data')->group(function(){
 	Route::get('national', 'API\SupervisionController@getNationalData');
 
 	Route::get('facility-listing', 'API\FacilityController@search');
+	Route::put('facility/update-status/{id}', 'API\FacilityController@updateFacilityStatus');
+	Route::post('facility/upload-listing', 'API\FacilityController@uploadListing');
+	Route::get('temporary-facilities', 'API\FacilityController@getTemporaryFacilities');
+	Route::delete('temporary-facilities/{id}', 'API\FacilityController@deleteTemporaryFacility');
+	Route::post('remove-duplicate-temporary-listing', 'API\FacilityController@removeDuplicateTemporaryFacilities');
+	Route::post('confirm-temporary-listing', 'API\FacilityController@moveTemporaryToFacilityListing');
+	Route::post('empty-temporary-facility-listing', 'API\FacilityController@emptyTemporaryFacilityListing');
+	Route::get('facility-temporary-listing-count', function(){
+	    return ['count' => \App\FacilityUploadTmp::count()];
+    });
 
-	Route::get('facility-types', 'Api\FacilityController@getFacilityTypes');	
+	Route::get('facility-types', 'API\FacilityController@getFacilityTypes');
 });
 
-Route::post('facilities/add', 'API\FacilityController@store');
+Route::post('facilities', 'API\FacilityController@store');
+Route::put('facilities', 'API\FacilityController@update');
+Route::get('facilities/{id}', 'API\FacilityController@get');
