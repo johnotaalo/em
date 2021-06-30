@@ -280,6 +280,7 @@
 						</b-tab>
 					</b-tabs>
 				</b-card>
+                <county-breakdown-table :county="selectedCounty" :pneumoniaData="data.all.pneumonia" :diarrhoeaData="data.all.diarrhoea" :assessments="assessmentOptions"></county-breakdown-table>
 			</div>
 		</div>
 		<div v-else>
@@ -302,6 +303,7 @@
 	import DiarrhoeaLocTreatments from './graphs/DiarrhoeaLocTreatments'
 	import DiarrhoeaFacilityPrescriptionPattern from  './graphs/DiarrhoeaFacilityPrescriptionPattern'
 	import DiarrhoeaLocPrescriptionPattern from './graphs/DiarrhoeaLocPrescriptionPattern'
+    import CountyBreakdownTable from "./graphs/county/CountyBreakdownTable";
 
 	import NoDataComponent from './common/NoDataComponent'
 
@@ -319,7 +321,7 @@
 			legacydata: { type: null, default: null },
 			error: { type: null, default: null }
 		},
-		components: { NoDataComponent, GraphComponent, LocGraphComponent, FacilityGraphComponent, FacilitySubCountyComponent, DiarrhoeaSubcountyTreatment, DiarrhoeaLocTreatments, DiarrhoeaFacilityPrescriptionPattern, DiarrhoeaLocPrescriptionPattern, GaugeComponent, DonutTreatmentDonut },
+		components: {CountyBreakdownTable, NoDataComponent, GraphComponent, LocGraphComponent, FacilityGraphComponent, FacilitySubCountyComponent, DiarrhoeaSubcountyTreatment, DiarrhoeaLocTreatments, DiarrhoeaFacilityPrescriptionPattern, DiarrhoeaLocPrescriptionPattern, GaugeComponent, DonutTreatmentDonut },
 		data(){
 			return {
 				selectedAssessment: "",
@@ -578,6 +580,8 @@
 						value: subcounty.sub_county,
 						text: subcounty.sub_county
 					}))
+
+                    this.options.subcounties = res.data
 
 					this.subcounties = [{sub_county: "<b>" + _.upperCase(this.county + " County") +" </b>"}];
 					_.forOwn(res.data, (subcounty) => {
@@ -1585,17 +1589,6 @@
 				obj.color = this.pneumoniaColor
 				notClassifiedObj.color = this.notclassifiedColor.color
 				notClassifiedObj.borderColor = "red"
-				// _.forOwn(categories, (subcounty, k) => {
-				// 	if(k != 0){
-				// 		if(typeof categoryData[subcounty] == "undefined"){
-				// 			obj.data.push(0)
-				// 			notClassifiedObj.data.push(0)
-				// 		}else{
-				// 			obj.data.push(categoryData[subcounty]['classified'])
-				// 			notClassifiedObj.data.push(categoryData[subcounty]['notClassified'])
-				// 		}
-				// 	}
-				// })
 
 				_.forOwn(cleanedSubcountyData, (data, k) => {
 					var key = k + 1;

@@ -2,22 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d1a20898-e408-4314-8e4f-c78559f6a25a" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/database/migrations/2021_05_26_163015_add_timestamps_to_facilities.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/templates/facility_upload_template.xlsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/components/facilityListing/FacilityEdit.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/components/facilityListing/TemporaryFacilities.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/dashboard/data/editFacility.blade.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/dashboard/data/temporaryFacilities.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/js/components/graphs/county/CountyBreakdownTable.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Facility.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Facility.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/API/FacilityController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/API/FacilityController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Dashboard/FacilityController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Dashboard/FacilityController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/UploaderComponent.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/UploaderComponent.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/facilityListing/FacilityAdd.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/facilityListing/FacilityAdd.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/facilityListing/FacilityListing.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/facilityListing/FacilityListing.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/api.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/CountyBreakdownComponent.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/CountyBreakdownComponent.vue" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -184,11 +171,26 @@
     <property name="ts.external.directory.path" value="C:\Program Files\JetBrains\PhpStorm 2021.1.1\plugins\JavaScriptLanguage\jsLanguageServicesImpl\external" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="PHPUnit.phpunit.xml">
     <configuration name="phpunit.xml" type="PHPUnitRunConfigurationType" factoryName="PHPUnit">
       <TestRunner scope="XML" />
       <method v="2" />
     </configuration>
+    <configuration name="watch" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="watch" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="npm.watch" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -207,7 +209,10 @@
       <workItem from="1621878189461" duration="3830000" />
       <workItem from="1621925533819" duration="14374000" />
       <workItem from="1622018844576" duration="2496000" />
-      <workItem from="1622031142238" duration="10506000" />
+      <workItem from="1622031142238" duration="11979000" />
+      <workItem from="1622107703931" duration="1443000" />
+      <workItem from="1622109179765" duration="9117000" />
+      <workItem from="1622360891155" duration="722000" />
     </task>
     <servers />
   </component>
