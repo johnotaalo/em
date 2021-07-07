@@ -72,7 +72,7 @@ class FacilityController extends Controller
 
         $facility = new \App\Facility();
 
-        $facility->COUNTY = $request->county['label'];
+        $facility->COUNTY = (\App\County::find($request->county['value'])->first())->county;
         $facility->COUNTY_ID = $request->county['value'];
         $facility->SUB_COUNTY = $request->sub_county['label'];
         $facility->SUB_COUNTY_ID = $request->sub_county['value'];

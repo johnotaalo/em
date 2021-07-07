@@ -4,12 +4,12 @@
             <div class = "card-header">
                 <h3 class="card-title">Classification</h3>
             </div>
-            <div class="card-body">
+            <!-- <div class="card-body">
                 <b-button @click="displaySubcountiesClassificationData">Get Data</b-button>
                 <pre>
                     {{ rawData }}
                 </pre>
-            </div>
+            </div> -->
             <table class = "table table-bordered table-sm card-table">
                 <thead>
                     <tr>
